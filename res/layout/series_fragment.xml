@@ -1,0 +1,112 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+
+<LinearLayout 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <TextView
+        android:id="@+id/series_fragment_id"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Info" />
+
+    <TextView
+        android:id="@+id/series_header"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Title"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+	<ScrollView
+	    android:id="@+id/series_fragment"
+	    android:layout_width="match_parent"
+	    android:layout_height="fill_parent" >
+
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:orientation="vertical" >
+
+	        <WebView
+	            android:id="@+id/series_fragment_overview"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:scrollbars="none" />
+
+	        <LinearLayout
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content" >
+
+	            <RelativeLayout
+	                android:layout_width="60dp"
+	                android:layout_height="fill_parent" >
+
+	                <ImageView
+	                    android:id="@+id/imageView1"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:layout_centerHorizontal="true"
+	                    android:layout_centerInParent="true"
+	                    android:src="@drawable/vote_star" />
+
+	                <TextView
+	                    android:id="@+id/series_page_voting"
+	                    android:layout_width="fill_parent"
+	                    android:layout_height="fill_parent"
+	                    android:layout_centerHorizontal="true"
+	                    android:layout_centerVertical="true"
+	                    android:gravity="center_vertical|center_horizontal|center"
+	                    android:text="-/-"
+	                    android:textStyle="bold" />
+	            </RelativeLayout>
+
+	            <LinearLayout
+	                android:layout_width="fill_parent"
+	                android:layout_height="match_parent"
+	                android:orientation="vertical" >
+
+	                <TextView
+	                    android:id="@+id/series_page_genres"
+	                    android:layout_width="fill_parent"
+	                    android:layout_height="wrap_content"
+	                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+	                <TextView
+	                    android:id="@+id/series_page_first_aired"
+	                    android:layout_width="fill_parent"
+	                    android:layout_height="wrap_content"
+	                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+	                <TextView
+	                    android:id="@+id/series_page_last_aired"
+	                    android:layout_width="fill_parent"
+	                    android:layout_height="wrap_content"
+	                    android:textAppearance="?android:attr/textAppearanceMedium" />
+	            </LinearLayout>
+	        </LinearLayout>
+
+	        <TableLayout
+	            android:id="@+id/series_page_info_table"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:stretchColumns="*" >
+	        </TableLayout>
+	    </LinearLayout>
+
+	</ScrollView>
+
+  </LinearLayout>
+
+<ProgressBar
+    android:id="@+id/series_fragment_progress"
+    style="?android:attr/progressBarStyleLarge"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="true" />
+
+</RelativeLayout>	
