@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import net.oncaphillis.whatsontv.SearchThread.Current;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -116,31 +117,36 @@ public class MainFragment extends Fragment {
 								
 								@Override
 								public void run() {
-									synchronized(MainActivity.StoredResults) {
-										if(MainActivity.StoredResults[_idx].size()!=0)
-											tv.setText(Integer.toString(MainActivity.ListAdapters[_idx].getCount()));
-										else
-											tv.setText(cycle[c]);
+									final Current ci = MainActivity.SearchThread.getCurrent();
+									if(ci.list > _idx) {
+										pb.setVisibility(View.INVISIBLE);
+										tv.setVisibility(View.INVISIBLE);
+									} else if(ci.list ==_idx) {
+										tv.setText(Integer.toString(ci.count));
+									} else {
+										tv.setText(cycle[c]);
 									}										
 								}
 							});
+							
 							try {
 								Thread.sleep(1000);
 							} catch (InterruptedException e) {
 							}
+							
 							ci++;
 							if(ci>=cycle.length)
 								ci=0;
 						}
+
 						_activity.runOnUiThread(new Runnable(){
 							@Override
 							public void run() {
 								pb.setVisibility(View.INVISIBLE);
 								tv.setVisibility(View.INVISIBLE);
-							}							
+							}
 						});
 					}
-					
 				}).start();
 			}
         return _rootView;
