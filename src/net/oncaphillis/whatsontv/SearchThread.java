@@ -24,6 +24,17 @@ public class SearchThread extends Thread {
 	private Pager[]                  _pagers;
 	private ProgressBar              _pb;
 	private TextView                 _tv;
+	private int _list  = -1;
+	private int _count = -1;
+	
+	public class Current {
+		public Current(int l,int c) {
+			list  = l;
+			count = c;
+		}
+		public int list;
+		public int count;
+	};
 	
 	public SearchThread(Activity a,ArrayAdapter<TvSeries>[] listAdapters,Pager[] pagers,ProgressBar pb,TextView tv) {
 		_activity    = a;		
@@ -41,9 +52,13 @@ public class SearchThread extends Thread {
 
 	@Override
 	public void run() {
+		synchronized(this) {
+			_list  = 0;
+			_count = 0;
+		}
 		
-		for(int j=0; j < _pagers.length ; j++) {
-			final int fj = j;
+		for(_list=0; _list < _pagers.length ;) {
+			final int fj = _list;
 
 			final Semaphore mutex = new Semaphore(0);
 
@@ -74,34 +89,36 @@ public class SearchThread extends Thread {
 	
 			List<TvSeries> li_page= new ArrayList<TvSeries>();
 			
-			_pagers[j].start();
+			_pagers[_list].start();
 			
 			int cc;
-			while( (cc=_listAdapters[j].getCount()) < MAX_SEARCH) {
+			while( (cc=_listAdapters[_list].getCount()) < MAX_SEARCH) {
 				
 				lock();
 				
-				li_page=_pagers[j].getPage(page++);
+				li_page=_pagers[_list].getPage(page++);
 				final TextView tv = _tv;
 				final List<TvSeries> li = li_page;
 				_activity.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 						_listAdapters[fj].addAll(li);						
-						_listAdapters[fj].notifyDataSetChanged();
 						if( tv != null ) {
 							tv.setText(Integer.toString(_listAdapters[fj].getCount()));
 						}
 					}
 				});
 				
+				synchronized(this) {
+					_count = _listAdapters[fj].getCount();
+				}
 				release();
 
 				if(li_page.size() == 0)
 					break;
 			} 
 			
-			_pagers[j].end();
+			_pagers[_list].end();
 			
 			if( _pb != null || _tv != null) {
 				final ProgressBar pb = _pb;
@@ -116,6 +133,9 @@ public class SearchThread extends Thread {
 							tv.setVisibility(View.INVISIBLE);
 					}
 				});
+			}
+			synchronized(this) {
+				_list++;
 			}
 		}
 	}
@@ -139,4 +159,9 @@ public class SearchThread extends Thread {
 		_lock.release();
 	}
 
+	public Current getCurrent() {
+		synchronized(this) {
+			return new Current(this._list,this._count);
+		}
+	}
 };
