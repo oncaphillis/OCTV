@@ -45,15 +45,25 @@ public class SearchThread extends Thread {
 		for(int j=0; j < _pagers.length ; j++) {
 			final int fj = j;
 
-			
+			final Semaphore mutex = new Semaphore(0);
+
+			Runnable r;
 			_activity.runOnUiThread(new Runnable() {
 		        @Override
 		        public void run() {
 					_listAdapters[fj].clear();
 					_listAdapters[fj].notifyDataSetChanged();
+			        mutex.release();					
 		        }
 		    });						
-	
+
+			try {
+			    mutex.acquire();
+			} catch (InterruptedException e) {
+			    e.printStackTrace();
+			}
+			
+			
 			int page = 1;
 			int n = 0;
 			int s = 0;
