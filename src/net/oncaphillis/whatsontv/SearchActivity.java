@@ -46,7 +46,7 @@ public class SearchActivity extends Activity {
 		
 	    /// Set up our special		
 		_listAdapter = new TvSeriesListAdapter(this,
-				android.R.layout.simple_list_item_1,_mainList,_defBitmap,this,1);
+				android.R.layout.simple_list_item_1,_mainList,_defBitmap,this);
 		
 		_listView.setAdapter(_listAdapter);
 		
@@ -110,11 +110,12 @@ public class SearchActivity extends Activity {
 	}
 	
 	private void doMySearch(final String query) {
+		
 		_searchThread = new SearchThread(this,_listAdapter,new Pager() {
 
 			@Override
 			public List<TvSeries> getPage(int page) {
-				return Tmdb.get().api().getSearch().searchTv(query, null, page);
+				return api().getSearch().searchTv(query, null, page);
 			}
 
 			@Override

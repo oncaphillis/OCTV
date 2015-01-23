@@ -38,7 +38,8 @@
             android:label="@string/title_activity_about" >
         </activity>        <activity
             android:name=".ErrorActivity"
-            android:label="@string/title_activity_error" >
+            android:label="@string/title_activity_error"
+            android:launchMode="singleTop" >
         </activity>
         <activity
             android:name=".SearchActivity"

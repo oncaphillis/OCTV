@@ -45,13 +45,13 @@ public class MainFragment extends Fragment {
 			DisplayMetrics displaymetrics = new DisplayMetrics();
 			_activity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
 			
-			int width  = displaymetrics.widthPixels;
-
-			if(width>400)
+			float width  = displaymetrics.widthPixels * 160.0f / displaymetrics.xdpi;
+			
+			if(width > 400.0f)
 				_cols=2;
-			if(width>600)
+			if(width > 800.0f)
 				_cols=3;
-			if(width>700)
+			if(width > 1000.0f)
 				_cols=4;
 		}
 		
@@ -109,7 +109,7 @@ public class MainFragment extends Fragment {
 					public void run() {
 						int ci=0;
 						final String[] cycle={"  ."," ..","...","..*",".**","***","**.","*..","..."," .."};
-						while(MainActivity.SearchThreads[_idx].getState()!=Thread.State.TERMINATED) {
+						while(MainActivity.SearchThread.getState()!=Thread.State.TERMINATED) {
 							final int c = ci;
 		
 							_activity.runOnUiThread(new Runnable(){
@@ -117,8 +117,8 @@ public class MainFragment extends Fragment {
 								@Override
 								public void run() {
 									synchronized(MainActivity.StoredResults) {
-										if(MainActivity.Counts[_idx]!=0)
-											tv.setText(Integer.toString(MainActivity.Counts[_idx]));
+										if(MainActivity.StoredResults[_idx].size()!=0)
+											tv.setText(Integer.toString(MainActivity.ListAdapters[_idx].getCount()));
 										else
 											tv.setText(cycle[c]);
 									}										

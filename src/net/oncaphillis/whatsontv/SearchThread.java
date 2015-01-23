@@ -1,5 +1,6 @@
 package net.oncaphillis.whatsontv;
 
+import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.util.ArrayList;
@@ -18,58 +19,68 @@ public class SearchThread extends Thread {
 	static final int MAX_SEARCH = 1000;
 	private Semaphore _lock       = new Semaphore(0);
 	
-	private Activity               _activity;
-	private ArrayAdapter<TvSeries> _listAdapter;
-	private Pager                  _pager;
-	private ProgressBar            _pb;
-	private TextView               _tv;
+	private Activity                 _activity;
+	private ArrayAdapter<TvSeries>[] _listAdapters;
+	private Pager[]                  _pagers;
+	private ProgressBar              _pb;
+	private TextView                 _tv;
 	
-	public SearchThread(Activity a,ArrayAdapter<TvSeries> l,Pager p,ProgressBar pb,TextView tv) {
+	public SearchThread(Activity a,ArrayAdapter<TvSeries>[] listAdapters,Pager[] pagers,ProgressBar pb,TextView tv) {
 		_activity    = a;		
-		_listAdapter = l;
-		_pager       = p;
+		_listAdapters= listAdapters;
+		_pagers      = pagers;
 		_pb          = pb;
 		_tv          = tv;
 	}
 	
+	
+	public SearchThread(SearchActivity a, ArrayAdapter<TvSeries> listadapter,
+			Pager pager, ProgressBar pb, TextView tv) {
+		this(a,new ArrayAdapter[]{listadapter},new Pager[]{pager},pb,tv);
+	}
+
 	@Override
 	public void run() {
 		
-		_activity.runOnUiThread(new Runnable() {
-	        @Override
-	        public void run() {
-				synchronized(_listAdapter) {
-					_listAdapter.clear();
-					_listAdapter.notifyDataSetChanged();
-				}
-	        }
-	    });						
+		for(int j=0; j < _pagers.length ; j++) {
+			final int fj = j;
 
-		int page = 1;
-		int n = 0;
-		int s = 0;
-		
-		if(Tmdb.get().api()==null) {
-			return;
-		}
-
-		List<TvSeries> li_page= new ArrayList<TvSeries>();
-		
-		_pager.start();
-
-		while(true) {
-			int nn=0;
-			while( _listAdapter.getCount() <= MAX_SEARCH) {
+			
+			_activity.runOnUiThread(new Runnable() {
+		        @Override
+		        public void run() {
+					_listAdapters[fj].clear();
+					_listAdapters[fj].notifyDataSetChanged();
+		        }
+		    });						
+	
+			int page = 1;
+			int n = 0;
+			int s = 0;
+			
+			if(Tmdb.get().api()==null) {
+				return;
+			}
+	
+			List<TvSeries> li_page= new ArrayList<TvSeries>();
+			
+			_pagers[j].start();
+			
+			int cc;
+			while( (cc=_listAdapters[j].getCount()) < MAX_SEARCH) {
+				
 				lock();
-				li_page=_pager.getPage(page++);
+				
+				li_page=_pagers[j].getPage(page++);
 				final TextView tv = _tv;
 				final List<TvSeries> li = li_page;
 				_activity.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						_listAdapter.addAll(li);						
+						_listAdapters[fj].addAll(li);						
+						_listAdapters[fj].notifyDataSetChanged();
 						if( tv != null ) {
-							tv.setText(Integer.toString(_listAdapter.getCount()));
+							tv.setText(Integer.toString(_listAdapters[fj].getCount()));
 						}
 					}
 				});
@@ -79,30 +90,29 @@ public class SearchThread extends Thread {
 				if(li_page.size() == 0)
 					break;
 			} 
-			break;
-		}
-		
-		_pager.end();
-		
-		if(_pb!=null || _tv!=null) {
-			final ProgressBar pb = _pb;
-			final TextView    tv = _tv;
-			_activity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					if(pb!=null)
-						pb.setVisibility(View.INVISIBLE);
-		        
-					if(tv!=null)
-						tv.setVisibility(View.INVISIBLE);
-				}
-			});
+			
+			_pagers[j].end();
+			
+			if( _pb != null || _tv != null) {
+				final ProgressBar pb = _pb;
+				final TextView    tv = _tv;
+				_activity.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						if(pb!=null)
+							pb.setVisibility(View.INVISIBLE);
+			        
+						if(tv!=null)
+							tv.setVisibility(View.INVISIBLE);
+					}
+				});
+			}
 		}
 	}
 
-	public void release() {
-		_lock.release();
-	}
+	/** Holds the read Thread by acquireing the 
+	 * associated semaphore.
+	 */
 
 	public void lock() {
 		try {
@@ -110,4 +120,13 @@ public class SearchThread extends Thread {
 		} catch (Exception ex) {
 		}
 	}
+	
+	/** 
+	 * 
+	 */
+	
+	public void release() {
+		_lock.release();
+	}
+
 };

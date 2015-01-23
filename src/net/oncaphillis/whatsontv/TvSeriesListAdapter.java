@@ -31,7 +31,6 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	private List<TvSeries> _list      = null; 
 	private Bitmap         _defBitmap = null;
 	private Activity       _activity  = null;
-	private int            _cols      = 1;
 	
 	/** Load a bitmap from an URL.
 	 * 
@@ -40,9 +39,9 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	 */
 	
 
-	public TvSeriesListAdapter(Context context, int resource, List<TvSeries> objects,Bitmap defBitmap,Activity ac,int cols) {
+	public TvSeriesListAdapter(Context context, int resource, List<TvSeries> objects,Bitmap defBitmap,Activity ac) {
 		super(context, resource, objects);
-		_cols = cols;
+
 		_defBitmap = defBitmap;
 		_list      = objects;
 		_activity  = ac;

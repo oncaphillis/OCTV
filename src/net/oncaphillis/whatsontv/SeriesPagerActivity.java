@@ -2,10 +2,12 @@ package net.oncaphillis.whatsontv;
 
 import net.oncaphillis.whatsontv.R;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
+import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -40,7 +42,10 @@ public class SeriesPagerActivity extends FragmentActivity {
         _viewPager = (ViewPager) findViewById(R.id.series_page_layout);
         _viewPager.setAdapter(_seriesCollectionPagerAdapter);
         _viewPager.setCurrentItem(b.getInt(SeriesObjectFragment.ARG_IX));
-
+	   
+        ActionBar actionBar = getActionBar();
+	    actionBar.setDisplayHomeAsUpEnabled(true);
+	    
         String t;
         if( (t = b.getString(SeriesObjectFragment.ARG_TITLE))!=null) {
         	this.setTitle(t);
@@ -79,13 +84,19 @@ public class SeriesPagerActivity extends FragmentActivity {
 			startActivity(myIntent);
 			return true;
 		}
-		return this.onMenuItemSelected(feature, it);
+		return super.onMenuItemSelected(feature, it);
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		
-		return super.onOptionsItemSelected(item);
+	    switch (item.getItemId()) {
+	    // Respond to the action bar's Up/Home button
+	    case android.R.id.home:
+	        //NavUtils.navigateUpFromSameTask(this);
+	        finish();
+	    	return true;
+	    }
+	    return super.onOptionsItemSelected(item);
 	}
 	@Override
 	public boolean onSearchRequested() {

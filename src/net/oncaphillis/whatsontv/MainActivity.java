@@ -11,12 +11,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.oncaphillis.whatsontv.R;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -24,13 +26,16 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.PagerTitleStrip;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -49,22 +54,25 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import info.movito.themoviedbapi.*;
+import info.movito.themoviedbapi.model.core.ResponseStatusException;
 import info.movito.themoviedbapi.model.tv.*;
+import info.movito.themoviedbapi.tools.MovieDbException;
 
 public class MainActivity extends FragmentActivity {
 	
 	private ViewPager _viewPager = null;
+	
 	private MainPagerAdapter _mainPagerAdapter = null;
 	
-	public static final String[] Titles={"Today","On the Air","Hi Vote","Popular"};
+	public static final String[] Titles={"Today","On the Air","Hi Vote","Popular" };
 
 	static public ArrayAdapter<TvSeries>[]          ListAdapters = new ArrayAdapter[Titles.length];
 	
 	static public HashMap<Integer,List<TvSeries>>[] StoredResults = new HashMap[Titles.length];
 	
-	static public SearchThread[] SearchThreads=new SearchThread[Titles.length];
+	static public SearchThread SearchThread = null;
 	
-	static public int Counts[] = new int[Titles.length];
+	//static public Integer[] Counts = new Integer[Titles.length];
 	
 	static private List<TvSeries>[] MainList = new List[Titles.length];
 	
@@ -72,23 +80,28 @@ public class MainActivity extends FragmentActivity {
 	
 	static private Bitmap _defBitmap = null;
 	
+	private ActionBarDrawerToggle _DrawerToggle = null;
+	private DrawerLayout          _DrawerLayout = null; 
+	
 	/** Spit out a simple alert dialog
 	 * 
 	 * @param txt message to show
 	 */
-	class ListPager implements Pager {
-		int _type=0;
-		public ListPager(int t) {
-			_type = t;
-		}
+	abstract class CachingPager extends Pager {
 		
-		@Override
+		private HashMap<Integer,List<TvSeries>> _storage;
+		
+		abstract public List<TvSeries> request(int page);
+		
+		public CachingPager(HashMap<Integer,List<TvSeries>> storage) {
+			_storage = storage;
+		}
 		public List<TvSeries> getPage(int page) {
 
 			List<TvSeries> l;
 				
-			synchronized(StoredResults )  {					
-				if( (l=StoredResults[_type].get(page))!=null)
+			synchronized( _storage  )  {					
+				if( ( l = _storage.get(page))!=null)
 					return l;
 			}	
 			
@@ -102,19 +115,11 @@ public class MainActivity extends FragmentActivity {
 				}
 				
 				try {
-					if(_type==0)
-						l=Tmdb.get().api().getTvSeries().getAiringToday(null, page);
-					else if(_type==1)
-						l=Tmdb.get().api().getTvSeries().getOnTheAir(null, page);
-					else if(_type==2)
-						l=Tmdb.get().api().getTvSeries().getTopRated(null, page);
-					else
-						l=Tmdb.get().api().getTvSeries().getPopular(null, page);
-
+					l = request(page);
+					
 					if(l!=null) {
-						synchronized(StoredResults )  {					
-							StoredResults[_type].put(page, l);
-							Counts[_type]+=l.size();
+						synchronized(_storage )  {					
+							_storage.put(page, l);
 							return l;
 						}
 					}	
@@ -126,16 +131,14 @@ public class MainActivity extends FragmentActivity {
 				}
 			}
 		}
-
-		@Override
+		
 		public void start() {
 		}
 
-		@Override
 		public void end() {
 		}
-		
 	}
+
 	private void checkOnline() { 
 		if(!isOnline()) {
 			final MainActivity a=this;
@@ -159,59 +162,137 @@ public class MainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_main_pager);
+		initNavbar();
 		
-		/*if(savedInstanceState!=null) {
-			synchronized(StoredResults) {
-				StoredResults = (HashMap<Integer,List<TvSeries>>[])savedInstanceState.getSerializable("savedstate");
-			}
-		}*/
-		
-		_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image);
-		
-		int c = 1;
-			{
-				DisplayMetrics displaymetrics = new DisplayMetrics();
-				getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-				
-				int width  = displaymetrics.widthPixels;
+		try {
+			
+			/*if(savedInstanceState!=null) {
+				synchronized(StoredResults) {
+					StoredResults = (HashMap<Integer,List<TvSeries>>[])savedInstanceState.getSerializable("savedstate");
+				}
+			}*/
+			
+			_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image);
+
+			Bundle b = getIntent().getExtras();
+			
+			_mainPagerAdapter = new MainPagerAdapter(getSupportFragmentManager(),this);
+			
+			_viewPager = (ViewPager) findViewById(R.id.main_pager_layout);
+	        _viewPager.setAdapter(_mainPagerAdapter);
+	        _viewPager.setCurrentItem(0);
+	        
+	        checkOnline();
+
+	        
+	        for(int i=0;i< Titles.length ;i++) {
+				final int j = i;
+	        	if(StoredResults[i]==null)
+					StoredResults[i] = new HashMap<Integer,List<TvSeries>>();
 	
-				if(width>400)
-					c=2;
-				if(width>600)
-					c=3;
-				if(width>700)
-					c=4;
-			}
-			
+	        	if(MainList[i]==null)
+					MainList[i] = new ArrayList<TvSeries>();
+				
+	        	if(ListAdapters[i]==null)
+					ListAdapters[i] = new TvSeriesListAdapter(this,
+						android.R.layout.simple_list_item_1,MainList[i],_defBitmap,this);
+	        	
+	        	final int idx = i;
+	        	if(ThePager[i]==null) {
+	        		ThePager[i] = new CachingPager(StoredResults[i]) {
+						public List<TvSeries> request(int page) {
+			        		switch(idx) {
+			        		case 0:
+		        				return api().getTvSeries().getAiringToday(language(), page);
 
-		Bundle b = getIntent().getExtras();
-		
-		_mainPagerAdapter = new MainPagerAdapter(getSupportFragmentManager(),this);
-		
-		_viewPager = (ViewPager) findViewById(R.id.main_pager_layout);
-        _viewPager.setAdapter(_mainPagerAdapter);
-        _viewPager.setCurrentItem(0);
-        
-        checkOnline();
-        
-        for(int i=0;i<Titles.length;i++) {
-			final int j = i;
-        	if(StoredResults[i]==null)
-				StoredResults[i] = new HashMap<Integer,List<TvSeries>>();
+			        		case 1:
+		        				return api().getTvSeries().getOnTheAir(language(),page);
 
-        	if(MainList[i]==null)
-				MainList[i] = new ArrayList<TvSeries>();
-			
-        	if(ListAdapters[i]==null)
-				ListAdapters[i] = new TvSeriesListAdapter(this,
-					android.R.layout.simple_list_item_1,MainList[i],_defBitmap,this,c);
+			        		case 2:	
+		        				return api().getTvSeries().getTopRated(language(),page);
 
-	       SearchThreads[i] = new SearchThread(this,ListAdapters[i],ThePager[i] = new ListPager(i),null,null);
-	       
-	       SearchThreads[i].start();
-        }
+			        		default:
+		        				return api().getTvSeries().getPopular(language(), page);
+			        		}
+						}
+					};
+	        	}
+	        }
+
+	        SearchThread = new SearchThread(this,ListAdapters,ThePager,null,null);
+		        
+		    final Activity a = this; 
+		        
+	        Thread.UncaughtExceptionHandler h = new Thread.UncaughtExceptionHandler() {
+	            public void uncaughtException(Thread th, Throwable ex) {
+	            	
+	            	Bundle b        = new Bundle();
+	            	
+	            	if(ex.getMessage()!=null)
+	            		b.putString("txt1", ex.getMessage());
+	            	else
+	            		b.putString("txr1", " ? ? ? ");
+	            	
+	            	if(ex.getCause()!=null && ex.getCause().getMessage()!=null)
+	            		b.putString("txt2", ex.getCause().getMessage());
+	            	else
+	            		b.putString("txt2", "...");
+	            		
+	    			Intent myIntent = new Intent(a, ErrorActivity.class);
+	    			myIntent.putExtras(b);
+	    			startActivity(myIntent);
+	    			finish();
+	            }
+	        };
+	        
+	        SearchThread.setUncaughtExceptionHandler(h);
+	        SearchThread.start();
+
+		} catch(Exception ex) {
+			Intent myIntent = new Intent(this, ErrorActivity.class);
+			Bundle b        = new Bundle();
+				b.putString("txt", ex.getMessage()+" "+ex.getCause());
+				myIntent.putExtras(b);
+				startActivity(myIntent);
+		} catch(Throwable ta) {			
+		}
 	}
 	
+	private void initNavbar() {
+        _DrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+	     getActionBar().setDisplayHomeAsUpEnabled(true);
+	     getActionBar().setHomeButtonEnabled(true);
+	        
+		 _DrawerToggle = new ActionBarDrawerToggle(
+	            this,                   /* host Activity */
+	            _DrawerLayout,          /* DrawerLayout object */
+	            R.drawable.ic_drawer,   /* nav drawer image to replace 'Up' caret */
+	            R.string.nav_bar_open,  /* "open drawer" description for accessibility */
+	            R.string.nav_bar_close  /* "close drawer" description for accessibility */
+	    ) {
+	        @Override
+	        public void onDrawerClosed(View drawerView) {
+	        	super.onDrawerClosed(drawerView);
+	            invalidateOptionsMenu();
+	        }
+
+	        @Override
+	        public void onDrawerOpened(View drawerView) {
+	        	super.onDrawerOpened(drawerView);
+	            invalidateOptionsMenu();
+	        }
+	    };
+	    
+	    _DrawerLayout.post(new Runnable() {
+	        @Override
+	        public void run() {
+	            _DrawerToggle.syncState();
+	        }
+	    });
+	    _DrawerLayout.setDrawerListener(_DrawerToggle);
+	}
+
 	protected void onDestroy() {
 		super.onDestroy();
 	}
@@ -223,17 +304,13 @@ public class MainActivity extends FragmentActivity {
 	}
 	@Override
 	protected void	onPause() {
-		for(int i=0;i<SearchThreads.length;i++)  {
-			SearchThreads[i].lock();
-		}
+		SearchThread.lock();
 		super.onPause();
 	}
 	
 	@Override
 	protected void	onResume() {
-		for(int i=0;i<SearchThreads.length;i++)  {
-			SearchThreads[i].release();
-		}
+		SearchThread.release();
 		super.onResume();
 	}
 	
@@ -250,9 +327,34 @@ public class MainActivity extends FragmentActivity {
 			startActivity(myIntent);
 			return true;
 		}
-		return this.onMenuItemSelected(feature, it);
+		return super.onMenuItemSelected(feature, it);
 	}
 	
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        _DrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        _DrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (_DrawerToggle.onOptionsItemSelected(item)) {
+          return true;
+        }
+        // Handle your other action bar items...
+
+        return super.onOptionsItemSelected(item);
+    }
+
 	@Override
 	protected void  onSaveInstanceState (Bundle outState){
 		synchronized(StoredResults) {

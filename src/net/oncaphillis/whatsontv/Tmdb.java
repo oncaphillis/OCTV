@@ -174,11 +174,8 @@ public class Tmdb {
 	 */
 	
 	TmdbApi api() {
-		try {
-			if(_api == null) {
-				_api = new TmdbApi(_key);
-			}
-		} catch(Exception ex) {
+		if(_api == null) {
+			_api = new TmdbApi(_key);
 		}
 		return _api;
 	}

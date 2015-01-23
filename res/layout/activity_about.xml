@@ -26,7 +26,7 @@
         android:src="@drawable/tmdb_logo" />
 
     <TextView
-        android:id="@+id/error_text"
+        android:id="@+id/error_text1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
