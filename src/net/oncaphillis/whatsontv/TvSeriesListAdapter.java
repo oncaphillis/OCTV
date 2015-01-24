@@ -38,19 +38,12 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	 * @return Bitmap or null on failure
 	 */
 	
-
 	public TvSeriesListAdapter(Context context, int resource, List<TvSeries> objects,Bitmap defBitmap,Activity ac) {
 		super(context, resource, objects);
 
 		_defBitmap = defBitmap;
 		_list      = objects;
 		_activity  = ac;
-	}
-
-	@Override
-	public void notifyDataSetChanged() {
-		super.notifyDataSetChanged();
-		
 	}
 
 	@Override
@@ -73,9 +66,6 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	ImageView   ii = (ImageView)    v.findViewById(R.id.series_list_image);
 	    	TextView   tt_vote = (TextView)     v.findViewById(R.id.series_rating);
 	    	ProgressBar pb = (ProgressBar)  v.findViewById(R.id.series_wait_bar);
-	    	
-	    	// v.setBackgroundColor(_activity.getResources().getColor( (position / _cols) % 2 == 0 ? 
-	    	//		R.color.list_item1_color : R.color.list_item0_color));
 
 	    	pb.setVisibility(View.INVISIBLE);
 	    	
