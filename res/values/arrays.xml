@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="navbar_array">
+        <item >Public Lists</item>
+        <item >My Lists</item>
+        <item >Login</item>
+        <item >About</item>
+    </string-array>
+</resources>
