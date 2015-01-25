@@ -19,6 +19,12 @@
         android:text="What&apos;s on TV\n(c) 2015 Sebastian Kloska\nsebastian.kloska@snafu.de"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
+    <WebView
+        android:id="@+id/about_webview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="2" />
+
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="fill_parent"
