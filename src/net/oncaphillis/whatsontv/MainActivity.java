@@ -43,6 +43,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -82,6 +83,8 @@ public class MainActivity extends FragmentActivity {
 	
 	private ActionBarDrawerToggle _DrawerToggle = null;
 	private DrawerLayout          _DrawerLayout = null; 
+	private String[]              _DrawerArray  = null;
+	private ListView              _DrawerList   = null;
 	
 	/** Spit out a simple alert dialog
 	 * 
@@ -261,9 +264,33 @@ public class MainActivity extends FragmentActivity {
 	private void initNavbar() {
         _DrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-	     getActionBar().setDisplayHomeAsUpEnabled(true);
-	     getActionBar().setHomeButtonEnabled(true);
+	     
+
+        _DrawerArray = getResources().getStringArray(R.array.navbar_array);
+        _DrawerList  = (ListView) findViewById(R.id.left_drawer);
+
+        // Set the adapter for the list view
+        
+        _DrawerList.setAdapter(new NavigatorAdapter(this, R.layout.nav_list_entry,_DrawerArray));
+ 
+        // Set the list's click listener
+        _DrawerList.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				// TODO Auto-generated method stub	
+			}
+        });
+
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+	    getActionBar().setHomeButtonEnabled(true);
 	        
+	     
+	     
+	     
+	     
+	     
 		 _DrawerToggle = new ActionBarDrawerToggle(
 	            this,                   /* host Activity */
 	            _DrawerLayout,          /* DrawerLayout object */
