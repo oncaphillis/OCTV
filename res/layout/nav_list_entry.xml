@@ -2,16 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:layout_marginTop="8dp"
-    android:orientation="horizontal" >
+    android:layout_marginBottom="16dp"
+    android:layout_marginTop="16dp"
+    android:orientation="horizontal"
+    android:paddingBottom="8dp"
+    android:paddingRight="16dp" >
 
     <ImageView
         android:id="@+id/nav_list_image"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_gravity="clip_vertical"
-        android:src="@drawable/ic_action_person" />
+        android:src="@drawable/ic_action_about" />
 
     <TextView
         android:id="@+id/nav_list_text"
@@ -19,7 +21,7 @@
         android:layout_height="wrap_content"
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/actionbar_text_color"
+        android:textColor="@color/oncaphillis_blue"
         android:textSize="@dimen/abc_action_bar_title_text_size" />
 
 </LinearLayout>
