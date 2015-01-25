@@ -4,24 +4,32 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="16dp"
     android:layout_marginTop="16dp"
+    android:minHeight="64dp"
     android:orientation="horizontal"
     android:paddingBottom="8dp"
     android:paddingRight="16dp" >
 
     <ImageView
         android:id="@+id/nav_list_image"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_gravity="clip_vertical"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="12dp"
+        android:maxHeight="40dp"
+        android:maxWidth="40dp"
         android:src="@drawable/ic_action_about" />
 
     <TextView
         android:id="@+id/nav_list_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/oncaphillis_blue"
-        android:textSize="@dimen/abc_action_bar_title_text_size" />
+        android:textColor="@color/actionbar_text_color"
+        android:textColorLink="@color/actionbar_text_color"
+        android:textSize="@dimen/abc_action_bar_title_text_size"
+        android:textStyle="bold"
+        android:typeface="normal" />
 
 </LinearLayout>
