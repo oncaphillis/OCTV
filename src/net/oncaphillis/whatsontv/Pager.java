@@ -20,4 +20,5 @@ public abstract class Pager {
 	abstract List<TvSeries> getPage(int page);
 	abstract void start();
 	abstract void end();
+	abstract int getTotal();  
 }
