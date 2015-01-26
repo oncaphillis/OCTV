@@ -1,5 +1,6 @@
 package net.oncaphillis.whatsontv;
 
+import info.movito.themoviedbapi.TvResults;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.util.ArrayList;
@@ -112,10 +113,12 @@ public class SearchActivity extends Activity {
 	private void doMySearch(final String query) {
 		
 		_searchThread = new SearchThread(this,_listAdapter,new Pager() {
-
+			private int _Total = -1;
 			@Override
 			public List<TvSeries> getPage(int page) {
-				return api().getSearch().searchTv(query, null, page);
+				TvResults r = api().getSearch().searchTvPage(query, null, page);
+				_Total = r.getTotalResults();
+				return r.getResults();
 			}
 
 			@Override
@@ -124,6 +127,12 @@ public class SearchActivity extends Activity {
 
 			@Override
 			public void end() {
+			}
+
+			@Override
+			int getTotal() {
+				// TODO Auto-generated method stub
+				return _Total;
 			}			
 		},null,null);
 		
@@ -167,12 +176,13 @@ public class SearchActivity extends Activity {
 	
 	@Override
 	public boolean onMenuItemSelected(int feature,MenuItem it) {
-		if(it.getItemId()==R.id.about) {
+		/* if(it.getItemId()==R.id.about) {
 			Intent myIntent = new Intent(this, AboutActivity.class);
 			Bundle b        = new Bundle();
 			startActivity(myIntent);
 			return true;
-		}
+		}*/
+		
 		return this.onMenuItemSelected(feature, it);
 	}
 	
