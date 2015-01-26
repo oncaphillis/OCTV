@@ -9,37 +9,26 @@
             android:layout_height="fill_parent"
             android:orientation="vertical" >
 
+            <ProgressBar
+                android:id="@+id/load_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:indeterminateBehavior="cycle"
+                android:max="10000" />
+
         <GridView
             android:id="@+id/main_list"
+            style="@style/AppBaseTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:focusable="false"
             android:numColumns="3" >
 
         </GridView>
 
     </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/big_progress_bar"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_gravity="center_vertical|center_horizontal|center" />
-
-    <TextView
-        android:id="@+id/big_progress_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_gravity="center_vertical|fill_vertical|center"
-        android:text="***"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        android:typeface="normal" />
     
 </RelativeLayout>

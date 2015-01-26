@@ -4,4 +4,6 @@
     <color name="list_item1_color">#ff444444</color>
     <color name="actionbar_text_color">#ffffffff</color>
     <color name="oncaphillis_blue">#2349bf</color>
+    <color name="oncaphillis_orange">#FFFF9933</color>
+    <color name="oncaphillis_white">#ffffffff</color>
 </resources>

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <!--
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
@@ -15,18 +15,26 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
-    
+
+
     <!-- ActionBar styles -->
-    <style name="CustomActionBar"
+    <style name="OncaphillisTheme.ActionBar"
            parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
         <item name="android:textColor">@color/actionbar_text_color</item>
         <item name="android:background">@color/oncaphillis_blue</item>
     </style>
-    
+    <!-- Search edit text -->
+
+	<style name="OncaphillisTheme.SearchField" parent="@style/Widget.AppCompat.Light.AutoCompleteTextView">
+	    <item name="android:textColor">@color/oncaphillis_white</item>
+	    <item name="android:textColorHint">@color/oncaphillis_white</item>
+	</style>
+
     <!-- the theme applied to the application or activity -->
-    <style name="CustomActionBarTheme"
-           parent="@android:style/Theme.Holo.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/CustomActionBar</item>    
+    <style name="OncaphillisTheme"
+           parent="@style/Theme.AppCompat.Light">
+		<item name="searchViewAutoCompleteTextView">@style/OncaphillisTheme.SearchField</item>
+        <item name="android:actionBarStyle">@style/OncaphillisTheme.ActionBar</item>
     </style>
     <!-- ActionBar styles -->
 </resources>
