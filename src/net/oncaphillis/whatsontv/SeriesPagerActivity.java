@@ -62,7 +62,7 @@ public class SeriesPagerActivity extends FragmentActivity {
 	    inflater.inflate(R.menu.main, menu);
 	    
 	    MenuItem mi = (MenuItem) menu.findItem(R.id.search);
-	    SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView(); //new SearchView(this);
+	    SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
 	    SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 	    
 	    if(searchView!=null) {
@@ -78,21 +78,13 @@ public class SeriesPagerActivity extends FragmentActivity {
 	
 	@Override
 	public boolean onMenuItemSelected(int feature,MenuItem it) {
-		if(it.getItemId()==R.id.about) {
-			Intent myIntent = new Intent(this, AboutActivity.class);
-			Bundle b        = new Bundle();
-			startActivity(myIntent);
-			return true;
-		}
 		return super.onMenuItemSelected(feature, it);
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
-	    // Respond to the action bar's Up/Home button
 	    case android.R.id.home:
-	        //NavUtils.navigateUpFromSameTask(this);
 	        finish();
 	    	return true;
 	    }
