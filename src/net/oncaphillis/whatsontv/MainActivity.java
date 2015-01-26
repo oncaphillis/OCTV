@@ -6,14 +6,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import net.oncaphillis.whatsontv.R;
+import net.oncaphillis.whatsontv.SearchThread.Current;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.support.v4.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -42,11 +45,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -71,8 +77,6 @@ public class MainActivity extends FragmentActivity {
 	
 	static public HashMap<Integer,List<TvSeries>>[] StoredResults = new HashMap[Titles.length];
 	
-	static public SearchThread SearchThread = null;
-	
 	//static public Integer[] Counts = new Integer[Titles.length];
 	
 	static private List<TvSeries>[] MainList = new List[Titles.length];
@@ -80,11 +84,13 @@ public class MainActivity extends FragmentActivity {
 	static private Pager[] ThePager = new Pager[Titles.length];
 	
 	static private Bitmap _defBitmap = null;
-	
+
+	private SearchThread SearchThread = null;
+	private MainFragment _actFragment = null;
 	private ActionBarDrawerToggle _DrawerToggle = null;
 	private DrawerLayout          _DrawerLayout = null; 
-	private String[]              _DrawerArray  = null;
-	private ListView              _DrawerList   = null;
+	private ExpandableListView    _DrawerList   = null;
+	private NavigatorAdapter      _DrawerAdapter = null;
 	
 	/** Spit out a simple alert dialog
 	 * 
@@ -93,12 +99,14 @@ public class MainActivity extends FragmentActivity {
 	abstract class CachingPager extends Pager {
 		
 		private HashMap<Integer,List<TvSeries>> _storage;
+		private int _totalCount = -1;
 		
-		abstract public List<TvSeries> request(int page);
+		abstract public TvResults request(int page);
 		
 		public CachingPager(HashMap<Integer,List<TvSeries>> storage) {
 			_storage = storage;
 		}
+
 		public List<TvSeries> getPage(int page) {
 
 			List<TvSeries> l;
@@ -118,7 +126,9 @@ public class MainActivity extends FragmentActivity {
 				}
 				
 				try {
-					l = request(page);
+					TvResults r =  request(page);
+					l = r.getResults();
+					_totalCount = r.getTotalResults();
 					
 					if(l!=null) {
 						synchronized(_storage )  {					
@@ -140,6 +150,10 @@ public class MainActivity extends FragmentActivity {
 
 		public void end() {
 		}
+		
+		public int getTotal() {
+			return _totalCount;
+		}
 	}
 
 	private void checkOnline() { 
@@ -155,6 +169,7 @@ public class MainActivity extends FragmentActivity {
 			})
 			.setIcon(android.R.drawable.ic_dialog_alert).show();
 		}
+
 	}
 	
 	/** main activity after startup
@@ -165,16 +180,10 @@ public class MainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_main_pager);
+
 		initNavbar();
 		
-		try {
-			
-			/*if(savedInstanceState!=null) {
-				synchronized(StoredResults) {
-					StoredResults = (HashMap<Integer,List<TvSeries>>[])savedInstanceState.getSerializable("savedstate");
-				}
-			}*/
-			
+		try {			
 			_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image);
 
 			Bundle b = getIntent().getExtras();
@@ -186,7 +195,6 @@ public class MainActivity extends FragmentActivity {
 	        _viewPager.setCurrentItem(0);
 	        
 	        checkOnline();
-
 	        
 	        for(int i=0;i< Titles.length ;i++) {
 				final int j = i;
@@ -203,28 +211,29 @@ public class MainActivity extends FragmentActivity {
 	        	final int idx = i;
 	        	if(ThePager[i]==null) {
 	        		ThePager[i] = new CachingPager(StoredResults[i]) {
-						public List<TvSeries> request(int page) {
+						public TvResults request(int page) {
 			        		switch(idx) {
 			        		case 0:
-		        				return api().getTvSeries().getAiringToday(language(), page);
+		        				return api().getTvSeries().getAiringTodayPage(language(), page);
 
 			        		case 1:
-		        				return api().getTvSeries().getOnTheAir(language(),page);
+		        				return api().getTvSeries().getOnTheAirPage(language(),page);
 
 			        		case 2:	
-		        				return api().getTvSeries().getTopRated(language(),page);
+		        				return api().getTvSeries().getTopRatedPage(language(),page);
 
 			        		default:
-		        				return api().getTvSeries().getPopular(language(), page);
+		        				return api().getTvSeries().getPopularPage(language(), page);
 			        		}
 						}
+
 					};
 	        	}
 	        }
 
 	        SearchThread = new SearchThread(this,ListAdapters,ThePager,null,null);
 		        
-		    final Activity a = this; 
+		    final FragmentActivity a = this; 
 		        
 	        Thread.UncaughtExceptionHandler h = new Thread.UncaughtExceptionHandler() {
 	            public void uncaughtException(Thread th, Throwable ex) {
@@ -251,6 +260,47 @@ public class MainActivity extends FragmentActivity {
 	        SearchThread.setUncaughtExceptionHandler(h);
 	        SearchThread.start();
 
+	        new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					while(SearchThread.getState()!=Thread.State.TERMINATED) {
+						a.runOnUiThread(new Runnable(){
+							@Override
+							public void run() {
+								Current ci = SearchThread.getCurrent();
+								synchronized(a) {
+									if(_actFragment!=null) {
+										if( _actFragment.getIdx() < ci.list) {
+											_actFragment.setProgressBarVisibility(false);							
+										} else if(_actFragment.getIdx()==ci.list) {
+											_actFragment.setProgressBarVisibility(true);
+											_actFragment.setProgressBarIndeterminate(false);
+											_actFragment.setProgress(ci.count * 10000 / ci.total);
+										} else {
+											_actFragment.setProgressBarVisibility(true);
+											_actFragment.setProgressBarIndeterminate(true);
+										}
+									}
+								}
+							}
+						});
+						
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+						}
+					}
+
+					a.runOnUiThread(new Runnable(){
+						@Override
+						public void run() {
+//							a.setProgressBarIndeterminate(false);
+//							a.setProgressBarVisibility(false);
+						}
+					});
+				}
+			}).start();
 		} catch(Exception ex) {
 			Intent myIntent = new Intent(this, ErrorActivity.class);
 			Bundle b        = new Bundle();
@@ -260,36 +310,42 @@ public class MainActivity extends FragmentActivity {
 		} catch(Throwable ta) {			
 		}
 	}
-	
+
+	@Override
+	public void onAttachFragment(Fragment fragment) {
+		super.onAttachFragment(fragment);
+    	if (fragment instanceof MainFragment) {
+    		synchronized(this) {
+				_actFragment  = (MainFragment) fragment;
+    		}
+    	}
+	}
+	  
 	private void initNavbar() {
         _DrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-	     
-
-        _DrawerArray = getResources().getStringArray(R.array.navbar_array);
-        _DrawerList  = (ListView) findViewById(R.id.left_drawer);
+        _DrawerList  = (ExpandableListView) findViewById(R.id.left_drawer);
 
         // Set the adapter for the list view
         
-        _DrawerList.setAdapter(new NavigatorAdapter(this, R.layout.nav_list_entry,_DrawerArray));
- 
+        _DrawerList.setAdapter(_DrawerAdapter = new NavigatorAdapter(this));
+        final Activity a = this;
         // Set the list's click listener
-        _DrawerList.setOnItemClickListener(new OnItemClickListener() {
-
+        
+        _DrawerList.setOnGroupClickListener( new OnGroupClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				// TODO Auto-generated method stub	
+			public boolean onGroupClick(ExpandableListView parent, View v,
+					int groupPosition, long id) {
+				Intent myIntent = new Intent( a, AboutActivity.class);
+				Bundle b        = new Bundle();
+				startActivity(myIntent);
+				return true;
+				
+
 			}
         });
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
 	    getActionBar().setHomeButtonEnabled(true);
-	        
-	     
-	     
-	     
-	     
 	     
 		 _DrawerToggle = new ActionBarDrawerToggle(
 	            this,                   /* host Activity */
@@ -348,12 +404,6 @@ public class MainActivity extends FragmentActivity {
 	
 	@Override
 	public boolean onMenuItemSelected(int feature,MenuItem it) {
-		if(it.getItemId()==R.id.about) {
-			Intent myIntent = new Intent(this, AboutActivity.class);
-			Bundle b        = new Bundle();
-			startActivity(myIntent);
-			return true;
-		}
 		return super.onMenuItemSelected(feature, it);
 	}
 	
@@ -411,5 +461,4 @@ public class MainActivity extends FragmentActivity {
 	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
 	    return netInfo != null && netInfo.isConnectedOrConnecting();
 	}
-
 }

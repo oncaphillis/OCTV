@@ -26,22 +26,21 @@ import android.support.v4.app.Fragment;
 public class MainFragment extends Fragment {
 	private Activity _activity = null;
 	private View _rootView = null;
-	public  ProgressBar  BigProgressBar = null;
-	public  TextView     BigProgressText = null;
+	private ProgressBar  _progressBar = null;
 
 	private GridView _mainGridView = null;
 	
-	
 	private int _idx;
-	private int _cols;
 	
 	@Override
     public View onCreateView(LayoutInflater inflater,
     		ViewGroup container, Bundle savedInstanceState) {
 		Bundle b = this.getArguments();
+		
 		_idx  = b.getInt("idx");
 		
-		int _cols = 1;
+		int cols = 1;
+
 		if(_activity!=null){
 			DisplayMetrics displaymetrics = new DisplayMetrics();
 			_activity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -49,27 +48,23 @@ public class MainFragment extends Fragment {
 			float width  = displaymetrics.widthPixels * 160.0f / displaymetrics.xdpi;
 			
 			if(width > 400.0f)
-				_cols=2;
+				cols=2;
 			if(width > 800.0f)
-				_cols=3;
+				cols=3;
 			if(width > 1000.0f)
-				_cols=4;
+				cols=4;
 		}
 		
 		_rootView   = inflater.inflate(R.layout.main_fragment, container, false);
+				
+		_progressBar  = (ProgressBar)_rootView.findViewById(R.id.load_progress);
 		
-		/*synchronized(MainActivity.StoredResults) {
-			if(savedInstanceState!=null && MainActivity.StoredResults[_idx]==null) {	
-				MainActivity.StoredResults[_idx] = (HashMap<Integer,List<TvSeries>>)savedInstanceState.getSerializable("map");
-			}
-		}*/
-		
-		BigProgressBar  = (ProgressBar)_rootView.findViewById(R.id.big_progress_bar);
-		BigProgressText = (TextView)_rootView.findViewById(R.id.big_progress_text);
+		setProgressBarVisibility(true);
+		setProgressBarIndeterminate(true);
 		
 		_mainGridView    = (GridView)    _rootView.findViewById(R.id.main_list);
 		
-		_mainGridView.setNumColumns(_cols);
+		_mainGridView.setNumColumns(cols);
 		
 			Object o = MainActivity.ListAdapters[_idx];
 				
@@ -99,73 +94,39 @@ public class MainFragment extends Fragment {
 					}
 				}
 			});
-
-			final ProgressBar pb = BigProgressBar;
-			final TextView tv = BigProgressText;
-
-			if(_activity!=null) {
-				new Thread(new Runnable() {
-					
-					@Override
-					public void run() {
-						int ci=0;
-						final String[] cycle={"  ."," ..","...","..*",".**","***","**.","*..","..."," .."};
-						while(MainActivity.SearchThread.getState()!=Thread.State.TERMINATED) {
-							final int c = ci;
-		
-							_activity.runOnUiThread(new Runnable(){
-								
-								@Override
-								public void run() {
-									final Current ci = MainActivity.SearchThread.getCurrent();
-									if(ci.list > _idx) {
-										pb.setVisibility(View.INVISIBLE);
-										tv.setVisibility(View.INVISIBLE);
-									} else if(ci.list ==_idx) {
-										tv.setText(Integer.toString(ci.count));
-									} else {
-										tv.setText(cycle[c]);
-									}										
-								}
-							});
-							
-							try {
-								Thread.sleep(1000);
-							} catch (InterruptedException e) {
-							}
-							
-							ci++;
-							if(ci>=cycle.length)
-								ci=0;
-						}
-
-						_activity.runOnUiThread(new Runnable(){
-							@Override
-							public void run() {
-								pb.setVisibility(View.INVISIBLE);
-								tv.setVisibility(View.INVISIBLE);
-							}
-						});
-					}
-				}).start();
-			}
         return _rootView;
     }
 		
 	@Override
 	public void onSaveInstanceState(Bundle outState) { 
-		/*synchronized(MainActivity.StoredResults) {
-			if(MainActivity.StoredResults[_idx]!=null)
-				outState.putSerializable("map", MainActivity.StoredResults[_idx]);
-		}*/
-		
 		super.onSaveInstanceState(outState);
 	}
 	
 	@Override
-	
 	public void onAttach(Activity act) {
         _activity = act;
         super.onAttach(act);
+	}
+
+	public int getIdx() {
+		return _idx;
+	}
+
+	public void setProgressBarVisibility(boolean b) {
+		if(_progressBar!=null) {
+			_progressBar.setVisibility( b ? View.VISIBLE : View.INVISIBLE);
+		}
+	}
+
+	public void setProgressBarIndeterminate(boolean b) {
+		if(_progressBar!=null) {
+			_progressBar.setIndeterminate(b);
+		}
+	}
+
+	public void setProgress(int i) {
+		if(_progressBar!=null) {
+			_progressBar.setProgress(i);
+		}
 	}
 }
