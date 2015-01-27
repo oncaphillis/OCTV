@@ -294,12 +294,13 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			public boolean onGroupClick(ExpandableListView parent, View v,
 					int groupPosition, long id) {
-				Intent myIntent = new Intent( a, AboutActivity.class);
-				Bundle b        = new Bundle();
-				startActivity(myIntent);
-				return true;
-				
-
+				if(groupPosition==NavigatorAdapter.ABOUT) {
+					Intent myIntent = new Intent( a, AboutActivity.class);
+					Bundle b        = new Bundle();
+					startActivity(myIntent);
+					return true;
+				}
+				return false;
 			}
         });
 
