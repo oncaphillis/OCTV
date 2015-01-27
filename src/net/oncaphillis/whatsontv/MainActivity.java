@@ -52,6 +52,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -287,7 +288,7 @@ public class MainActivity extends FragmentActivity {
         // Set the adapter for the list view
         
         _DrawerList.setAdapter(_DrawerAdapter = new NavigatorAdapter(this));
-        final Activity a = this;
+        final MainActivity a = this;
         // Set the list's click listener
         
         _DrawerList.setOnGroupClickListener( new OnGroupClickListener() {
@@ -299,11 +300,24 @@ public class MainActivity extends FragmentActivity {
 					Bundle b        = new Bundle();
 					startActivity(myIntent);
 					return true;
-				}
+				}				
 				return false;
 			}
         });
 
+        _DrawerList.setOnChildClickListener(new OnChildClickListener() {
+			@Override
+			public boolean onChildClick(ExpandableListView parent, View v,
+					int groupPosition, int childPosition, long id) {
+				if(groupPosition == NavigatorAdapter.LISTS) {
+					a._viewPager.setCurrentItem(childPosition);
+					return true;
+				}
+				return false;
+			}
+        	
+        });
+        
         getActionBar().setDisplayHomeAsUpEnabled(true);
 	    getActionBar().setHomeButtonEnabled(true);
 	     
