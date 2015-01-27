@@ -290,7 +290,6 @@ public class MainActivity extends FragmentActivity {
         _DrawerList.setAdapter(_DrawerAdapter = new NavigatorAdapter(this));
         final MainActivity a = this;
         // Set the list's click listener
-        
         _DrawerList.setOnGroupClickListener( new OnGroupClickListener() {
 			@Override
 			public boolean onGroupClick(ExpandableListView parent, View v,
@@ -298,6 +297,7 @@ public class MainActivity extends FragmentActivity {
 				if(groupPosition==NavigatorAdapter.ABOUT) {
 					Intent myIntent = new Intent( a, AboutActivity.class);
 					Bundle b        = new Bundle();
+			        _DrawerLayout.closeDrawers();
 					startActivity(myIntent);
 					return true;
 				}				
@@ -310,6 +310,7 @@ public class MainActivity extends FragmentActivity {
 			public boolean onChildClick(ExpandableListView parent, View v,
 					int groupPosition, int childPosition, long id) {
 				if(groupPosition == NavigatorAdapter.LISTS) {
+			        _DrawerLayout.closeDrawers();
 					a._viewPager.setCurrentItem(childPosition);
 					return true;
 				}
