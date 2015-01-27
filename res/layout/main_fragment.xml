@@ -16,7 +16,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:indeterminateBehavior="cycle"
-                android:max="10000" />
+                android:max="10000"
+                android:visibility="invisible" />
 
         <GridView
             android:id="@+id/main_list"

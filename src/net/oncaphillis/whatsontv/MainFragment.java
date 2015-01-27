@@ -4,6 +4,7 @@ import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import net.oncaphillis.whatsontv.SearchThread.Current;
@@ -24,8 +25,8 @@ import android.widget.TextView;
 import android.support.v4.app.Fragment;
 
 public class MainFragment extends Fragment {
-	private Activity _activity = null;
-	private View _rootView = null;
+	private Activity     _activity    = null;
+	private View         _theView    = null;
 	private ProgressBar  _progressBar = null;
 
 	private GridView _mainGridView = null;
@@ -55,14 +56,12 @@ public class MainFragment extends Fragment {
 				cols=4;
 		}
 		
-		_rootView   = inflater.inflate(R.layout.main_fragment, container, false);
+		_theView   = inflater.inflate(R.layout.main_fragment, container, false);
 				
-		_progressBar  = (ProgressBar)_rootView.findViewById(R.id.load_progress);
+		_progressBar  = (ProgressBar)_theView.findViewById(R.id.load_progress);
 		
-		setProgressBarVisibility(true);
-		setProgressBarIndeterminate(true);
 		
-		_mainGridView    = (GridView)    _rootView.findViewById(R.id.main_list);
+		_mainGridView    = (GridView)    _theView.findViewById(R.id.main_list);
 		
 		_mainGridView.setNumColumns(cols);
 		
@@ -94,7 +93,54 @@ public class MainFragment extends Fragment {
 					}
 				}
 			});
-        return _rootView;
+			
+			if(_activity!=null && _activity instanceof MainActivity) {
+				
+				final MainActivity a = (MainActivity)_activity;
+				final MainFragment f = this;
+				
+				new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						while(a.SearchThread.getState()!=Thread.State.TERMINATED) {
+							a.runOnUiThread(new Runnable(){
+								@Override
+								public void run() {
+									Current ci = a.SearchThread.getCurrent();
+									synchronized(a) {
+										if( f.getIdx() < ci.list) {
+											f.setProgressBarVisibility(false);							
+										} else if(f.getIdx()==ci.list) {
+											f.setProgressBarVisibility(true);
+											f.setProgressBarIndeterminate(false);
+											f.setProgress(ci.count * 10000 / ci.total);
+										} else {
+											f.setProgressBarVisibility(true);
+											f.setProgressBarIndeterminate(true);
+										}
+									}
+								}
+							});
+							
+							try {
+								Thread.sleep(1000);
+							} catch (InterruptedException e) {
+							}
+						}
+						
+						a.runOnUiThread(new Runnable(){
+							@Override
+							public void run() {
+								f.setProgressBarIndeterminate(false);
+								f.setProgressBarVisibility(false);
+							}
+						});
+					}
+				}).start();
+			}
+			
+        return _theView;
     }
 		
 	@Override
@@ -114,7 +160,7 @@ public class MainFragment extends Fragment {
 
 	public void setProgressBarVisibility(boolean b) {
 		if(_progressBar!=null) {
-			_progressBar.setVisibility( b ? View.VISIBLE : View.INVISIBLE);
+			_progressBar.setVisibility( b ? View.VISIBLE : View.GONE);
 		}
 	}
 

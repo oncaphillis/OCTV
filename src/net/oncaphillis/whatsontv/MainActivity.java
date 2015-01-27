@@ -85,7 +85,7 @@ public class MainActivity extends FragmentActivity {
 	
 	static private Bitmap _defBitmap = null;
 
-	private SearchThread SearchThread = null;
+	public  SearchThread SearchThread = null;
 	private MainFragment _actFragment = null;
 	private ActionBarDrawerToggle _DrawerToggle = null;
 	private DrawerLayout          _DrawerLayout = null; 
@@ -259,48 +259,7 @@ public class MainActivity extends FragmentActivity {
 	        
 	        SearchThread.setUncaughtExceptionHandler(h);
 	        SearchThread.start();
-
-	        new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					while(SearchThread.getState()!=Thread.State.TERMINATED) {
-						a.runOnUiThread(new Runnable(){
-							@Override
-							public void run() {
-								Current ci = SearchThread.getCurrent();
-								synchronized(a) {
-									if(_actFragment!=null) {
-										if( _actFragment.getIdx() < ci.list) {
-											_actFragment.setProgressBarVisibility(false);							
-										} else if(_actFragment.getIdx()==ci.list) {
-											_actFragment.setProgressBarVisibility(true);
-											_actFragment.setProgressBarIndeterminate(false);
-											_actFragment.setProgress(ci.count * 10000 / ci.total);
-										} else {
-											_actFragment.setProgressBarVisibility(true);
-											_actFragment.setProgressBarIndeterminate(true);
-										}
-									}
-								}
-							}
-						});
-						
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-						}
-					}
-
-					a.runOnUiThread(new Runnable(){
-						@Override
-						public void run() {
-//							a.setProgressBarIndeterminate(false);
-//							a.setProgressBarVisibility(false);
-						}
-					});
-				}
-			}).start();
+	        
 		} catch(Exception ex) {
 			Intent myIntent = new Intent(this, ErrorActivity.class);
 			Bundle b        = new Bundle();
