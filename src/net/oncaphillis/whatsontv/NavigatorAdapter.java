@@ -18,9 +18,9 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 	
 	private ArrayList<String>_Array;
 	
-	private final int LOGIN = 0;
-	private final int LISTS = 1;
-	private final int ABOUT = 2;
+	static final int LOGIN = 0;
+	static final int LISTS = 1;
+	static final int ABOUT = 2;
 	
 	private String[] _Groups = new String[] {
 			"Login","Lists","About"
@@ -30,6 +30,12 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 			{},
 			{"Today","On Air","Hi Vote","Popular"},
 			{}
+	};
+	
+	private int[] _GroupImageId = new int[] {
+			R.drawable.ic_action_person,
+			R.drawable.ic_action_view_as_list,
+			R.drawable.ic_action_about
 	};
 	
 	private String    _Child = "Child";
@@ -95,9 +101,24 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 		String s = (String)getGroup(idx);
 
 		if (s != null) {
-	    	TextView   tt  = (TextView)     v.findViewById(R.id.nav_list_text);
-	    	ImageView   ii = (ImageView)    v.findViewById(R.id.nav_list_image);
-    		tt.setText( s );
+	    	TextView    tt  = (TextView)     v.findViewById(R.id.nav_list_text);
+	    	
+	    	ImageView   ii0 = (ImageView)    v.findViewById(R.id.nav_list_image);
+	    	ImageView   ii1 = (ImageView)    v.findViewById(R.id.nav_group_expand);
+	    
+	    	ii0.setImageDrawable(_Context.getResources().getDrawable(_GroupImageId[idx]));;
+	    	
+	    	if(idx == LISTS) { 
+	    		ii1.setVisibility(View.VISIBLE);
+	    		if(isExpanded)
+	    			ii1.setImageDrawable(_Context.getResources().getDrawable(R.drawable.down));
+	    		else
+	    			ii1.setImageDrawable(_Context.getResources().getDrawable(R.drawable.right));
+	    	}
+	    	else
+	    		ii1.setVisibility(idx == LISTS ? View.VISIBLE : View.INVISIBLE);
+    		
+	    	tt.setText( s );
 	    }
 		return v;
 	}
@@ -116,9 +137,14 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 		String s = (String)getChild(idxp,idxc);
 
 		if (s != null) {
-	    	TextView   tt  = (TextView)     v.findViewById(R.id.nav_list_text);
-	    	ImageView   ii = (ImageView)    v.findViewById(R.id.nav_list_image);
-    		tt.setText( s );
+	    	TextView    tt  = (TextView)     v.findViewById(R.id.nav_list_text);
+	    	ImageView   ii0 = (ImageView)    v.findViewById(R.id.nav_list_image);
+	    	ImageView   ii1 = (ImageView)    v.findViewById(R.id.nav_group_expand);
+	    	
+	    	ii0.setVisibility(View.INVISIBLE);
+	    	ii1.setVisibility(View.INVISIBLE);
+	    	
+	    	tt.setText( s );
 	    }
 		return v;
 	}
