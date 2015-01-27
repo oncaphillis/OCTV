@@ -7,7 +7,7 @@
     android:minHeight="64dp"
     android:orientation="horizontal"
     android:paddingBottom="8dp"
-    android:paddingRight="16dp" >
+    android:paddingRight="8dp" >
 
     <ImageView
         android:id="@+id/nav_list_image"
@@ -21,9 +21,10 @@
 
     <TextView
         android:id="@+id/nav_list_text"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
+        android:layout_weight="2"
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/actionbar_text_color"
@@ -31,5 +32,12 @@
         android:textSize="@dimen/abc_action_bar_title_text_size"
         android:textStyle="bold"
         android:typeface="normal" />
+
+    <ImageView
+        android:id="@+id/nav_group_expand"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:src="@drawable/right" />
 
 </LinearLayout>
