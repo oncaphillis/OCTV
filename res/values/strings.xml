@@ -14,7 +14,7 @@
     <string name="action_search_string">search</string>
     <string name="title_activity_search">SearchActivity</string>
     <string name="title_activity_series_pager">Series</string>
-    <string name="title_activity_about">About...</string>
+    <string name="title_activity_about">About What's On TV</string>
     <string name="title_activity_error">Error</string>
     <string name="nav_bar_open">Open Navigator</string>
     <string name="nav_bar_close">Close Navbar</string>
