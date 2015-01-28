@@ -19,6 +19,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,11 +27,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ListView;
 
 public class SearchActivity extends Activity {
 
-	private ListView _listView;
+	private GridView _gridView;
 	private ArrayAdapter<TvSeries> _listAdapter;
 	private Bitmap                 _defBitmap;
 	private List<TvSeries> _mainList = new ArrayList<TvSeries>();
@@ -42,16 +44,32 @@ public class SearchActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search);
 		
-		_listView    = (ListView)    findViewById(R.id.search_list);
+		_gridView    = (GridView)    findViewById(R.id.search_table);
 		_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image); 
 		
 	    /// Set up our special		
 		_listAdapter = new TvSeriesListAdapter(this,
 				android.R.layout.simple_list_item_1,_mainList,_defBitmap,this);
 		
-		_listView.setAdapter(_listAdapter);
+		int cols = 1;
+	
+		DisplayMetrics displaymetrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+				
+		float width  = displaymetrics.widthPixels * 160.0f / displaymetrics.xdpi;
+				
+		if(width > 400.0f)
+			cols=2;
+		if(width > 800.0f)
+			cols=3;
+		if(width > 1000.0f)
+			cols=4;
 		
-		_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		_gridView.setNumColumns(cols);
+		
+		_gridView.setAdapter(_listAdapter);
+		
+		_gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
 				Intent myIntent = new Intent(SearchActivity.this, SeriesPagerActivity.class);

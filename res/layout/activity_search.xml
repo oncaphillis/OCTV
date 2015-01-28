@@ -12,25 +12,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
-        <LinearLayout
+        <GridView
+            android:id="@+id/search_table"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="fill_horizontal" >
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="top|fill_horizontal" >
-
-        </LinearLayout>
-
-        <ListView
-            android:id="@+id/search_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" >
-        </ListView>
+            android:layout_weight="1"
+            android:numColumns="3" >
+        </GridView>
 
     </LinearLayout>
 
