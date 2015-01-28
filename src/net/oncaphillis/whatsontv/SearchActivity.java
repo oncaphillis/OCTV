@@ -38,6 +38,7 @@ public class SearchActivity extends Activity {
 	private List<TvSeries> _mainList = new ArrayList<TvSeries>();
 	private Menu                   _menu = null;
 	private SearchThread           _searchThread = null;
+	private String                 _query = "";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,8 +91,8 @@ public class SearchActivity extends Activity {
 				}
 				b.putIntArray("ids", ids);
 				b.putStringArray("names", names);
-				
 				b.putInt("ix", position);
+				b.putString(SeriesObjectFragment.ARG_TITLE, "'"+_query+"'...?");
 				
 				myIntent.putExtras(b);
 				startActivity(myIntent);
@@ -123,12 +124,14 @@ public class SearchActivity extends Activity {
 	private void handleIntent(Intent intent) {
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			String query = intent.getStringExtra(SearchManager.QUERY);
-			this.setTitle(query+" ?");
+			this.setTitle("'"+query+"'...?");
 			doMySearch(query);
 		}
 	}
 	
 	private void doMySearch(final String query) {
+		
+		_query = query;
 		
 		_searchThread = new SearchThread(this,_listAdapter,new Pager() {
 			private int _Total = -1;
