@@ -2,12 +2,14 @@ package net.oncaphillis.whatsontv;
 
 import java.io.ByteArrayOutputStream;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.Base64;
+import android.view.MenuItem;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.ImageView;
@@ -52,9 +54,7 @@ public class AboutActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-
 		setContentView(R.layout.activity_about);
-
 
 		WebView  webview    = ((WebView) findViewById(R.id.about_webview));
 		
@@ -62,6 +62,9 @@ public class AboutActivity extends Activity {
 				_middle+getBitmapHtml(R.drawable.tmdb_logo,null,null)+
 				_postfix,"text/html; charset=utf-8;", "utf-8");
 		
+        ActionBar actionBar = getActionBar();
+	    actionBar.setDisplayHomeAsUpEnabled(true);
+	
 	}
 	
 	private String getBitmapHtml(Bitmap bm,Integer w,Integer h) {
@@ -93,7 +96,17 @@ public class AboutActivity extends Activity {
 	    return "<img "+ws+" "+hs+" style='max-width:100%;padding-right:0.5cm;padding-bottom:0.5cm;float:left;' src='"+
 	    		"data:image/png;base64," + imgageBase64+"' />";
 	}
-
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    case android.R.id.home:
+	        finish();
+	    	return true;
+	    }
+	    return super.onOptionsItemSelected(item);
+	}
+	
 	private String getBitmapHtml(int id,Integer w,Integer h)  {
 		return getBitmapHtml(((BitmapDrawable)getResources().getDrawable(id)).getBitmap(),w,h);
 	}
