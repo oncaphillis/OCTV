@@ -11,6 +11,7 @@ import net.oncaphillis.whatsontv.R;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
@@ -44,7 +45,10 @@ public class SearchActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search);
-		
+        
+		ActionBar actionBar = getActionBar();
+	    actionBar.setDisplayHomeAsUpEnabled(true);
+	    
 		_gridView    = (GridView)    findViewById(R.id.search_table);
 		_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image); 
 		
@@ -196,19 +200,17 @@ public class SearchActivity extends Activity {
 	}
 	
 	@Override
-	public boolean onMenuItemSelected(int feature,MenuItem it) {
-		/* if(it.getItemId()==R.id.about) {
-			Intent myIntent = new Intent(this, AboutActivity.class);
-			Bundle b        = new Bundle();
-			startActivity(myIntent);
-			return true;
-		}*/
-		
-		return this.onMenuItemSelected(feature, it);
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    case android.R.id.home:
+	        finish();
+	    	return true;
+	    }
+	    return super.onOptionsItemSelected(item);
 	}
 	
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		return super.onOptionsItemSelected(item);
+	public boolean onMenuItemSelected(int feature,MenuItem it) {
+		return super.onMenuItemSelected(feature, it);
 	}
 }
