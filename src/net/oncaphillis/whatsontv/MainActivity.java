@@ -102,7 +102,7 @@ public class MainActivity extends FragmentActivity {
 		private HashMap<Integer,List<TvSeries>> _storage;
 		private int _totalCount = -1;
 		
-		abstract public TvResults request(int page);
+		abstract public TvResultsPage request(int page);
 		
 		public CachingPager(HashMap<Integer,List<TvSeries>> storage) {
 			_storage = storage;
@@ -127,7 +127,7 @@ public class MainActivity extends FragmentActivity {
 				}
 				
 				try {
-					TvResults r =  request(page);
+					TvResultsPage r =  request(page);
 					l = r.getResults();
 					_totalCount = r.getTotalResults();
 					
@@ -212,19 +212,19 @@ public class MainActivity extends FragmentActivity {
 	        	final int idx = i;
 	        	if(ThePager[i]==null) {
 	        		ThePager[i] = new CachingPager(StoredResults[i]) {
-						public TvResults request(int page) {
+						public TvResultsPage request(int page) {
 			        		switch(idx) {
 			        		case 0:
-		        				return api().getTvSeries().getAiringTodayPage(language(), page);
+		        				return api().getTvSeries().getAiringToday(language(), page);
 
 			        		case 1:
-		        				return api().getTvSeries().getOnTheAirPage(language(),page);
+		        				return api().getTvSeries().getOnTheAir(language(),page);
 
 			        		case 2:	
-		        				return api().getTvSeries().getTopRatedPage(language(),page);
+		        				return api().getTvSeries().getTopRated(language(),page);
 
 			        		default:
-		        				return api().getTvSeries().getPopularPage(language(), page);
+		        				return api().getTvSeries().getPopular(language(), page);
 			        		}
 						}
 

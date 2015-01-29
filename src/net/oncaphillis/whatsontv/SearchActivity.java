@@ -1,6 +1,6 @@
 package net.oncaphillis.whatsontv;
 
-import info.movito.themoviedbapi.TvResults;
+import info.movito.themoviedbapi.TvResultsPage;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.util.ArrayList;
@@ -137,7 +137,7 @@ public class SearchActivity extends Activity {
 			private int _Total = -1;
 			@Override
 			public List<TvSeries> getPage(int page) {
-				TvResults r = api().getSearch().searchTvPage(query, null, page);
+				TvResultsPage r = api().getSearch().searchTv(query, null, page);
 				_Total = r.getTotalResults();
 				return r.getResults();
 			}
