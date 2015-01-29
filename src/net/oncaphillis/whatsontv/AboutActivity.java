@@ -29,7 +29,8 @@ public class AboutActivity extends Activity {
 	"         <p> "+
 	"          "+Environment.COPYRIGHT+"."+
 	"          Licensed under the <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GPLv2</a>. "+
-	"          Source available at <a href='https://github.com/oncaphillis/WhatsOnTV'>github.com/oncaphillis/WhatsOnTV</a>. Icons made by  "+
+	"          Source available at <a href='https://github.com/oncaphillis/WhatsOnTV'>github.com/oncaphillis/WhatsOnTV</a>. "+
+	"          <i>'themoviedbapi'</i>&copy; 2014-15 by Holger Brandl. Icons made by  "+
 	"           <a href='http://www.icomoon.io' title='Icomoon'>Icomoon</a>, "+
 	"           <a href='http://catalinfertu.com' title='Catalin Fertu'>Catalin Fertu</a>, "+
 	"           <a href='http://linhpham.me/miu' title='Linh Pham'>Linh Pham</a> "+
