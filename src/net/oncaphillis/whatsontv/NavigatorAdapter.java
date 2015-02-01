@@ -116,7 +116,7 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 	    			ii1.setImageDrawable(_Context.getResources().getDrawable(R.drawable.right));
 	    	}
 	    	else
-	    		ii1.setVisibility(idx == LISTS ? View.VISIBLE : View.INVISIBLE);
+	    		ii1.setVisibility(View.INVISIBLE);
     		
 	    	tt.setText( s );
 	    }
