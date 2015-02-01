@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="80dp"
     android:layout_marginBottom="4dp"
@@ -9,7 +10,8 @@
     android:minHeight="80dp"
     android:orientation="horizontal"
     android:paddingBottom="4dp"
-    android:paddingTop="4dp" >
+    android:paddingTop="4dp"
+    tools:context=".TvSeriesListAdapter" >
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -25,7 +27,6 @@
             android:id="@+id/series_wait_bar"
             android:layout_width="64dp"
             android:layout_height="fill_parent" />
-
     </RelativeLayout>
 
     <LinearLayout
@@ -46,11 +47,8 @@
                 android:maxLines="3"
                 android:shadowColor="@color/list_item1_color"
                 android:text="Large Text"
-                android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textSize="20sp" />
-
         </LinearLayout>
-       
     </LinearLayout>
 
     <RelativeLayout
@@ -71,9 +69,12 @@
             android:layout_centerVertical="true"
             android:gravity="center_horizontal|clip_vertical"
             android:text="-/-"
+            android:textColor="#ff000000"
+            android:textColorHint="@color/actionbar_text_color"
+            android:textColorLink="@color/oncaphillis_blue"
             android:textStyle="bold"
             android:typeface="normal" />
 
     </RelativeLayout>
-    
+
 </LinearLayout>
