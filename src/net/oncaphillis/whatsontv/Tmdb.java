@@ -128,27 +128,27 @@ public class Tmdb {
 			if((bm=_hash.get(size,path))!=null)
 				return bm;
 		}
-		
 		synchronized(this) {
-			try {
-				if(act!=null && pb!=null) {
-					final ProgressBar p = pb;
-					act.runOnUiThread(new Runnable(){
-						@Override
-						public void run() {
-							p.setVisibility(View.VISIBLE);
-						}
-					});
+			if(path!=null) {
+				try {
+					if(act!=null && pb!=null) {
+						final ProgressBar p = pb;
+						act.runOnUiThread(new Runnable(){
+							@Override
+							public void run() {
+								p.setVisibility(View.VISIBLE);
+							}
+						});
+					}
+					URL url = new URL(api().getConfiguration().getBaseUrl() + api().getConfiguration().getPosterSizes().get(size) + path);
+					InputStream is = url.openConnection().getInputStream();
+					bm = BitmapFactory.decodeStream(is);
+					if(bm != null) {
+						_hash.put(bm,size,path);
+					}
+				} catch(Exception ex) {
 				}
-				URL url = new URL(api().getConfiguration().getBaseUrl() + api().getConfiguration().getPosterSizes().get(size) + path);
-				InputStream is = url.openConnection().getInputStream();
-				bm = BitmapFactory.decodeStream(is);
-				if(bm != null) {
-					_hash.put(bm,size,path);
-				}
-			} catch(Exception ex) {
 			}
-
 			if(act!=null && pb!=null) {
 				final ProgressBar p = pb;
 				act.runOnUiThread(new Runnable(){

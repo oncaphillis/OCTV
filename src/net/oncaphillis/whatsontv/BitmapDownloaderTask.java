@@ -20,7 +20,7 @@ class BitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
 	
     public BitmapDownloaderTask(ImageView imageView, Activity act,ProgressBar pb, Bitmap defBitmap,ProgressBar pb_group) {
         _imageView = new WeakReference<ImageView>(imageView);
-        _path      = imageView.getTag().toString();
+        _path      = imageView == null || imageView.getTag() == null ? null : imageView.getTag().toString();
         _defBitmap = defBitmap; 
         _pb        = pb;
         _act       = act;
@@ -33,8 +33,10 @@ class BitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
     			_imageView.get().getTag()!=null &&
     			_imageView.get().getTag().toString().equals(_path)) 
     		return Tmdb.get().loadPoster(0,_path,_act,_pb);      		 
-    	else
+    	else {
+    		_pb.setVisibility(View.INVISIBLE);
     		return null;
+    	}
     }
 
     @Override
