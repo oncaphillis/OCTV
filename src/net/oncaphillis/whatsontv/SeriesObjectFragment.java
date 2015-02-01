@@ -39,7 +39,7 @@ public class SeriesObjectFragment extends Fragment {
     public static final String ARG_IDS   = "ids";
     public static final String ARG_TITLE   = "actiontitle";
 	private static final String _prefix = "<html>"+
-										   " <body>";
+										   " <body style='background-color: #000000; color: #ffffff'>";
 	private static final String _postfix = "</body></html>";
 	
 	private Activity _activity;

@@ -3,23 +3,10 @@
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     -->
-    <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
-        <!--
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        -->
-    </style>
-
-    <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-    </style>
-
 
     <!-- ActionBar styles -->
     <style name="OncaphillisTheme.ActionBar"
-           parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+           parent="@style/Widget.AppCompat.ActionBar">
         <item name="android:textColor">@color/actionbar_text_color</item>
         <item name="android:background">@color/oncaphillis_blue</item>
     </style>
@@ -31,10 +18,9 @@
 	</style>
 
     <!-- the theme applied to the application or activity -->
-    <style name="OncaphillisTheme"
-           parent="@style/Theme.AppCompat.Light">
-		<item name="searchViewAutoCompleteTextView">@style/OncaphillisTheme.SearchField</item>
-        <item name="android:actionBarStyle">@style/OncaphillisTheme.ActionBar</item>
+    <style name="OncaphillisTheme" parent="@style/Theme.AppCompat">
+	  <!--  <item name="searchViewAutoCompleteTextView">@style/OncaphillisTheme.SearchField</item> -->
+      <item name="android:actionBarStyle">@style/OncaphillisTheme.ActionBar</item>
     </style>
     <!-- ActionBar styles -->
 </resources>
