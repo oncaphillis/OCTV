@@ -215,7 +215,7 @@ public class MainActivity extends FragmentActivity {
 						public TvResultsPage request(int page) {
 			        		switch(idx) {
 			        		case 0:
-		        				return api().getTvSeries().getAiringToday(language(), page);
+		        				return api().getTvSeries().getAiringToday(language(), page,null);
 
 			        		case 1:
 		        				return api().getTvSeries().getOnTheAir(language(),page);
@@ -284,7 +284,8 @@ public class MainActivity extends FragmentActivity {
 	private void initNavbar() {
         _DrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         _DrawerList  = (ExpandableListView) findViewById(R.id.left_drawer);
-
+        _DrawerList.setGroupIndicator(null);
+        
         // Set the adapter for the list view
         
         _DrawerList.setAdapter(_DrawerAdapter = new NavigatorAdapter(this));
