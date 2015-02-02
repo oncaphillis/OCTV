@@ -12,9 +12,19 @@
         android:id="@+id/series_table_header_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_weight="1"
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/actionbar_text_color"
         android:textColorLink="@color/actionbar_text_color" />
 
+    <ImageView
+        android:id="@+id/series_table_header_expand"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="right|center_vertical"
+        android:layout_margin="8dp"
+        android:src="@drawable/right" />
+    
 </LinearLayout>
