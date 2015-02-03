@@ -21,6 +21,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -92,6 +93,8 @@ public class MainActivity extends FragmentActivity {
 	private DrawerLayout          _DrawerLayout = null; 
 	private ExpandableListView    _DrawerList   = null;
 	private NavigatorAdapter      _DrawerAdapter = null;
+
+	public SharedPreferences Preferences;
 	
 	/** Spit out a simple alert dialog
 	 * 
@@ -182,6 +185,8 @@ public class MainActivity extends FragmentActivity {
 		
 		setContentView(R.layout.activity_main_pager);
 
+		Preferences = getPreferences(MODE_PRIVATE);
+		
 		initNavbar();
 		
 		try {			
@@ -289,14 +294,20 @@ public class MainActivity extends FragmentActivity {
         // Set the adapter for the list view
         
         _DrawerList.setAdapter(_DrawerAdapter = new NavigatorAdapter(this));
-        final MainActivity a = this;
+        final MainActivity activity = this;
         // Set the list's click listener
         _DrawerList.setOnGroupClickListener( new OnGroupClickListener() {
 			@Override
 			public boolean onGroupClick(ExpandableListView parent, View v,
 					int groupPosition, long id) {
 				if(groupPosition==NavigatorAdapter.ABOUT) {
-					Intent myIntent = new Intent( a, AboutActivity.class);
+					Intent myIntent = new Intent( activity, AboutActivity.class);
+					Bundle b        = new Bundle();
+			        _DrawerLayout.closeDrawers();
+					startActivity(myIntent);
+					return true;
+				} else if(groupPosition==NavigatorAdapter.LOGIN) {
+					Intent myIntent = new Intent( activity, LoginActivity.class);
 					Bundle b        = new Bundle();
 			        _DrawerLayout.closeDrawers();
 					startActivity(myIntent);
@@ -312,7 +323,7 @@ public class MainActivity extends FragmentActivity {
 					int groupPosition, int childPosition, long id) {
 				if(groupPosition == NavigatorAdapter.LISTS) {
 			        _DrawerLayout.closeDrawers();
-					a._viewPager.setCurrentItem(childPosition);
+					activity._viewPager.setCurrentItem(childPosition);
 					return true;
 				}
 				return false;
