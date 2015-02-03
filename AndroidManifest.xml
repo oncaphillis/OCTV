@@ -40,7 +40,14 @@
             android:label="@string/title_activity_about" 
 			android:theme="@style/OncaphillisTheme"
             >
-        </activity>        <activity
+		</activity>
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login" 
+			android:theme="@style/OncaphillisTheme"
+            >
+        </activity>
+        <activity
             android:name=".ErrorActivity"
             android:label="@string/title_activity_error"
             android:launchMode="singleTop"
