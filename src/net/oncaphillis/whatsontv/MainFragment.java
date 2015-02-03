@@ -111,7 +111,7 @@ public class MainFragment extends Fragment {
 									synchronized(a) {
 										if( f.getIdx() < ci.list) {
 											f.setProgressBarVisibility(false);							
-										} else if(f.getIdx()==ci.list) {
+										} else if(f.getIdx()==ci.list && ci.count>0) {
 											f.setProgressBarVisibility(true);
 											f.setProgressBarIndeterminate(false);
 											f.setProgress(ci.count * 10000 / ci.total);
