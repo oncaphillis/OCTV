@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.concurrent.Semaphore;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -105,11 +106,12 @@ class BitmapHash {
 }
 
 public class Tmdb {
-	private static Tmdb   _one = null;
-	private static String _key = null;
-	private TmdbApi       _api = null;
-	private BitmapHash    _hash= new BitmapHash();
-	
+	private static Tmdb      _one  = null;
+	private static String    _key  = null;
+	private TmdbApi          _api  = null;
+	private BitmapHash       _hash = new BitmapHash();
+	private static Semaphore _lock = new Semaphore(0);
+
 	private Tmdb() {
 		_key = TmdbKey.APIKEY;
 	}
@@ -174,8 +176,23 @@ public class Tmdb {
 	 */
 	
 	TmdbApi api() {
+		// This may trigger net access. Therefor we place it
+		// into its own thread. 
 		if(_api == null) {
-			_api = new TmdbApi(_key);
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					_api = new TmdbApi(_key);
+					_lock.release();
+				}
+			}).start();
+
+			try {
+				_lock.acquire();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return _api;
 	}
