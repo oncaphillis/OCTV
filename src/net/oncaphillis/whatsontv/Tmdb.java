@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.Semaphore;
 
@@ -14,6 +15,7 @@ import android.graphics.BitmapFactory;
 import android.view.View;
 import android.widget.ProgressBar;
 import info.movito.themoviedbapi.TmdbApi;
+import info.movito.themoviedbapi.model.config.Timezone;
 
 /**
  * A cash for Bitmap objects we retrieve from the Web. It holds 
@@ -110,10 +112,30 @@ public class Tmdb {
 	private static String    _key  = null;
 	private TmdbApi          _api  = null;
 	private BitmapHash       _hash = new BitmapHash();
-	private static Semaphore _lock = new Semaphore(0);
+	private List<Timezone> _timezones= null;
 
 	private Tmdb() {
+		final Semaphore mutex = new Semaphore(0);
 		_key = TmdbKey.APIKEY;
+
+		// This may trigger net access. Therefor we place it
+		// into its own thread. 
+		if(_api == null) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					_api = new TmdbApi(_key);
+					_timezones = _api.getTimezones();
+					mutex.release();
+				}
+			}).start();
+
+			try {
+				mutex.acquire();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public Bitmap loadPoster(int size,String path,Activity act,ProgressBar pb) {
@@ -176,28 +198,17 @@ public class Tmdb {
 	 */
 	
 	TmdbApi api() {
-		// This may trigger net access. Therefor we place it
-		// into its own thread. 
-		if(_api == null) {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					_api = new TmdbApi(_key);
-					_lock.release();
-				}
-			}).start();
-
-			try {
-				_lock.acquire();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 		return _api;
 	}
 	
 	static Tmdb get() {
-		return _one == null ? _one=new Tmdb() : _one;  
+		if( _one == null ) {
+			_one=new Tmdb();
+		}
+		return _one;  
+	}
+
+	List<Timezone> getTimezones() {
+		return _timezones;
 	}
 }
