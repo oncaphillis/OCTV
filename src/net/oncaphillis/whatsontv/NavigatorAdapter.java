@@ -20,25 +20,27 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 	
 	static final int LOGIN = 0;
 	static final int LISTS = 1;
-	static final int ABOUT = 2;
+	static final int SETUP = 2;
+	static final int ABOUT = 3;
 	
 	private String[] _Groups = new String[] {
-			"Login","Lists","About"
+			"Login","Lists","Setup","About"
 	};
 	
 	private String[][] _Children = new String[][] {
 			{},
 			{"Today","On Air","Hi Vote","Popular"},
+			{},
 			{}
 	};
 	
 	private int[] _GroupImageId = new int[] {
 			R.drawable.ic_action_person,
 			R.drawable.ic_action_view_as_list,
+			R.drawable.ic_action_view_as_list,
 			R.drawable.ic_action_about
 	};
 	
-	private String    _Child = "Child";
 	private Context _Context = null;
 	
 	public NavigatorAdapter(Context c) {

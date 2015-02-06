@@ -306,6 +306,12 @@ public class MainActivity extends FragmentActivity {
 			        _DrawerLayout.closeDrawers();
 					startActivity(myIntent);
 					return true;
+				} else if(groupPosition==NavigatorAdapter.SETUP) {
+					Intent myIntent = new Intent( activity, SetupActivity.class);
+					Bundle b        = new Bundle();
+			        _DrawerLayout.closeDrawers();
+					startActivity(myIntent);
+					return true;
 				} else if(groupPosition==NavigatorAdapter.LOGIN) {
 					Intent myIntent = new Intent( activity, LoginActivity.class);
 					Bundle b        = new Bundle();

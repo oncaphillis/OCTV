@@ -19,5 +19,6 @@
     <string name="nav_bar_open">Open Navigator</string>
     <string name="nav_bar_close">Close Navbar</string>
     <string name="title_activity_login">Login...</string>
+    <string name="title_activity_setup">Setup</string>
 
 </resources>
