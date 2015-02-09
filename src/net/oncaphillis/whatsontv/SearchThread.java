@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 public class SearchThread extends Thread {
 	
-	static final int MAX_SEARCH = 1000;
+	static final int MAX_SEARCH = 2000;
 	private Semaphore _lock       = new Semaphore(0);
 	
 	private Activity                 _activity;
