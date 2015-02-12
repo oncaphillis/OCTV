@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.config.Timezone;
+import info.movito.themoviedbapi.model.tv.TvSeries;
 
 /**
  * A cash for Bitmap objects we retrieve from the Web. It holds 
@@ -149,11 +150,8 @@ public class Tmdb {
 		Bitmap bm = null;
 		
 		synchronized(this) {
-			if((bm=_hash.get(size,path))!=null)
-				return bm;
-		}
-		synchronized(this) {
-			if(path!=null) {
+			
+			if(path!=null && (bm=_hash.get(size,path))==null) {
 				try {
 					if(act!=null && pb!=null) {
 						final ProgressBar p = pb;
@@ -173,6 +171,7 @@ public class Tmdb {
 				} catch(Exception ex) {
 				}
 			}
+
 			if(act!=null && pb!=null) {
 				final ProgressBar p = pb;
 				act.runOnUiThread(new Runnable(){
@@ -191,6 +190,11 @@ public class Tmdb {
 		return loadPoster(size,path,null,null);
 	}
 
+	public TvSeries loadSeries(int id) {
+		
+		return null;
+	}
+	
 	/** returns the TmdbApi object we are working with. Might be null
 	 * if we currently don't have a connection.
 	 *  
@@ -210,5 +214,9 @@ public class Tmdb {
 
 	List<Timezone> getTimezones() {
 		return _timezones;
+	}
+
+	public static String getLanguage() {
+		return "en";
 	}
 }
