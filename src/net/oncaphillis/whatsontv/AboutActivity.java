@@ -58,9 +58,17 @@ public class AboutActivity extends Activity {
 		setContentView(R.layout.activity_about);
 
 		WebView  webview    = ((WebView) findViewById(R.id.about_webview));
+		String debug = new String("");
+		
+		if(Tmdb.isDebug()) {
+			debug = "<p>Series:"+Integer.toString(Tmdb.getSeriesCache().size())+";"+
+						   "Seasons:"+Integer.toString(Tmdb.getSeasonsCache().size())+";"+
+						   "Episodes:"+Integer.toString(Tmdb.getEpisodeCache().size())+";"+
+						   "Bitmaps:"+Integer.toString(Tmdb.getBitmapCache().size())+"</p>";
+		}
 		
 		webview.loadData(_prefix+getBitmapHtml(R.drawable.ic_launcher,new Integer(128),null)+
-				_middle+getBitmapHtml(R.drawable.tmdb_logo,null,null)+
+				_middle+getBitmapHtml(R.drawable.tmdb_logo,null,null)+debug+
 				_postfix,"text/html; charset=utf-8;", "utf-8");
 		
         ActionBar actionBar = getActionBar();
