@@ -47,7 +47,10 @@ class BitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
     			_imageView.get().getTag()!=null &&
     			_imageView.get().getTag().toString().equals(_path)) 
        		_imageView.get().setImageBitmap(bm);
-    
+    	
+    	if(_pb!=null)
+    		_pb.setVisibility(View.INVISIBLE);
+    	
     	if(_pb_group!=null && _pb_group.getTag()!=null) {
     		Integer c=(Integer)_pb_group.getTag();
     		if(c>0) {
