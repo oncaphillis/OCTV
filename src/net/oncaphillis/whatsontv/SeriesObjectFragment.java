@@ -124,7 +124,7 @@ public class SeriesObjectFragment extends Fragment {
 				
 				TvSeries t=null;
 				try {
-					t = Tmdb.get().api().getTvSeries().getSeries(_seriesId,null);
+					t = Tmdb.get().loadSeries(_seriesId);
 				} catch (Exception ex) {
 					return;
 				}
