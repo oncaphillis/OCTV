@@ -6,10 +6,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import net.oncaphillis.whatsontv.R;
 import net.oncaphillis.whatsontv.SearchThread.Current;
@@ -63,6 +68,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import info.movito.themoviedbapi.*;
+import info.movito.themoviedbapi.TmdbTV.TvMethod;
 import info.movito.themoviedbapi.model.core.ResponseStatusException;
 import info.movito.themoviedbapi.model.tv.*;
 import info.movito.themoviedbapi.tools.MovieDbException;
@@ -77,7 +83,7 @@ public class MainActivity extends FragmentActivity {
 
 	static public ArrayAdapter<TvSeries>[]          ListAdapters = new ArrayAdapter[Titles.length];
 	
-	static public HashMap<Integer,List<TvSeries>>[] StoredResults = new HashMap[Titles.length];
+	static public Map<Integer,List<TvSeries>>[] StoredResults = new HashMap[Titles.length];
 	
 	//static public Integer[] Counts = new Integer[Titles.length];
 	
@@ -88,36 +94,48 @@ public class MainActivity extends FragmentActivity {
 	static private Bitmap _defBitmap = null;
 
 	public  SearchThread SearchThread = null;
-	private MainFragment _actFragment = null;
 	private ActionBarDrawerToggle _DrawerToggle = null;
 	private DrawerLayout          _DrawerLayout = null; 
 	private ExpandableListView    _DrawerList   = null;
-	private NavigatorAdapter      _DrawerAdapter = null;
 
 	public SharedPreferences Preferences;
 	
-	/** Spit out a simple alert dialog
-	 * 
-	 * @param txt message to show
-	 */
+
+	class SeriesStorage extends HashMap<Integer,List<TvSeries>> {
+		@Override
+		public List<TvSeries> put(Integer key, List<TvSeries> value) {
+			return super.put(key,value);
+		}
+
+		@Override
+		public List<TvSeries> remove(Object key) {
+			return super.remove(key);
+		}
+
+		@Override
+		public void clear() {
+			super.clear();
+		}
+	};
+	
 	abstract class CachingPager extends Pager {
 		
-		private HashMap<Integer,List<TvSeries>> _storage;
+		private Map<Integer,List<TvSeries>> _storage;
 		private int _totalCount = -1;
 		
 		abstract public TvResultsPage request(int page);
 		
-		public CachingPager(HashMap<Integer,List<TvSeries>> storage) {
+		public CachingPager(Map<Integer,List<TvSeries>> storage) {
 			_storage = storage;
 		}
 
 		public List<TvSeries> getPage(int page) {
 
-			List<TvSeries> l;
+			List<TvSeries> series_list;
 				
 			synchronized( _storage  )  {					
-				if( ( l = _storage.get(page))!=null)
-					return l;
+				if( ( series_list = _storage.get(page))!=null)
+					return series_list;
 			}	
 			
 			while(true) {
@@ -131,13 +149,13 @@ public class MainActivity extends FragmentActivity {
 				
 				try {
 					TvResultsPage r =  request(page);
-					l = r.getResults();
+					series_list = r.getResults();
 					_totalCount = r.getTotalResults();
 					
-					if(l!=null) {
+					if(series_list!=null) {
 						synchronized(_storage )  {					
-							_storage.put(page, l);
-							return l;
+							_storage.put(page, series_list);
+							return series_list;
 						}
 					}	
 				} catch(Exception ex0) {
@@ -205,7 +223,7 @@ public class MainActivity extends FragmentActivity {
 	        for(int i=0;i< Titles.length ;i++) {
 				final int j = i;
 	        	if(StoredResults[i]==null)
-					StoredResults[i] = new HashMap<Integer,List<TvSeries>>();
+					StoredResults[i] = new SeriesStorage();
 	
 	        	if(MainList[i]==null)
 					MainList[i] = new ArrayList<TvSeries>();
@@ -279,11 +297,6 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	public void onAttachFragment(Fragment fragment) {
 		super.onAttachFragment(fragment);
-    	if (fragment instanceof MainFragment) {
-    		synchronized(this) {
-				_actFragment  = (MainFragment) fragment;
-    		}
-    	}
 	}
 	  
 	private void initNavbar() {
@@ -293,7 +306,7 @@ public class MainActivity extends FragmentActivity {
         
         // Set the adapter for the list view
         
-        _DrawerList.setAdapter(_DrawerAdapter = new NavigatorAdapter(this));
+        _DrawerList.setAdapter( new NavigatorAdapter(this)) ;
         final MainActivity activity = this;
         // Set the list's click listener
         _DrawerList.setOnGroupClickListener( new OnGroupClickListener() {
