@@ -12,11 +12,6 @@ public abstract class Pager {
 	protected TmdbApi api() {
 		return Tmdb.get().api();
 	}
-	
-	protected String language()  {
-		return _language;
-	}
-	
 	abstract List<TvSeries> getPage(int page);
 	abstract void start();
 	abstract void end();
