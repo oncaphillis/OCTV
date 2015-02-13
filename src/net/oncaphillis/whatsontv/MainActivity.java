@@ -100,18 +100,15 @@ public class MainActivity extends FragmentActivity {
 
 	public SharedPreferences Preferences;
 	
-
 	class SeriesStorage extends HashMap<Integer,List<TvSeries>> {
 		@Override
 		public List<TvSeries> put(Integer key, List<TvSeries> value) {
 			return super.put(key,value);
 		}
-
 		@Override
 		public List<TvSeries> remove(Object key) {
 			return super.remove(key);
 		}
-
 		@Override
 		public void clear() {
 			super.clear();
@@ -238,16 +235,16 @@ public class MainActivity extends FragmentActivity {
 						public TvResultsPage request(int page) {
 			        		switch(idx) {
 			        		case 0:
-		        				return api().getTvSeries().getAiringToday(language(), page,null);
+		        				return api().getTvSeries().getAiringToday(Tmdb.getLanguage(), page,Tmdb.getTimezone());
 
 			        		case 1:
-		        				return api().getTvSeries().getOnTheAir(language(),page);
+		        				return api().getTvSeries().getOnTheAir(Tmdb.getLanguage(),page);
 
 			        		case 2:	
-		        				return api().getTvSeries().getTopRated(language(),page);
+		        				return api().getTvSeries().getTopRated(Tmdb.getLanguage(),page);
 
 			        		default:
-		        				return api().getTvSeries().getPopular(language(), page);
+		        				return api().getTvSeries().getPopular(Tmdb.getLanguage(), page);
 			        		}
 						}
 
