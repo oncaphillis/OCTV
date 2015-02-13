@@ -5,8 +5,13 @@ import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.lang.ref.WeakReference;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -24,15 +29,45 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, String> {
 	@Override
 	protected String doInBackground(String... params) {
 		String nws = "";
+		
 		if(_textView != null && _textView.get() != null && _textView.get().getTag()!=null && _textView.get().getTag() instanceof Integer) {
 			TvSeries s = Tmdb.get().loadSeries((Integer)_textView.get().getTag());
 			for(Network nw : s.getNetworks() )  {
 				nws += (nws.isEmpty() ? "" : " ") + nw.getName();
 			}
 			
-			/* Calendar c = ;
-			*/
-			nws = " ("+Calendar.getInstance().getTimeZone().getDisplayName()+")";
+			if(s.getLastAirDate()!=null) {
+				nws += " ["+s.getLastAirDate()+"] ";
+				Calendar c = Calendar.getInstance();
+				
+				DateFormat f = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+	
+				try {
+					c.setTime(f.parse(s.getLastAirDate()));
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+	
+				TimeZone fromTimeZone = TimeZone.getDefault();
+		        TimeZone toTimeZone   = TimeZone.getTimeZone("EST");
+	
+		        c.setTimeZone(fromTimeZone);
+		        c.add(Calendar.MILLISECOND, fromTimeZone.getRawOffset() * -1);
+	
+		        if (fromTimeZone.inDaylightTime(c.getTime())) {
+		            c.add(Calendar.MILLISECOND, c.getTimeZone().getDSTSavings() * -1);
+		        }
+	
+		        c.add(Calendar.MILLISECOND, toTimeZone.getRawOffset());
+		        if (toTimeZone.inDaylightTime(c.getTime())) {
+		            c.add(Calendar.MILLISECOND, toTimeZone.getDSTSavings());
+		        }
+		        DateFormat formater = DateFormat.getDateTimeInstance(DateFormat.DEFAULT,DateFormat.MEDIUM,Locale.getDefault());
+		        
+		        nws += " (" + formater.format(c.getTime()) +")";
+			} else {
+				nws += " (???)";
+			}
 		}
 		return nws;
 	}	
