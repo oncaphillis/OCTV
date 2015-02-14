@@ -87,7 +87,7 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 
 	    	if(tt1.getTag() == null || !(tt1.getTag() instanceof Integer) || !((Integer)tt1.getTag()).equals(the_series.getId()) ) {
     			tt1.setTag(new Integer(the_series.getId()));
-    			new SeriesInfoDownLoaderTask(tt1,_activity,pb,_defBitmap,null).execute();
+    			new SeriesInfoDownLoaderTask(tt1,_activity).execute();
     		} 
 	    	tt_vote.setText( String.format("%.1f", the_series.getVoteAverage())+"/"+Integer.toString(the_series.getVoteCount()));
 	    }
