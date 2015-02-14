@@ -33,10 +33,6 @@ class BitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
     			_imageView.get().getTag()!=null &&
     			_imageView.get().getTag().toString().equals(_path)) 
     		return Tmdb.get().loadPoster(0,_path,_act,_pb);      		 
-    	/* else {
-    		_pb.setVisibility(View.INVISIBLE);
-    	}
- 		*/
     	return null;
     }
 
