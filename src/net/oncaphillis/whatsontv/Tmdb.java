@@ -361,7 +361,7 @@ public class Tmdb {
 	}
 
 	public static boolean isDebug() {
-		return true;
+		return Environment.isDebug();
 	}
 
 	public static Timezone getTimezone() {
