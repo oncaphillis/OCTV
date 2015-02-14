@@ -19,64 +19,132 @@ import android.os.AsyncTask;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, String> {
+class SeriesInfo {
+	private TvSeries _tvs;
+	private String _nws = new String("");
+	private Calendar _lastAired = null;
+	private String _lastAiredStr = null;
+	
+	public SeriesInfo(TvSeries s) {
+		_tvs = s;
+		if(_tvs.getNetworks()!=null) {
+			for(Network nw : _tvs.getNetworks() )  {
+				_nws += (_nws.isEmpty() ? "" : " ") + nw.getName();
+			}
+		}
+		if(Environment.isDebug()) 
+			_nws += " ["+s.getLastAirDate()+"] ";
+		
+		if(s.getLastAirDate()!=null) {
+			Calendar c = Calendar.getInstance();
+			
+			DateFormat f = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+			try {
+				c.setTime(f.parse(s.getLastAirDate()));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+
+			TimeZone fromTimeZone = TimeZone.getDefault();
+	        TimeZone toTimeZone   = TimeZone.getTimeZone("EST");
+
+	        c.setTimeZone(fromTimeZone);
+	        c.add(Calendar.MILLISECOND, fromTimeZone.getRawOffset() * -1);
+
+	        if (fromTimeZone.inDaylightTime(c.getTime())) {
+	            c.add(Calendar.MILLISECOND, c.getTimeZone().getDSTSavings() * -1);
+	        }
+
+	        c.add(Calendar.MILLISECOND, toTimeZone.getRawOffset());
+	        
+	        if (toTimeZone.inDaylightTime(c.getTime())) {
+	            c.add(Calendar.MILLISECOND, toTimeZone.getDSTSavings());
+	        }
+	        
+	        DateFormat formater = DateFormat.getDateTimeInstance(DateFormat.DEFAULT,DateFormat.SHORT,Locale.getDefault());
+	        
+	        _lastAired    = c;
+	        _lastAiredStr = formater.format(c.getTime());
+		}
+	}
+
+	Calendar getLastAired() {
+		return _lastAired;
+	}
+
+	String getLastAiredStr() {
+		return _lastAiredStr;
+	}
+	
+	String getNetworks() {
+		return _nws;
+	}
+};
+
+public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo> {
 	private WeakReference<TextView> _textView;
-	public SeriesInfoDownLoaderTask(TextView tt1, Activity _activity,
-			ProgressBar pb, Bitmap _defBitmap, Object object) {
+	private Activity _activity;
+	private DateFormat _formater = DateFormat.getDateTimeInstance(DateFormat.DEFAULT,DateFormat.SHORT,Locale.getDefault());
+	
+	public SeriesInfoDownLoaderTask(TextView tt1, Activity activity) {
 		_textView = new WeakReference(tt1);
+		_activity = activity;
 	}
 
 	@Override
-	protected String doInBackground(String... params) {
-		String nws = "";
-		
+	protected SeriesInfo doInBackground(String... params) {
+		SeriesInfo si = null;
 		if(_textView != null && _textView.get() != null && _textView.get().getTag()!=null && _textView.get().getTag() instanceof Integer) {
 			TvSeries s = Tmdb.get().loadSeries((Integer)_textView.get().getTag());
-			for(Network nw : s.getNetworks() )  {
-				nws += (nws.isEmpty() ? "" : " ") + nw.getName();
-			}
-			
-			if(s.getLastAirDate()!=null) {
-				nws += " ["+s.getLastAirDate()+"] ";
-				Calendar c = Calendar.getInstance();
-				
-				DateFormat f = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-	
-				try {
-					c.setTime(f.parse(s.getLastAirDate()));
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-	
-				TimeZone fromTimeZone = TimeZone.getDefault();
-		        TimeZone toTimeZone   = TimeZone.getTimeZone("EST");
-	
-		        c.setTimeZone(fromTimeZone);
-		        c.add(Calendar.MILLISECOND, fromTimeZone.getRawOffset() * -1);
-	
-		        if (fromTimeZone.inDaylightTime(c.getTime())) {
-		            c.add(Calendar.MILLISECOND, c.getTimeZone().getDSTSavings() * -1);
-		        }
-	
-		        c.add(Calendar.MILLISECOND, toTimeZone.getRawOffset());
-		        if (toTimeZone.inDaylightTime(c.getTime())) {
-		            c.add(Calendar.MILLISECOND, toTimeZone.getDSTSavings());
-		        }
-		        DateFormat formater = DateFormat.getDateTimeInstance(DateFormat.DEFAULT,DateFormat.MEDIUM,Locale.getDefault());
-		        
-		        nws += " (" + formater.format(c.getTime()) +")";
-			} else {
-				nws += " (???)";
-			}
+			si = new SeriesInfo(s);			
 		}
-		return nws;
+		return si;
 	}	
 
+	private Calendar toTimeZone(Calendar ci,String tz) {
+		
+		TimeZone fromTimeZone = TimeZone.getDefault();
+        TimeZone toTimeZone   = TimeZone.getTimeZone("EST");
+        Calendar c = (Calendar) ci.clone();
+        c.setTimeZone(fromTimeZone);
+        c.add(Calendar.MILLISECOND, fromTimeZone.getRawOffset() * -1);
+
+        if (fromTimeZone.inDaylightTime(c.getTime())) {
+            c.add(Calendar.MILLISECOND, c.getTimeZone().getDSTSavings() * -1);
+        }
+
+        c.add(Calendar.MILLISECOND, toTimeZone.getRawOffset());
+        
+        if (toTimeZone.inDaylightTime(c.getTime())) {
+            c.add(Calendar.MILLISECOND, toTimeZone.getDSTSavings());
+        }
+        
+        return c;
+	}
+	
+	private Calendar getToday() {
+		Calendar nw = Calendar.getInstance();
+		nw.set(Calendar.HOUR, 0);
+		nw.set(Calendar.MINUTE, 0);
+		nw.set(Calendar.SECOND, 0);
+		nw.set(Calendar.MILLISECOND, 0);
+		return nw;
+	}
+	
 	@Override
-	// Once the image is downloaded, associates it to the imageView
-	protected void onPostExecute(String nws) {
-		if(_textView != null && _textView.get() != null && _textView.get().getTag()!=null && _textView.get().getTag() instanceof Integer) {
-			_textView.get().setText(nws);
+	protected void onPostExecute(SeriesInfo si) {
+		
+		
+		if(si!=null && _textView != null && _textView.get() != null && _textView.get().getTag()!=null && _textView.get().getTag() instanceof Integer) {
+			_textView.get().setText(si.getNetworks()+" "+(si.getLastAiredStr()== null ? "" : si.getLastAiredStr())+"::"+
+					_formater.format(toTimeZone(getToday(),"EST").getTime()));
+
+			if(si.getLastAired()==null || si.getLastAired().before(toTimeZone(getToday(),"EST"))) {
+				_textView.get().setTextColor(_activity.getResources().getColor(R.color.actionbar_text_color));
+			} else {
+				_textView.get().setTextColor(_activity.getResources().getColor(R.color.oncaphillis_orange));
+			}
 		}
 	}
 }
