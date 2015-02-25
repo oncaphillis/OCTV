@@ -63,7 +63,8 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 		
 	    if (the_series != null && Tmdb.get().api()!=null) {
 	    	TextView   tt0 = (TextView)     the_view.findViewById(R.id.series_title);
-	    	TextView   tt1 = (TextView)     the_view.findViewById(R.id.series_info);
+	    	TextView   tt1 = (TextView)     the_view.findViewById(R.id.series_network);
+	    	TextView   tt2 = (TextView)     the_view.findViewById(R.id.series_time);
 	    	
 	    	ImageView       ii = (ImageView)    the_view.findViewById(R.id.series_list_image);
 	    	TextView   tt_vote = (TextView) the_view.findViewById(R.id.series_rating);
@@ -84,11 +85,17 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 
 	    	
 	    	tt0.setText( the_series.getName() );
-
+	    	
 	    	if(tt1.getTag() == null || !(tt1.getTag() instanceof Integer) || !((Integer)tt1.getTag()).equals(the_series.getId()) ) {
     			tt1.setTag(new Integer(the_series.getId()));
-    			new SeriesInfoDownLoaderTask(tt1,_activity).execute();
-    		} 
+	    	}
+
+	    	if(tt2.getTag() == null || !(tt2.getTag() instanceof Integer) || !((Integer)tt2.getTag()).equals(the_series.getId()) ) {
+    			tt2.setTag(new Integer(the_series.getId()));
+	    	}
+	    	
+    		new SeriesInfoDownLoaderTask(tt1,tt2, _activity).execute();
+ 
 	    	tt_vote.setText( String.format("%.1f", the_series.getVoteAverage())+"/"+Integer.toString(the_series.getVoteCount()));
 	    }
 	    return the_view;
