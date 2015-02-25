@@ -142,10 +142,10 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 		if(si!=null) {
 			if(_timeText != null && _timeText.get() != null && _timeText.get().getTag()!=null && _timeText.get().getTag() instanceof Integer) {
 				if(si.getNextAiring()!=null) {
-					_timeText.get().setText(si.getNextAiring()+" '"+(si.getTitle()== null ? "" : si.getTitle())+"'");					
+					_timeText.get().setText(si.getNextAiring()+" "+(si.getTitle()== null ? "" : si.getTitle()));					
 					_timeText.get().setTextColor(_activity.getResources().getColor(R.color.oncaphillis_orange));
 				} else {
-					_timeText.get().setText(si.getLastAiredStr()+" '"+(si.getTitle()== null ? "" : si.getTitle())+"'");
+					_timeText.get().setText(si.getLastAiredStr()+" "+(si.getTitle()== null ? "" : si.getTitle()));
 					_timeText.get().setTextColor(_activity.getResources().getColor(R.color.actionbar_text_color));
 				}
 			}
