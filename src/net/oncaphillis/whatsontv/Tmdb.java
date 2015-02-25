@@ -2,14 +2,24 @@ package net.oncaphillis.whatsontv;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.PriorityQueue;
 import java.util.TimeZone;
 import java.util.concurrent.Semaphore;
+
+import org.joda.time.DateTime;
+
+import com.uwetrottmann.trakt.v2.TraktV2;
+import com.uwetrottmann.trakt.v2.entities.Episode;
+import com.uwetrottmann.trakt.v2.entities.SearchResult;
+import com.uwetrottmann.trakt.v2.enums.Extended;
+import com.uwetrottmann.trakt.v2.enums.IdType;
 
 import net.oncaphillis.whatsontv.Tmdb.SeasonKey;
 import android.app.Activity;
@@ -180,9 +190,43 @@ public class Tmdb {
 	private static Tmdb      _one     = null;
 	private static String    _key     = null;
 	private TmdbApi          _api     = null;
+	private TraktV2          _trakt   = null;
 	private BitmapHash       _hash    = new BitmapHash();
 	private List<Timezone> _timezones = null;
-
+	
+	public class EpisodeInfo {
+		private TvEpisode _tmdb_episode;
+		private Episode _trakt_episode;
+		EpisodeInfo (TvEpisode tmdb,Episode trakt)  {
+			_tmdb_episode = tmdb;
+			_trakt_episode = trakt;
+			
+		}
+		public TvEpisode getTmdb()  {
+			return _tmdb_episode;
+		}
+		
+		public Episode getTrakt()  {
+			if(_trakt_episode==null) {
+				List<SearchResult> l = Tmdb.get().trakt().search().idLookup(IdType.TMDB,Integer.toString(getTmdb().getId()), 1, null);
+				for(SearchResult r : l) {
+					if(r.type.equals("episode") ) {
+						Episode eps = trakt().episodes().summary(Integer.toString(r.show.ids.trakt),r.episode.season, r.episode.number, Extended.FULL);
+						if(eps.first_aired!=null) {
+							_trakt_episode=eps;
+						}
+					}
+				}
+			}
+			return _trakt_episode;
+		}
+		
+		public Calendar getAirTime() {
+			if(getTrakt()!=null && getTrakt().first_aired!=null)
+				return getTrakt().first_aired.toCalendar(Locale.getDefault());
+			return null;
+		}
+	}
 	class SeasonKey {
 		SeasonKey(int series, int season) {
 			this.series = series;
@@ -239,11 +283,11 @@ public class Tmdb {
 					SeasonMethod.external_ids, SeasonMethod.credits);
 		}
 	};
-	private CacheMap<EpisodeKey,TvEpisode> _episodes = new CacheMap<EpisodeKey,TvEpisode>(5000) {
+	private CacheMap<EpisodeKey,EpisodeInfo> _episodes = new CacheMap<EpisodeKey,EpisodeInfo>(5000) {
 		@Override
-		TvEpisode load(EpisodeKey key) {
-			return api().getTvEpisodes().getEpisode(key.series,key.season,key.episode, 
-					getLanguage(), EpisodeMethod.credits,EpisodeMethod.external_ids,EpisodeMethod.images);
+		EpisodeInfo load(EpisodeKey key) {
+			return new EpisodeInfo(api().getTvEpisodes().getEpisode(key.series,key.season,key.episode, 
+					getLanguage(), EpisodeMethod.credits,EpisodeMethod.external_ids,EpisodeMethod.images),null);
 		}
 	};
 
@@ -257,6 +301,8 @@ public class Tmdb {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
+					_trakt = new TraktV2();
+					_trakt.setApiKey(TmdbKey.TRAKTID);
 					_api = new TmdbApi(_key);
 					_timezones = _api.getTimezones();
 					mutex.release();
@@ -338,10 +384,10 @@ public class Tmdb {
 		return _seasons.get(new SeasonKey(series,season));
 	}
 
-	public TvEpisode loadEpisode(int series,int season,int episode) {
+	public EpisodeInfo loadEpisode(int series,int season,int episode) {
 		return _episodes.get(new EpisodeKey(series,season,episode));
 	}
-
+	
 	/** returns the TmdbApi object we are working with. Might be null
 	 * if we currently don't have a connection.
 	 *  
@@ -350,6 +396,10 @@ public class Tmdb {
 	
 	TmdbApi api() {
 		return _api;
+	}
+	
+	TraktV2 trakt() {
+		return _trakt;
 	}
 	
 	static Tmdb get() {

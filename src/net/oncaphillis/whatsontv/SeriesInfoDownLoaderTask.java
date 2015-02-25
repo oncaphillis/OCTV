@@ -17,6 +17,7 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -51,7 +52,6 @@ class SeriesInfo {
 	        Calendar td = TimeTool.toTimeZone(TimeTool.getToday(),"EST");
 
 	        if( ! td.after( _lastAired)  ) {
-	        	String lt = new String();
 	        	if(s.getSeasons()!=null) {
 	        		ListIterator<TvSeason> season_iterator = s.getSeasons().listIterator(s.getSeasons().size());
 	        		while(_nextAiring == null && season_iterator.hasPrevious()) {
@@ -59,16 +59,18 @@ class SeriesInfo {
 		        		if(season.getEpisodes()!=null) {
 
 		        			ListIterator<TvEpisode> episode_iterator = season.getEpisodes().listIterator(season.getEpisodes().size());
-			        		while(_nextAiring == null && episode_iterator.hasPrevious()) {
-			        			
-			        			//TvEpisode episode = Tmdb.get().loadEpisode(s.getId(), season.getSeasonNumber(), episode_iterator.next().getEpisodeNumber());
-			        			TvEpisode episode = episode_iterator.previous();
 
-			        			if(episode.getAirDate()!=null && TimeTool.fromString(episode.getAirDate()).before(td)) {
-			        				_nextAiring = lt;
+		        			EpisodeInfo le = null;
+
+		        			while(_nextAiring == null && episode_iterator.hasPrevious()) {
+			        			
+			        			EpisodeInfo episode = Tmdb.get().loadEpisode(s.getId(), season.getSeasonNumber(), episode_iterator.previous().getEpisodeNumber());
+			        			if(episode.getTmdb().getAirDate()!=null && le!=null && TimeTool.fromString(episode.getTmdb().getAirDate()).before(td) ) {
+			        				if(le.getAirTime()!=null)
+			        					_nextAiring = TimeTool.toString(le.getAirTime());
 			        				break;
 			        			}
-			        			lt = episode.getAirDate();
+			        			le = episode;
 			        		}
 		        		}
 		        	}
