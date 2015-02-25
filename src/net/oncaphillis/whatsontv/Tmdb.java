@@ -209,6 +209,7 @@ public class Tmdb {
 		public Episode getTrakt()  {
 			if(_trakt_episode==null) {
 				List<SearchResult> l = Tmdb.get().trakt().search().idLookup(IdType.TMDB,Integer.toString(getTmdb().getId()), 1, null);
+			
 				for(SearchResult r : l) {
 					if(r.type.equals("episode") ) {
 						Episode eps = trakt().episodes().summary(Integer.toString(r.show.ids.trakt),r.episode.season, r.episode.number, Extended.FULL);
@@ -222,8 +223,11 @@ public class Tmdb {
 		}
 		
 		public Calendar getAirTime() {
-			if(getTrakt()!=null && getTrakt().first_aired!=null)
-				return getTrakt().first_aired.toCalendar(Locale.getDefault());
+			if(getTrakt()!=null && getTrakt().first_aired!=null) {
+				Calendar c = getTrakt().first_aired.toCalendar(Locale.getDefault());
+				c.setTimeZone(TimeZone.getDefault());
+				return c;
+			}
 			return null;
 		}
 	}
