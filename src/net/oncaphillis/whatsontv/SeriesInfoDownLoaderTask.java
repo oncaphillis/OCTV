@@ -30,7 +30,7 @@ class SeriesInfo {
 	private Calendar _lastAired  = null;
 	private String _lastAiredStr = null;
 	private String _nextAiring   = null;
-	
+	private String _title = null; 
 	public SeriesInfo(TvSeries s) {
 		_tvs = s;
 		if(_tvs.getNetworks()!=null) {
@@ -68,12 +68,22 @@ class SeriesInfo {
 			        			if(episode.getTmdb().getAirDate()!=null && le!=null && TimeTool.fromString(episode.getTmdb().getAirDate()).before(td) ) {
 			        				if(le.getAirTime()!=null)
 			        					_nextAiring = TimeTool.toString(le.getAirTime());
+			        				_title = le.getTmdb().getName();
 			        				break;
 			        			}
 			        			le = episode;
 			        		}
 		        		}
 		        	}
+	        	}
+	        } else {
+	        	s = Tmdb.get().loadSeries(s.getId());
+	        	if(s.getSeasons()!=null && s.getSeasons().size()>0) {
+	        		TvSeason ts = Tmdb.get().loadSeason(s.getId(),s.getSeasons().get(s.getSeasons().size()-1).getSeasonNumber());
+	        		if(ts.getEpisodes()!=null && ts.getEpisodes().size()>0) {
+	        			EpisodeInfo eps = Tmdb.get().loadEpisode(s.getId(),ts.getSeasonNumber(),ts.getEpisodes().get(ts.getEpisodes().size()-1).getEpisodeNumber());
+	        			_title = eps.getTmdb().getName();
+	        		}
 	        	}
 	        }
 		}
@@ -93,6 +103,10 @@ class SeriesInfo {
 	
 	String getNetworks() {
 		return _nws;
+	}
+
+	public String getTitle() {
+		return _title;
 	}
 };
 
@@ -128,10 +142,10 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 		if(si!=null) {
 			if(_timeText != null && _timeText.get() != null && _timeText.get().getTag()!=null && _timeText.get().getTag() instanceof Integer) {
 				if(si.getNextAiring()!=null) {
-					_timeText.get().setText(si.getNextAiring());
+					_timeText.get().setText(si.getNextAiring()+" '"+(si.getTitle()== null ? "" : si.getTitle())+"'");					
 					_timeText.get().setTextColor(_activity.getResources().getColor(R.color.oncaphillis_orange));
 				} else {
-					_timeText.get().setText(si.getLastAiredStr());
+					_timeText.get().setText(si.getLastAiredStr()+" '"+(si.getTitle()== null ? "" : si.getTitle())+"'");
 					_timeText.get().setTextColor(_activity.getResources().getColor(R.color.actionbar_text_color));
 				}
 			}
