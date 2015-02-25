@@ -6,5 +6,15 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/themoviedbapi"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/trakt-java"/>
+	<classpathentry kind="lib" path="/home/kloska/.m2/repository/joda-time/joda-time/2.7/joda-time-2.7.jar" sourcepath="/home/kloska/.m2/repository/joda-time/joda-time/2.7/joda-time-2.7-sources.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="joda-time"/>
+			<attribute name="maven.artifactId" value="joda-time"/>
+			<attribute name="maven.version" value="2.7"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
