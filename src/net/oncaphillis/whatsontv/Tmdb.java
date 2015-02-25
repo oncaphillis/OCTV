@@ -8,6 +8,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.TimeZone;
 import java.util.concurrent.Semaphore;
 
 import net.oncaphillis.whatsontv.Tmdb.SeasonKey;
@@ -187,6 +188,16 @@ public class Tmdb {
 			this.series = series;
 			this.season = season;
 		}
+		
+		@Override
+		public int hashCode() {
+			return series << 8 | season;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			return (o instanceof SeasonKey ? ((SeasonKey)o).series == this.series && ((SeasonKey)o).season == this.season : false);
+		}
 		int	series;
 		int season;
 	};
@@ -197,6 +208,18 @@ public class Tmdb {
 			this.season  = season;
 			this.episode = episode;
 		}
+		
+		@Override
+		public int hashCode() {
+			return series << 16 | season << 8 | episode;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			return o instanceof EpisodeKey ? ((EpisodeKey)o).series == series && ((EpisodeKey)o).season == season && 
+					((EpisodeKey)o).episode == episode : false;
+		}
+		
 		int	series;
 		int season;
 		int episode;
