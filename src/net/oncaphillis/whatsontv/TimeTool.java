@@ -19,14 +19,6 @@ public class TimeTool {
 		
 		String s = c.getTimeZone().getID();
 		
-		// Transform to UTC + DST
-		
-		/* c.add(Calendar.MILLISECOND, c.getTimeZone().getRawOffset());
-
-		if (c.getTimeZone().inDaylightTime(c.getTime())) {
-            c.add(Calendar.MILLISECOND, +c.getTimeZone().getDSTSavings() * -1);
-        }
-        */
 		
         c.add(Calendar.MILLISECOND, toTimeZone.getRawOffset());
         
@@ -63,6 +55,11 @@ public class TimeTool {
 	}
 	
 	public static String toString(Calendar cw) {
-		return _toFormater.format(cw.getTime());
+		Calendar c = (Calendar)cw.clone();
+		c.add(Calendar.MILLISECOND, cw.getTimeZone().getRawOffset());
+		if(c.getTimeZone().inDaylightTime(c.getTime())) {
+			c.add(Calendar.MILLISECOND, c.getTimeZone().getDSTSavings());
+		}
+		return _toFormater.format(c.getTime());
 	}
 }
