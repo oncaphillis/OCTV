@@ -61,10 +61,15 @@ public class AboutActivity extends Activity {
 		String debug = new String("");
 		
 		if(Tmdb.isDebug()) {
-			debug = "<p>Series:"+Integer.toString(Tmdb.getSeriesCache().size())+";"+
-						   "Seasons:"+Integer.toString(Tmdb.getSeasonsCache().size())+";"+
-						   "Episodes:"+Integer.toString(Tmdb.getEpisodeCache().size())+";"+
-						   "Bitmaps:"+Integer.toString(Tmdb.getBitmapCache().size())+"</p>";
+			debug = "<p>Series:"+Integer.toString(Tmdb.getSeriesCache().size())+"/"+
+							Integer.toString(Tmdb.getSeriesCache().hit())+";"+
+						   "Seasons:"+Integer.toString(Tmdb.getSeasonsCache().size())+"/"+
+						   Integer.toString(Tmdb.getSeasonsCache().hit())+"; "+
+						   "Episodes:"+Integer.toString(Tmdb.getEpisodeCache().size())+"/"+
+						   Integer.toString(Tmdb.getEpisodeCache().hit())+"; "+
+						   "Bitmaps:"+Integer.toString(Tmdb.getBitmapCache().size())+"/"+
+						   Integer.toString(Tmdb.getBitmapCache().hit())+
+						   "</p>";
 		}
 		
 		webview.loadData(_prefix+getBitmapHtml(R.drawable.ic_launcher,new Integer(128),null)+
