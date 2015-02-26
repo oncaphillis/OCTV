@@ -54,21 +54,24 @@ class SeriesInfo {
 	        if( ! td.after( _lastAired)  ) {
 	        	if(s.getSeasons()!=null) {
 	        		ListIterator<TvSeason> season_iterator = s.getSeasons().listIterator(s.getSeasons().size());
-	        		while(_nextAiring == null && season_iterator.hasPrevious()) {
+	        		TvEpisode episode = null;
+	        		while(_nextAiring == null && season_iterator.hasPrevious() && (episode==null || td.before(episode.getAirDate())) ) {
 		        		TvSeason  season = Tmdb.get().loadSeason(s.getId(), season_iterator.previous().getSeasonNumber());
 		        		if(season.getEpisodes()!=null) {
 
 		        			ListIterator<TvEpisode> episode_iterator = season.getEpisodes().listIterator(season.getEpisodes().size());
 
-		        			EpisodeInfo le = null;
-
+		        			TvEpisode le = null;
+		        			
 		        			while(_nextAiring == null && episode_iterator.hasPrevious()) {
-			        			
-			        			EpisodeInfo episode = Tmdb.get().loadEpisode(s.getId(), season.getSeasonNumber(), episode_iterator.previous().getEpisodeNumber());
-			        			if(episode.getTmdb().getAirDate()!=null && le!=null && TimeTool.fromString(episode.getTmdb().getAirDate()).before(td) ) {
-			        				if(le.getAirTime()!=null)
-			        					_nextAiring = TimeTool.toString(le.getAirTime());
-			        				_title = le.getTmdb().getName();
+		        				episode = episode_iterator.previous();
+		        				
+		        				//episode = Tmdb.get().loadEpisode(s.getId(), season.getSeasonNumber(), episode_iterator.previous().getEpisodeNumber());
+			        			if(episode.getAirDate()!=null && le!=null && TimeTool.fromString(episode.getAirDate()).before(td) ) {
+			        				EpisodeInfo ei = Tmdb.get().loadEpisode(s.getId(), season.getSeasonNumber(), le.getEpisodeNumber());
+			        				if(ei.getAirTime()!=null)
+			        					_nextAiring = TimeTool.toString(ei.getAirTime());
+			        				_title = ei.getTmdb().getName();
 			        				break;
 			        			}
 			        			le = episode;
