@@ -2,6 +2,7 @@ package net.oncaphillis.whatsontv;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import info.movito.themoviedbapi.model.tv.TvSeries;
 abstract class CacheMap<K,V> {
 	
 	private int _max = 5000;
+	private int _hit = 0;
 	
 	class Node {
 		Node(V s) {
@@ -70,8 +72,10 @@ abstract class CacheMap<K,V> {
 			if(v!=null) {
 				_map.put(key,n=new Node(v));
 			}
+		} else {
+			_hit++;
 		}
-		
+ 		
 		if(n!=null) {
 			n.count++;
 			return n.value;
@@ -83,6 +87,11 @@ abstract class CacheMap<K,V> {
 	public int size() {
 		return _map.size();
 	}
+	
+	public int hit() {
+		return _hit;
+	}
+	
 	abstract V load(K key);
 };
 
@@ -96,7 +105,7 @@ abstract class CacheMap<K,V> {
  */
 
 class BitmapHash {
-	
+	private int _hit = 0; 
 	private class Node {
 		public int count = 0;
 		public Bitmap bm = null;
@@ -127,7 +136,6 @@ class BitmapHash {
 	
 	void put(Bitmap bm,int size,String path) {
 
-		
 		HashMap<String,Node> hm0 = null;
 		
 		if((hm0 = _bmHash.get(size))==null) {
@@ -170,6 +178,7 @@ class BitmapHash {
 		if(hm != null) {
 			if((nd=hm.get(path))!=null) {
 				nd.count++;
+				_hit ++;
 				return nd.bm;
 			}
 		}
@@ -184,6 +193,10 @@ class BitmapHash {
 		}
 		return s;
 	}
+
+	public int hit() {
+		return _hit;
+	}
 }
 
 public class Tmdb {
@@ -197,6 +210,7 @@ public class Tmdb {
 	public class EpisodeInfo {
 		private TvEpisode _tmdb_episode;
 		private Episode _trakt_episode;
+		
 		EpisodeInfo (TvEpisode tmdb,Episode trakt)  {
 			_tmdb_episode = tmdb;
 			_trakt_episode = trakt;
@@ -207,14 +221,22 @@ public class Tmdb {
 		}
 		
 		public Episode getTrakt()  {
+
 			if(_trakt_episode==null) {
-				List<SearchResult> l = Tmdb.get().trakt().search().idLookup(IdType.TMDB,Integer.toString(getTmdb().getId()), 1, null);
-			
-				for(SearchResult r : l) {
-					if(r.type.equals("episode") ) {
-						Episode eps = trakt().episodes().summary(Integer.toString(r.show.ids.trakt),r.episode.season, r.episode.number, Extended.FULL);
-						if(eps.first_aired!=null) {
-							_trakt_episode=eps;
+				List<SearchResult> l;
+				
+				synchronized(Tmdb.get()) {
+					 l = Tmdb.get().trakt().search().idLookup(IdType.TMDB,Integer.toString(getTmdb().getId()), 1, null);
+				}
+				
+				if(l != null) {
+					for(SearchResult r : l) {
+						if(r.type.equals("episode") ) {
+							Episode eps = trakt().episodes().summary(Integer.toString(r.show.ids.trakt),r.episode.season, 
+									r.episode.number, Extended.FULL);
+							if(eps.first_aired!=null) {
+								_trakt_episode=eps;
+							}
 						}
 					}
 				}
@@ -228,6 +250,12 @@ public class Tmdb {
 				c.setTimeZone(TimeZone.getDefault());
 				return c;
 			}
+			return null;
+		}
+		public Calendar getAirDate() {
+			if(getTmdb().getAirDate()!=null)
+				return TimeTool.toTimeZone(TimeTool.fromString(getTmdb().getAirDate()),"EST");
+			
 			return null;
 		}
 	}
