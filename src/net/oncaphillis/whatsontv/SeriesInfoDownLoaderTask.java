@@ -29,8 +29,12 @@ class SeriesInfo {
 	private String _nws = new String("");
 	private Calendar _lastAired  = null;
 	private String _lastAiredStr = null;
-	private String _nextAiring   = null;
-	private String _title = null; 
+	private String _nextAiringStr   = null;
+	private String _lastEpisodeTitle = null; 
+
+	private static DateFormat _timeFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy hh:mm");
+	private static DateFormat _dateFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy");
+	
 	public SeriesInfo(TvSeries s) {
 		_tvs = s;
 		if(_tvs.getNetworks()!=null) {
@@ -43,7 +47,7 @@ class SeriesInfo {
 			
 			Calendar c    = TimeTool.fromString(s.getLastAirDate());
 	        _lastAired    = c;
-	        _lastAiredStr = TimeTool.toString(_lastAired);
+	        _lastAiredStr =  _dateFormater.format(_lastAired.getTime());
 
 			// All TMDB dates are EST.
 	        // We check if the Last Aired Field is >= Today
@@ -55,7 +59,7 @@ class SeriesInfo {
 	        	if(s.getSeasons()!=null) {
 	        		ListIterator<TvSeason> season_iterator = s.getSeasons().listIterator(s.getSeasons().size());
 	        		TvEpisode episode = null;
-	        		while(_nextAiring == null && season_iterator.hasPrevious() && (episode==null || td.before(episode.getAirDate())) ) {
+	        		while(_nextAiringStr == null && season_iterator.hasPrevious() && (episode==null || td.before(episode.getAirDate())) ) {
 		        		TvSeason  season = Tmdb.get().loadSeason(s.getId(), season_iterator.previous().getSeasonNumber());
 		        		if(season.getEpisodes()!=null) {
 
@@ -63,15 +67,15 @@ class SeriesInfo {
 
 		        			TvEpisode le = null;
 		        			
-		        			while(_nextAiring == null && episode_iterator.hasPrevious()) {
+		        			while(_nextAiringStr == null && episode_iterator.hasPrevious()) {
 		        				episode = episode_iterator.previous();
 		        				
 		        				//episode = Tmdb.get().loadEpisode(s.getId(), season.getSeasonNumber(), episode_iterator.previous().getEpisodeNumber());
 			        			if(episode.getAirDate()!=null && le!=null && TimeTool.fromString(episode.getAirDate()).before(td) ) {
 			        				EpisodeInfo ei = Tmdb.get().loadEpisode(s.getId(), season.getSeasonNumber(), le.getEpisodeNumber());
 			        				if(ei.getAirTime()!=null)
-			        					_nextAiring = TimeTool.toString(ei.getAirTime());
-			        				_title = ei.getTmdb().getName();
+			        					_nextAiringStr = _timeFormater.format(ei.getAirTime().getTime());
+			        				_lastEpisodeTitle = ei.getTmdb().getName();
 			        				break;
 			        			}
 			        			le = episode;
@@ -85,7 +89,7 @@ class SeriesInfo {
 	        		TvSeason ts = Tmdb.get().loadSeason(s.getId(),s.getSeasons().get(s.getSeasons().size()-1).getSeasonNumber());
 	        		if(ts.getEpisodes()!=null && ts.getEpisodes().size()>0) {
 	        			EpisodeInfo eps = Tmdb.get().loadEpisode(s.getId(),ts.getSeasonNumber(),ts.getEpisodes().get(ts.getEpisodes().size()-1).getEpisodeNumber());
-	        			_title = eps.getTmdb().getName();
+	        			_lastEpisodeTitle = eps.getTmdb().getName();
 	        		}
 	        	}
 	        }
@@ -100,27 +104,31 @@ class SeriesInfo {
 		return _lastAiredStr;
 	}
 	
-	String getNextAiring() {
-		return _nextAiring; 
+	String getNextAiringStr() {
+		return _nextAiringStr; 
 	}
 	
 	String getNetworks() {
 		return _nws;
 	}
 
-	public String getTitle() {
-		return _title;
+	public String getLastEpisodeTitle() {
+		return _lastEpisodeTitle;
 	}
 };
 
 public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo> {
 	private WeakReference<TextView> _networkText;
 	private WeakReference<TextView> _timeText;
+	private WeakReference<TextView> _lastEpisodeText;
 	private Activity _activity;
 	
-	public SeriesInfoDownLoaderTask(TextView networkText, TextView timeText,Activity activity) {
+
+	
+	public SeriesInfoDownLoaderTask(TextView networkText, TextView timeText,TextView lastEpisodeText, Activity activity) {
 		_networkText = new WeakReference(networkText);
 		_timeText    = new WeakReference(timeText);
+		_lastEpisodeText = new WeakReference(lastEpisodeText);
 		
 		_activity = activity;
 	}
@@ -144,17 +152,21 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 
 		if(si!=null) {
 			if(_timeText != null && _timeText.get() != null && _timeText.get().getTag()!=null && _timeText.get().getTag() instanceof Integer) {
-				if(si.getNextAiring()!=null) {
-					_timeText.get().setText(si.getNextAiring()+" "+(si.getTitle()== null ? "" : si.getTitle()));					
+				if(si.getNextAiringStr()!=null) {
+					_timeText.get().setText(si.getNextAiringStr());					
 					_timeText.get().setTextColor(_activity.getResources().getColor(R.color.oncaphillis_orange));
 				} else {
-					_timeText.get().setText(si.getLastAiredStr()+" "+(si.getTitle()== null ? "" : si.getTitle()));
+					_timeText.get().setText(si.getLastAiredStr());
 					_timeText.get().setTextColor(_activity.getResources().getColor(R.color.actionbar_text_color));
 				}
 			}
 
 			if(_networkText != null && _networkText.get() != null && _networkText.get().getTag()!=null && _networkText.get().getTag() instanceof Integer) {
 				_networkText.get().setText(si.getNetworks());
+			}
+
+			if(_lastEpisodeText != null && _lastEpisodeText.get() != null && _lastEpisodeText.get().getTag()!=null && _lastEpisodeText.get().getTag() instanceof Integer) {
+				_lastEpisodeText.get().setText(si.getLastEpisodeTitle());
 			}
 		}
 	}
