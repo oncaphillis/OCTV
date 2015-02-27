@@ -65,6 +65,7 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	TextView   tt0 = (TextView)     the_view.findViewById(R.id.series_title);
 	    	TextView   tt1 = (TextView)     the_view.findViewById(R.id.series_network);
 	    	TextView   tt2 = (TextView)     the_view.findViewById(R.id.series_time);
+	    	TextView   tt3 = (TextView)     the_view.findViewById(R.id.series_last_episode);
 	    	
 	    	ImageView       ii = (ImageView)    the_view.findViewById(R.id.series_list_image);
 	    	TextView   tt_vote = (TextView) the_view.findViewById(R.id.series_rating);
@@ -83,7 +84,6 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
     			ii.setImageBitmap(_defBitmap);
     		}
 
-	    	
 	    	tt0.setText( the_series.getName() );
 	    	
 	    	if(tt1.getTag() == null || !(tt1.getTag() instanceof Integer) || !((Integer)tt1.getTag()).equals(the_series.getId()) ) {
@@ -93,8 +93,16 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	if(tt2.getTag() == null || !(tt2.getTag() instanceof Integer) || !((Integer)tt2.getTag()).equals(the_series.getId()) ) {
     			tt2.setTag(new Integer(the_series.getId()));
 	    	}
-	    	
-    		new SeriesInfoDownLoaderTask(tt1,tt2, _activity).execute();
+
+	    	if(tt3.getTag() == null || !(tt3.getTag() instanceof Integer) || !((Integer)tt3.getTag()).equals(the_series.getId()) ) {
+    			tt3.setTag(new Integer(the_series.getId()));
+	    	}
+
+	    	tt1.setText("...");
+	    	tt2.setText("...");
+	    	tt3.setText("...");
+    		
+	    	new SeriesInfoDownLoaderTask(tt1,tt2, tt3,_activity).execute();
  
 	    	tt_vote.setText( String.format("%.1f", the_series.getVoteAverage())+"/"+Integer.toString(the_series.getVoteCount()));
 	    }
