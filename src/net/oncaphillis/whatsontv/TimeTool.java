@@ -10,7 +10,7 @@ import java.util.TimeZone;
 
 public class TimeTool {
 	// private static DateFormat _toFormater   = DateFormat.getDateTimeInstance(DateFormat.DEFAULT,DateFormat.SHORT,Locale.getDefault());
-	private static DateFormat _toFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy");
+	private static DateFormat _toFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy hh:mm");
 	private static DateFormat _fromFormater = new SimpleDateFormat("yyyy-MM-dd");
 
 	public static Calendar toTimeZone(Calendar ci,String tz) {
