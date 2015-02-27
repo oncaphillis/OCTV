@@ -207,6 +207,8 @@ public class Tmdb {
 	private BitmapHash       _hash    = new BitmapHash();
 	private List<Timezone> _timezones = null;
 	
+	private static Object _lock = new Object();
+	
 	public class EpisodeInfo {
 		private TvEpisode _tmdb_episode;
 		private Episode _trakt_episode;
@@ -225,7 +227,7 @@ public class Tmdb {
 			if(_trakt_episode==null) {
 				List<SearchResult> l;
 				
-				synchronized(Tmdb.get()) {
+				synchronized(_lock) {
 					 l = Tmdb.get().trakt().search().idLookup(IdType.TMDB,Integer.toString(getTmdb().getId()), 1, null);
 				}
 				
