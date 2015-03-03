@@ -62,21 +62,44 @@
 	                android:layout_height="wrap_content"
 	                android:text="Network"
 	                android:textAppearance="?android:attr/textAppearanceSmall" />
-	
-	            <TextView
-	                android:id="@+id/series_time"
-	                android:layout_width="fill_parent"
-	                android:layout_height="wrap_content"
-	                android:text="Time"
-	                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-	            <TextView
-	                android:id="@+id/series_last_episode"
-	                android:layout_width="fill_parent"
-	                android:layout_height="wrap_content"
-	                android:layout_weight="2"
-	                android:text="Medium Text"
-	                android:textAppearance="?android:attr/textAppearanceMedium" />
+	            <LinearLayout
+	                android:id="@+id/series_nearest_episode"
+	                android:layout_width="match_parent"
+	                android:layout_height="fill_parent"
+	                android:background="@color/oncaphillis_light_grey"
+	                android:orientation="vertical" >
+
+	                <LinearLayout
+	                    android:layout_width="match_parent"
+	                    android:layout_height="wrap_content" >
+
+	                    <TextView
+	                        android:id="@+id/series_airing_state"
+	                        android:layout_width="wrap_content"
+	                        android:layout_height="wrap_content"
+	                        android:gravity="center_vertical"
+	                        android:padding="4dp"
+	                        android:text="next"
+	                        android:textStyle="bold" />
+
+	                    <TextView
+	                        android:id="@+id/series_time"
+	                        android:layout_width="fill_parent"
+	                        android:layout_height="wrap_content"
+	                        android:text="Time"
+	                        android:textAppearance="?android:attr/textAppearanceMedium" />
+	                </LinearLayout>
+
+	                <TextView
+	                    android:id="@+id/series_last_episode"
+	                    android:layout_width="fill_parent"
+	                    android:layout_height="fill_parent"
+	                    android:layout_weight="2"
+	                    android:text="Medium Text"
+	                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+	            </LinearLayout>
 	
 	        </LinearLayout>
 	    </LinearLayout>
@@ -84,26 +107,6 @@
 	    <RelativeLayout
 	        android:layout_width="wrap_content"
 	        android:layout_height="match_parent" >
-	
-	        <ImageView
-	            android:id="@+id/creator_image"
-	            android:layout_width="wrap_content"
-	            android:layout_height="fill_parent"
-	            android:src="@drawable/vote_star" />
-	
-	        <TextView
-	            android:id="@+id/series_rating"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_centerHorizontal="true"
-	            android:layout_centerVertical="true"
-	            android:gravity="center_horizontal|clip_vertical"
-	            android:text="-/-"
-	            android:textColor="#ff000000"
-	            android:textColorHint="@color/actionbar_text_color"
-	            android:textColorLink="@color/oncaphillis_blue"
-	            android:textStyle="bold"
-	            android:typeface="normal" />
 	
 	    </RelativeLayout>
 	</LinearLayout>
