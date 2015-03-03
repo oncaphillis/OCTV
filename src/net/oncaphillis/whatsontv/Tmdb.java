@@ -3,8 +3,12 @@ package net.oncaphillis.whatsontv;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -208,7 +212,8 @@ public class Tmdb {
 	private List<Timezone> _timezones = null;
 	
 	private static Object _lock = new Object();
-	
+	private static Timezone _tz = new Timezone(TimeZone.getDefault().getID(),"de");
+
 	public class EpisodeInfo {
 		private TvEpisode _tmdb_episode;
 		private Episode _trakt_episode;
@@ -246,18 +251,25 @@ public class Tmdb {
 			return _trakt_episode;
 		}
 		
-		public Calendar getAirTime() {
+		public Date getAirTime() {
 			if(getTrakt()!=null && getTrakt().first_aired!=null) {
-				Calendar c = getTrakt().first_aired.toCalendar(Locale.getDefault());
-				c.setTimeZone(TimeZone.getDefault());
-				return c;
+				return  getTrakt().first_aired.toCalendar(Locale.getDefault()).getTime();
 			}
 			return null;
 		}
-		public Calendar getAirDate() {
-			if(getTmdb().getAirDate()!=null)
-				return TimeTool.toTimeZone(TimeTool.fromString(getTmdb().getAirDate()),"EST");
-			
+		
+		public Date getAirDate() {
+			if(getTmdb().getAirDate()!=null) {
+				DateFormat formater   = new SimpleDateFormat("yyyy-MM-dd") {
+					{
+						this.setTimeZone(TimeZone.getTimeZone("EST"));
+					}
+				};
+				try {
+					return formater.parse(getTmdb().getAirDate());
+				} catch (ParseException e) {
+				}
+			}
 			return null;
 		}
 	}
