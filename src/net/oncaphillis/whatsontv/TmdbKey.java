@@ -9,5 +9,6 @@ package net.oncaphillis.whatsontv;
  */
 
 public class TmdbKey {
-	static final String APIKEY = "Insert TMDB API Key here. See https://www.themoviedb.org/faq/api";
+	static final String APIKEY  = "Insert TMDB API Key here. See https://www.themoviedb.org/faq/api";
+	static final String TRAKTID = "Insert TRAKT API Id here. http://docs.trakt.apiary.io";
 }
