@@ -7,4 +7,5 @@
     <color name="oncaphillis_orange">#FFFF9933</color>
     <color name="oncaphillis_white">#ffffffff</color>
     <color name="oncaphillis_grey">#ff222222</color>
+    <color name="oncaphillis_light_grey">#ff666666</color>
 </resources>
