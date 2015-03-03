@@ -9,7 +9,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class TimeTool {
-	// private static DateFormat _toFormater   = DateFormat.getDateTimeInstance(DateFormat.DEFAULT,DateFormat.SHORT,Locale.getDefault());
 	private static DateFormat _toFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy hh:mm");
 	private static DateFormat _fromFormater = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -30,37 +29,17 @@ public class TimeTool {
         return c;
 	}
 	
-	public static Calendar getNow() {
-		Calendar nw = Calendar.getInstance();
-		return nw;
+	public static Date getNow() {
+		return Calendar.getInstance().getTime();
 	}
 
-	public static Calendar getToday() {
-		Calendar nw = getNow();
-		nw.set(Calendar.HOUR_OF_DAY, 0);
-		nw.set(Calendar.MINUTE, 0);
-		nw.set(Calendar.SECOND, 0);
-		nw.set(Calendar.MILLISECOND, 0);
-		return nw;
-	}
-	
-	public static Calendar fromString(String str) {
+	public static Date getToday() {
 		Calendar c = Calendar.getInstance();
-		Date d = null;
-		try {
-			d = _fromFormater.parse(str);
-		} catch (ParseException e) {
-		}
-		c.setTime(d);
-		return c;
-	}
-	
-	public static String toString(Calendar cw) {
-		Calendar c = (Calendar)cw.clone();
-		c.add(Calendar.MILLISECOND, cw.getTimeZone().getRawOffset());
-		if(c.getTimeZone().inDaylightTime(c.getTime())) {
-			c.add(Calendar.MILLISECOND, c.getTimeZone().getDSTSavings());
-		}
-		return _toFormater.format(c.getTime());
+		c.setTime(getNow());
+		c.set(Calendar.HOUR_OF_DAY,   0);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
+		return c.getTime();
 	}
 }
