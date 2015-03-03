@@ -4,6 +4,7 @@ import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.tv.Network;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -17,10 +18,12 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
@@ -59,16 +62,29 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 		
 		TvSeries the_series = getItem(position);
 		
-		// v.setBackgroundColor(R.id.action_bar);
 		
 	    if (the_series != null && Tmdb.get().api()!=null) {
+	    	LinearLayout ll = (LinearLayout)the_view.findViewById(R.id.series_nearest_episode);
+	    	
+	    	ll.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					try {
+						_activity.setWallpaper(_defBitmap);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+	    	});
+	    	
 	    	TextView   tt0 = (TextView)     the_view.findViewById(R.id.series_title);
 	    	TextView   tt1 = (TextView)     the_view.findViewById(R.id.series_network);
 	    	TextView   tt2 = (TextView)     the_view.findViewById(R.id.series_time);
 	    	TextView   tt3 = (TextView)     the_view.findViewById(R.id.series_last_episode);
+	    	TextView   tt4 = (TextView)     the_view.findViewById(R.id.series_airing_state);
 	    	
 	    	ImageView       ii = (ImageView)    the_view.findViewById(R.id.series_list_image);
-	    	TextView   tt_vote = (TextView) the_view.findViewById(R.id.series_rating);
 	    	ProgressBar     pb = (ProgressBar)  the_view.findViewById(R.id.series_wait_bar);
 
 	    	pb.setVisibility(View.INVISIBLE);
@@ -101,11 +117,10 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	tt1.setText("...");
 	    	tt2.setText("...");
 	    	tt3.setText("...");
+    		tt4.setText("...");
     		
-	    	new SeriesInfoDownLoaderTask(tt1,tt2, tt3,_activity).execute();
- 
-	    	tt_vote.setText( String.format("%.1f", the_series.getVoteAverage())+"/"+Integer.toString(the_series.getVoteCount()));
-	    }
+	    	new SeriesInfoDownLoaderTask(tt1,tt2, tt3,tt4,_activity).execute();
+ 	    }
 	    return the_view;
 	}
 }

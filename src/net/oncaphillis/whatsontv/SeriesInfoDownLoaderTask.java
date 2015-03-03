@@ -27,13 +27,16 @@ import android.widget.TextView;
 class SeriesInfo {
 	private TvSeries _tvs;
 	private String _nws = new String("");
-	private Calendar _lastAired  = null;
-	private String _lastAiredStr = null;
-	private String _nextAiringStr   = null;
-	private String _lastEpisodeTitle = null; 
+	private Date    _nearestAiring  = null;
+	private String _nearestEpisodeTitle = new String("");
+	private boolean _hasClock = false;
 
-	private static DateFormat _timeFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy hh:mm");
-	private static DateFormat _dateFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy");
+
+	private static DateFormat _tmdbDateFormater   = new SimpleDateFormat("yyyy-MM-dd") {
+		{
+			this.setTimeZone(TimeZone.getTimeZone("EST"));
+		}
+	};
 	
 	public SeriesInfo(TvSeries s) {
 		_tvs = s;
@@ -42,24 +45,31 @@ class SeriesInfo {
 				_nws += (_nws.isEmpty() ? "" : " ") + nw.getName();
 			}
 		}
+
+		_nearestAiring    = new Date();
 		
 		if(s.getLastAirDate()!=null) {
 			
-			Calendar c    = TimeTool.fromString(s.getLastAirDate());
-	        _lastAired    = c;
-	        _lastAiredStr =  _dateFormater.format(_lastAired.getTime());
+			try {
+				_nearestAiring = _tmdbDateFormater.parse( s.getLastAirDate());
+			} catch (ParseException e) {
+			}
 
 			// All TMDB dates are EST.
 	        // We check if the Last Aired Field is >= Today
 	        // I this case we search for the smallest airing date >= today
 	        
-	        Calendar td = TimeTool.toTimeZone(TimeTool.getToday(),"EST");
-
-	        if( ! td.after( _lastAired)  ) {
+	        Date td = TimeTool.getToday();
+	        
+	        String sxx=new String();
+	        boolean found = false;
+	        if( ! td.after( _nearestAiring )  ) {
+	        	
 	        	if(s.getSeasons()!=null) {
 	        		ListIterator<TvSeason> season_iterator = s.getSeasons().listIterator(s.getSeasons().size());
 	        		TvEpisode episode = null;
-	        		while(_nextAiringStr == null && season_iterator.hasPrevious() && (episode==null || td.before(episode.getAirDate())) ) {
+	        		
+	        		while( ! found && season_iterator.hasPrevious() && (episode==null || td.before(getAirDate(episode))) ) {
 		        		TvSeason  season = Tmdb.get().loadSeason(s.getId(), season_iterator.previous().getSeasonNumber());
 		        		if(season.getEpisodes()!=null) {
 
@@ -67,15 +77,21 @@ class SeriesInfo {
 
 		        			TvEpisode le = null;
 		        			
-		        			while(_nextAiringStr == null && episode_iterator.hasPrevious()) {
+		        			while(episode_iterator.hasPrevious()) {
 		        				episode = episode_iterator.previous();
 		        				
-		        				//episode = Tmdb.get().loadEpisode(s.getId(), season.getSeasonNumber(), episode_iterator.previous().getEpisodeNumber());
-			        			if(episode.getAirDate()!=null && le!=null && TimeTool.fromString(episode.getAirDate()).before(td) ) {
+		        				if(episode.getAirDate()!=null && le!=null && getAirDate(episode).before(td)) {
 			        				EpisodeInfo ei = Tmdb.get().loadEpisode(s.getId(), season.getSeasonNumber(), le.getEpisodeNumber());
-			        				if(ei.getAirTime()!=null)
-			        					_nextAiringStr = _timeFormater.format(ei.getAirTime().getTime());
-			        				_lastEpisodeTitle = ei.getTmdb().getName();
+			        				
+			        				if(ei.getAirTime() != null) {
+			        					// Too large difference between Trakt.
+			        					_nearestAiring = ei.getAirTime();
+			        					_hasClock = true;
+			        				} else {
+			        					_nearestAiring = ei.getAirDate();
+			        				}
+			        				_nearestEpisodeTitle = ei.getTmdb().getName();
+			        				found = true;
 			        				break;
 			        			}
 			        			le = episode;
@@ -89,31 +105,43 @@ class SeriesInfo {
 	        		TvSeason ts = Tmdb.get().loadSeason(s.getId(),s.getSeasons().get(s.getSeasons().size()-1).getSeasonNumber());
 	        		if(ts.getEpisodes()!=null && ts.getEpisodes().size()>0) {
 	        			EpisodeInfo eps = Tmdb.get().loadEpisode(s.getId(),ts.getSeasonNumber(),ts.getEpisodes().get(ts.getEpisodes().size()-1).getEpisodeNumber());
-	        			_lastEpisodeTitle = eps.getTmdb().getName();
+	        			_nearestEpisodeTitle = eps.getTmdb().getName();
+	        			_nearestAiring = eps.getAirDate();
 	        		}
 	        	}
 	        }
 		}
 	}
-
-	Calendar getLastAired() {
-		return _lastAired;
-	}
-
-	String getLastAiredStr() {
-		return _lastAiredStr;
+	
+	Date getAirDate(TvEpisode e) {
+		if(e.getAirDate()!=null) {
+			int delta = TimeZone.getDefault().getRawOffset() - TimeZone.getTimeZone("EST").getRawOffset();
+		
+			try {
+				Date date =  _tmdbDateFormater.parse(e.getAirDate());
+				date.setTime(date.getTime()+delta);
+				return date;
+			} catch (ParseException e1) {
+			}
+		}
+		
+		return null;
 	}
 	
-	String getNextAiringStr() {
-		return _nextAiringStr; 
+	Date getNearestAiring() {
+		return _nearestAiring;
 	}
-	
+
 	String getNetworks() {
 		return _nws;
 	}
 
-	public String getLastEpisodeTitle() {
-		return _lastEpisodeTitle;
+	public String getNearestEpisodeTitle() {
+		return _nearestEpisodeTitle;
+	}
+
+	public boolean hasClock() {
+		return _hasClock ;
 	}
 };
 
@@ -121,15 +149,27 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 	private WeakReference<TextView> _networkText;
 	private WeakReference<TextView> _timeText;
 	private WeakReference<TextView> _lastEpisodeText;
+	private WeakReference<TextView> _timeStateText;
 	private Activity _activity;
 	
 
+	private static DateFormat _timeFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm") {
+		{
+			this.setTimeZone(TimeZone.getDefault());
+		}
+	};
 	
-	public SeriesInfoDownLoaderTask(TextView networkText, TextView timeText,TextView lastEpisodeText, Activity activity) {
+	private static DateFormat _dateFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy") {
+		{
+			this.setTimeZone(TimeZone.getDefault());
+		}
+	};
+	
+	public SeriesInfoDownLoaderTask(TextView networkText, TextView timeText,TextView lastEpisodeText, TextView timeState,Activity activity) {
 		_networkText = new WeakReference(networkText);
 		_timeText    = new WeakReference(timeText);
 		_lastEpisodeText = new WeakReference(lastEpisodeText);
-		
+		_timeStateText   = new WeakReference(timeState);
 		_activity = activity;
 	}
 
@@ -148,16 +188,27 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 	protected void onPostExecute(SeriesInfo si) {
 		// dates reported by Tmdb are in EST. We need this to compare
 		// the last aired
-		Calendar today1 = TimeTool.toTimeZone(TimeTool.getToday(),"EST");
+		// Calendar today1 = TimeTool.toTimeZone(TimeTool.getToday(),"EST");
 
 		if(si!=null) {
 			if(_timeText != null && _timeText.get() != null && _timeText.get().getTag()!=null && _timeText.get().getTag() instanceof Integer) {
-				if(si.getNextAiringStr()!=null) {
-					_timeText.get().setText(si.getNextAiringStr());					
-					_timeText.get().setTextColor(_activity.getResources().getColor(R.color.oncaphillis_orange));
-				} else {
-					_timeText.get().setText(si.getLastAiredStr());
-					_timeText.get().setTextColor(_activity.getResources().getColor(R.color.actionbar_text_color));
+				if(si.getNearestAiring()!=null) {
+					
+					DateFormat df = si.hasClock() ? _timeFormater : _dateFormater;
+					
+					Date td = TimeTool.getToday();
+					_timeText.get().setText(df.format(si.getNearestAiring()) );					
+					
+					if(si.getNearestAiring().before(td)) {
+						_timeText.get().setTextColor(_activity.getResources().getColor(R.color.actionbar_text_color));
+						if(_timeStateText.get()!=null)
+							_timeStateText.get().setText("last");
+					} else {
+						if(_timeStateText.get()!=null)
+							_timeStateText.get().setText("next");
+						_timeText.get().setTextColor(_activity.getResources().getColor(R.color.oncaphillis_orange));
+
+					}
 				}
 			}
 
@@ -166,7 +217,7 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 			}
 
 			if(_lastEpisodeText != null && _lastEpisodeText.get() != null && _lastEpisodeText.get().getTag()!=null && _lastEpisodeText.get().getTag() instanceof Integer) {
-				_lastEpisodeText.get().setText(si.getLastEpisodeTitle());
+				_lastEpisodeText.get().setText(si.getNearestEpisodeTitle());
 			}
 		}
 	}
