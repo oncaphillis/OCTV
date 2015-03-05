@@ -57,7 +57,7 @@ class SeriesInfo {
 	        
 	        String sxx=new String();
 	        boolean found = false;
-	        if(false && ! td.after( _nearestAiring )  ) {
+	        if( ! td.after( _nearestAiring )  ) {
 	        	
 	        	if(s.getSeasons()!=null) {
 	        		ListIterator<TvSeason> season_iterator = s.getSeasons().listIterator(s.getSeasons().size());

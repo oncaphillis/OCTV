@@ -227,8 +227,6 @@ public class Tmdb {
 		}
 		
 		public Episode getTrakt()  {
-			return null;
-			/*
 			if(_trakt_episode==null) {
 				List<SearchResult> l;
 				
@@ -249,7 +247,6 @@ public class Tmdb {
 				}
 			}
 			return _trakt_episode;
-			*/
 		}
 		
 		public Date getAirTime() {
@@ -376,8 +373,6 @@ public class Tmdb {
 	}
 	
 	public Bitmap loadPoster(int size,String path,Activity act,ProgressBar pb) {
-		return null;
-/*
 		if(api()==null)
 			return null;
 		
@@ -429,7 +424,6 @@ public class Tmdb {
 		}
 		
 		return bm;
-		*/
 	}
 	
 	public Bitmap loadPoster(int size,String path) {
