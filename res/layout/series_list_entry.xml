@@ -21,11 +21,20 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_marginRight="4dp" >
+
+	        <TextView
+	            android:id="@+id/series_list_firstaired"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_centerHorizontal="true"
+	            android:gravity="center_vertical"
+	            android:text="2006" />
 	
 	        <ImageView
 	            android:id="@+id/series_list_image"
 	            android:layout_width="92dp"
 	            android:layout_height="135dp"
+	            android:layout_below="@id/series_list_firstaired"
 	            android:src="@drawable/no_image" />
 	
 	        <ProgressBar
@@ -34,18 +43,6 @@
 	            android:layout_height="fill_parent"
 	            android:layout_centerHorizontal="true"
 	            android:layout_centerVertical="true" />
-
-	        <TextView
-	            android:id="@+id/series_list_firstaired"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_alignParentBottom="true"
-	            android:layout_alignParentLeft="true"
-	            android:layout_below="@id/series_list_image"
-	            android:layout_centerHorizontal="true"
-	            android:layout_centerVertical="false"
-	            android:gravity="center_vertical"
-	            android:text="2006" />
 	
 	    </RelativeLayout>
 	
