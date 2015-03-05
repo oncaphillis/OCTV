@@ -30,6 +30,8 @@ class SeriesInfo {
 	private Date    _nearestAiring  = null;
 	private String _nearestEpisodeTitle = new String("");
 	private boolean _hasClock = false;
+	private int _nearestEpisodeSeason = 0;
+	private int _nearestEpisodeNumber = 0;
 
 
 	public SeriesInfo(TvSeries s) {
@@ -64,7 +66,8 @@ class SeriesInfo {
 	        		TvEpisode episode = null;
 	        		
 	        		while( ! found && season_iterator.hasPrevious() && (episode==null || td.before(getAirDate(episode))) ) {
-		        		TvSeason  season = Tmdb.get().loadSeason(s.getId(), season_iterator.previous().getSeasonNumber());
+		        		TvSeason season = season_iterator.previous();
+	        			season = Tmdb.get().loadSeason(s.getId(), season.getSeasonNumber());
 		        		if(season.getEpisodes()!=null) {
 
 		        			ListIterator<TvEpisode> episode_iterator = season.getEpisodes().listIterator(season.getEpisodes().size());
@@ -84,6 +87,8 @@ class SeriesInfo {
 			        				} else {
 			        					_nearestAiring = ei.getAirDate();
 			        				}
+			        				_nearestEpisodeSeason = season.getSeasonNumber();
+			        				_nearestEpisodeNumber = ei.getTmdb().getEpisodeNumber();
 			        				_nearestEpisodeTitle = ei.getTmdb().getName();
 			        				found = true;
 			        				break;
@@ -99,6 +104,8 @@ class SeriesInfo {
 	        		TvSeason ts = Tmdb.get().loadSeason(s.getId(),s.getSeasons().get(s.getSeasons().size()-1).getSeasonNumber());
 	        		if(ts.getEpisodes()!=null && ts.getEpisodes().size()>0) {
 	        			TvEpisode eps = ts.getEpisodes().get(ts.getEpisodes().size()-1);
+        				_nearestEpisodeSeason = ts.getSeasonNumber();
+        				_nearestEpisodeNumber = eps.getEpisodeNumber();
 	        			_nearestEpisodeTitle = eps.getName();
 	        			_nearestAiring = Tmdb.getAirDate(eps);
 	        		}
@@ -134,6 +141,12 @@ class SeriesInfo {
 		return _nearestEpisodeTitle;
 	}
 
+	public int getNearestEpisodeSeason() {
+		return _nearestEpisodeSeason;
+	}
+	public int getNearestEpisodeNumber() {
+		return _nearestEpisodeNumber;
+	}
 	public boolean hasClock() {
 		return _hasClock ;
 	}
@@ -212,7 +225,9 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 			}
 
 			if(_lastEpisodeText != null && _lastEpisodeText.get() != null && _lastEpisodeText.get().getTag()!=null && _lastEpisodeText.get().getTag() instanceof Integer) {
-				_lastEpisodeText.get().setText(si.getNearestEpisodeTitle());
+				String s = Integer.toString(si.getNearestEpisodeSeason())+"x"+Integer.toString(si.getNearestEpisodeNumber());
+				
+				_lastEpisodeText.get().setText(s+" "+si.getNearestEpisodeTitle());
 			}
 		}
 	}
