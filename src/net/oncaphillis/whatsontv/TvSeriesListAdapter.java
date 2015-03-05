@@ -74,12 +74,6 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	ll.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					try {
-						_activity.setWallpaper(_defBitmap);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
 				}
 	    	});
 	    	
