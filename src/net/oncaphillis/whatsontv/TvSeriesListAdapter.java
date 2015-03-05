@@ -5,6 +5,9 @@ import info.movito.themoviedbapi.model.tv.Network;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +37,8 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	private List<TvSeries> _list      = null; 
 	private Bitmap         _defBitmap = null;
 	private Activity       _activity  = null;
+	
+	private static SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy");
 	
 	/** Load a bitmap from an URL.
 	 * 
@@ -78,7 +83,9 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 				}
 	    	});
 	    	
-	    	TextView   tt0 = (TextView)     the_view.findViewById(R.id.series_title);
+	    	TextView   tt_series_title = (TextView) the_view.findViewById(R.id.series_title);
+	    	TextView   tt_first_aired  = (TextView) the_view.findViewById(R.id.series_list_firstaired);
+	    	
 	    	TextView   tt1 = (TextView)     the_view.findViewById(R.id.series_network);
 	    	TextView   tt2 = (TextView)     the_view.findViewById(R.id.series_time);
 	    	TextView   tt3 = (TextView)     the_view.findViewById(R.id.series_last_episode);
@@ -100,7 +107,19 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
     			ii.setImageBitmap(_defBitmap);
     		}
 
-	    	tt0.setText( the_series.getName() );
+	    	String fa = "XXXX"; 
+	    	
+	    	if(the_series.getFirstAirDate()!=null) {
+	    		Calendar c = Calendar.getInstance();
+	    		try {
+					c.setTime( Tmdb.DateFormater.parse(the_series.getFirstAirDate()) );
+		    		fa = Integer.toString(c.get(Calendar.YEAR));
+				} catch (ParseException e) {
+				}
+	    	}
+	    	
+	    	tt_series_title.setText( the_series.getName() );
+	    	tt_first_aired.setText( fa );
 	    	
 	    	if(tt1.getTag() == null || !(tt1.getTag() instanceof Integer) || !((Integer)tt1.getTag()).equals(the_series.getId()) ) {
     			tt1.setTag(new Integer(the_series.getId()));
