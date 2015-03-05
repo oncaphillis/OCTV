@@ -284,10 +284,15 @@ public class MainActivity extends FragmentActivity {
 		} catch(Exception ex) {
 			Intent myIntent = new Intent(this, ErrorActivity.class);
 			Bundle b        = new Bundle();
-				b.putString("txt", ex.getMessage()+" "+ex.getCause());
-				myIntent.putExtras(b);
-				startActivity(myIntent);
-		} catch(Throwable ta) {			
+			b.putString("txt", ex.getMessage()+" "+ex.getCause());
+			myIntent.putExtras(b);
+			startActivity(myIntent);
+		} catch(Throwable ta) {
+			Intent myIntent = new Intent(this,ErrorActivity.class);
+			Bundle b = new Bundle();
+			b.putString("txt", ta.getMessage()+" "+ta.getCause());
+			myIntent.putExtras(b);
+			startActivity(myIntent);
 		}
 	}
 
@@ -390,13 +395,15 @@ public class MainActivity extends FragmentActivity {
 	}
 	@Override
 	protected void	onPause() {
-		SearchThread.lock();
+		if(SearchThread!=null)
+			SearchThread.lock();
 		super.onPause();
 	}
 	
 	@Override
 	protected void	onResume() {
-		SearchThread.release();
+		if(SearchThread!=null)
+			SearchThread.release();
 		super.onResume();
 	}
 	
