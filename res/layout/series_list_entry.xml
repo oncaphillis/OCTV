@@ -5,7 +5,7 @@
 
 	<LinearLayout
 	    android:layout_width="fill_parent"
-	    android:layout_height="135dp"
+	    android:layout_height="160dp"
 	    android:layout_marginBottom="4dp"
 	    android:layout_marginLeft="4dp"
 	    android:layout_marginRight="4dp"
@@ -19,7 +19,8 @@
 	
 	    <RelativeLayout
 	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content" >
+	        android:layout_height="wrap_content"
+	        android:layout_marginRight="4dp" >
 	
 	        <ImageView
 	            android:id="@+id/series_list_image"
@@ -33,6 +34,18 @@
 	            android:layout_height="fill_parent"
 	            android:layout_centerHorizontal="true"
 	            android:layout_centerVertical="true" />
+
+	        <TextView
+	            android:id="@+id/series_list_firstaired"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_alignParentBottom="true"
+	            android:layout_alignParentLeft="true"
+	            android:layout_below="@id/series_list_image"
+	            android:layout_centerHorizontal="true"
+	            android:layout_centerVertical="false"
+	            android:gravity="center_vertical"
+	            android:text="2006" />
 	
 	    </RelativeLayout>
 	
