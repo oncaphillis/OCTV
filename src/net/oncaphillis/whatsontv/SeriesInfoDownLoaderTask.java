@@ -32,12 +32,6 @@ class SeriesInfo {
 	private boolean _hasClock = false;
 
 
-	private static DateFormat _tmdbDateFormater   = new SimpleDateFormat("yyyy-MM-dd") {
-		{
-			this.setTimeZone(TimeZone.getTimeZone("EST"));
-		}
-	};
-	
 	public SeriesInfo(TvSeries s) {
 		_tvs = s;
 		if(_tvs.getNetworks()!=null) {
@@ -51,7 +45,7 @@ class SeriesInfo {
 		if(s.getLastAirDate()!=null) {
 			
 			try {
-				_nearestAiring = _tmdbDateFormater.parse( s.getLastAirDate());
+				_nearestAiring = Tmdb.DateFormater.parse( s.getLastAirDate());
 			} catch (ParseException e) {
 			}
 
@@ -63,7 +57,7 @@ class SeriesInfo {
 	        
 	        String sxx=new String();
 	        boolean found = false;
-	        if( ! td.after( _nearestAiring )  ) {
+	        if(false && ! td.after( _nearestAiring )  ) {
 	        	
 	        	if(s.getSeasons()!=null) {
 	        		ListIterator<TvSeason> season_iterator = s.getSeasons().listIterator(s.getSeasons().size());
@@ -104,9 +98,9 @@ class SeriesInfo {
 	        	if(s.getSeasons()!=null && s.getSeasons().size()>0) {
 	        		TvSeason ts = Tmdb.get().loadSeason(s.getId(),s.getSeasons().get(s.getSeasons().size()-1).getSeasonNumber());
 	        		if(ts.getEpisodes()!=null && ts.getEpisodes().size()>0) {
-	        			EpisodeInfo eps = Tmdb.get().loadEpisode(s.getId(),ts.getSeasonNumber(),ts.getEpisodes().get(ts.getEpisodes().size()-1).getEpisodeNumber());
-	        			_nearestEpisodeTitle = eps.getTmdb().getName();
-	        			_nearestAiring = eps.getAirDate();
+	        			TvEpisode eps = ts.getEpisodes().get(ts.getEpisodes().size()-1);
+	        			_nearestEpisodeTitle = eps.getName();
+	        			_nearestAiring = Tmdb.getAirDate(eps);
 	        		}
 	        	}
 	        }
@@ -118,7 +112,7 @@ class SeriesInfo {
 			int delta = TimeZone.getDefault().getRawOffset() - TimeZone.getTimeZone("EST").getRawOffset();
 		
 			try {
-				Date date =  _tmdbDateFormater.parse(e.getAirDate());
+				Date date =  Tmdb.DateFormater.parse(e.getAirDate());
 				date.setTime(date.getTime()+delta);
 				return date;
 			} catch (ParseException e1) {
@@ -150,9 +144,9 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 	private WeakReference<TextView> _timeText;
 	private WeakReference<TextView> _lastEpisodeText;
 	private WeakReference<TextView> _timeStateText;
+
 	private Activity _activity;
 	
-
 	private static DateFormat _timeFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm") {
 		{
 			this.setTimeZone(TimeZone.getDefault());
@@ -170,6 +164,7 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 		_timeText    = new WeakReference(timeText);
 		_lastEpisodeText = new WeakReference(lastEpisodeText);
 		_timeStateText   = new WeakReference(timeState);
+		
 		_activity = activity;
 	}
 
@@ -186,6 +181,7 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 
 	@Override
 	protected void onPostExecute(SeriesInfo si) {
+		
 		// dates reported by Tmdb are in EST. We need this to compare
 		// the last aired
 		// Calendar today1 = TimeTool.toTimeZone(TimeTool.getToday(),"EST");
@@ -207,7 +203,6 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 						if(_timeStateText.get()!=null)
 							_timeStateText.get().setText("next");
 						_timeText.get().setTextColor(_activity.getResources().getColor(R.color.oncaphillis_orange));
-
 					}
 				}
 			}

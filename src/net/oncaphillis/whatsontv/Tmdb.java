@@ -212,7 +212,6 @@ public class Tmdb {
 	private List<Timezone> _timezones = null;
 	
 	private static Object _lock = new Object();
-	private static Timezone _tz = new Timezone(TimeZone.getDefault().getID(),"de");
 
 	public class EpisodeInfo {
 		private TvEpisode _tmdb_episode;
@@ -228,7 +227,8 @@ public class Tmdb {
 		}
 		
 		public Episode getTrakt()  {
-
+			return null;
+			/*
 			if(_trakt_episode==null) {
 				List<SearchResult> l;
 				
@@ -249,6 +249,7 @@ public class Tmdb {
 				}
 			}
 			return _trakt_episode;
+			*/
 		}
 		
 		public Date getAirTime() {
@@ -259,20 +260,25 @@ public class Tmdb {
 		}
 		
 		public Date getAirDate() {
-			if(getTmdb().getAirDate()!=null) {
-				DateFormat formater   = new SimpleDateFormat("yyyy-MM-dd") {
-					{
-						this.setTimeZone(TimeZone.getTimeZone("EST"));
-					}
-				};
-				try {
-					return formater.parse(getTmdb().getAirDate());
-				} catch (ParseException e) {
-				}
-			}
-			return null;
+			return Tmdb.getAirDate(getTmdb());
 		}
 	}
+	
+	static Date getAirDate(TvEpisode te) {
+		if(te.getAirDate()!=null) {
+			DateFormat formater   = new SimpleDateFormat("yyyy-MM-dd") {
+				{
+					this.setTimeZone(TimeZone.getTimeZone("EST"));
+				}
+			};
+			try {
+				return formater.parse(te.getAirDate());
+			} catch (ParseException e) {
+			}
+		}
+		return null;
+	}
+
 	class SeasonKey {
 		SeasonKey(int series, int season) {
 			this.series = series;
@@ -336,6 +342,12 @@ public class Tmdb {
 					getLanguage(), EpisodeMethod.credits,EpisodeMethod.external_ids,EpisodeMethod.images),null);
 		}
 	};
+	
+	static DateFormat DateFormater   = new SimpleDateFormat("yyyy-MM-dd") {
+		{
+			this.setTimeZone(TimeZone.getTimeZone("EST"));
+		}
+	};
 
 	private Tmdb() {
 		final Semaphore mutex = new Semaphore(0);
@@ -364,7 +376,8 @@ public class Tmdb {
 	}
 	
 	public Bitmap loadPoster(int size,String path,Activity act,ProgressBar pb) {
-		
+		return null;
+/*
 		if(api()==null)
 			return null;
 		
@@ -416,6 +429,7 @@ public class Tmdb {
 		}
 		
 		return bm;
+		*/
 	}
 	
 	public Bitmap loadPoster(int size,String path) {
