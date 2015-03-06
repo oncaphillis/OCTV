@@ -77,6 +77,10 @@
             android:name=".SetupActivity"
             android:label="@string/title_activity_setup" >
         </activity>
+        <activity
+            android:name=".EpisodePagerActivity"
+            android:label="@string/title_activity_episode_pager" >
+        </activity>
     </application>
 
 </manifest>

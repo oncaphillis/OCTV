@@ -20,5 +20,6 @@
     <string name="nav_bar_close">Close Navbar</string>
     <string name="title_activity_login">Login...</string>
     <string name="title_activity_setup">Setup</string>
+    <string name="title_activity_episode_pager">Episodes</string>
 
 </resources>
