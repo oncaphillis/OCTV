@@ -158,6 +158,7 @@ public class MainActivity extends FragmentActivity {
 				} catch(Exception ex0) {
 					try {
 						Thread.sleep(1000);
+						String ss = ex0.getMessage();
 					} catch(Exception ex1) {
 					}
 				}
@@ -207,8 +208,6 @@ public class MainActivity extends FragmentActivity {
 		try {			
 			_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image);
 
-			Bundle b = getIntent().getExtras();
-			
 			_mainPagerAdapter = new MainPagerAdapter(getSupportFragmentManager(),this);
 			
 			_viewPager = (ViewPager) findViewById(R.id.main_pager_layout);
