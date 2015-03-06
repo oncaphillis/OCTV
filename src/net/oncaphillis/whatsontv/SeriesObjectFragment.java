@@ -46,10 +46,11 @@ public class SeriesObjectFragment extends Fragment {
     public static final String ARG_IDS   = "ids";
     public static final String ARG_TITLE   = "actiontitle";
 	
-    private static final int CAST    = 0;
+    /*private static final int CAST    = 0;
     private static final int CREW    = 1;
     private static final int CREATOR = 2;
-       
+      */
+    
     private static final String _prefix = "<html>"+
 										   " <body style='background-color: #000000; color: #ffffff'>";
 	private static final String _postfix = "</body></html>";
@@ -59,7 +60,7 @@ public class SeriesObjectFragment extends Fragment {
 	private int  _seriesId;
 	private String _seriesName;
 	
-	class InfoNode {
+ 	class InfoNode {
 		public TableRow row = null;
 		public ArrayList<ImageView>   img = new ArrayList();
 		public ArrayList<ProgressBar> pb  = new ArrayList();
@@ -170,20 +171,10 @@ public class SeriesObjectFragment extends Fragment {
 				    });
 
 
-					// Credits
-					//
-					
-					final String[] info_type={"Cast","Crew","Creator"};
-					Credits c;
-					try {
-						c = Tmdb.get().api().getTvSeries().getCredits(ts.getId(),null);
-					} catch(Exception ex) {
-						return;
-					}
+
 
 		        	final List<TvSeason> tsa = ts.getSeasons();
-					final int img_count =  c.getCast().size()+c.getCrew().size()+ts.getCreatedBy().size()+tsa.size();
-				    tv_progress.setTag(new Integer(img_count));
+
 				    
 					if(tsa!=null && tsa.size()!=0) {
 						
@@ -284,7 +275,25 @@ public class SeriesObjectFragment extends Fragment {
 					}
 			
 					
-					final Credits   cr = c;
+
+					
+					// Credits
+					//
+					
+					final String[] info_type={"Cast","Crew","Creator"};
+					Credits c;
+					try {
+						c = Tmdb.get().api().getTvSeries().getCredits(ts.getId(),null);
+					} catch(Exception ex) {
+						return;
+					}
+					final int img_count =  c.getCast().size()+c.getCrew().size()+ts.getCreatedBy().size()+tsa.size();
+				    tv_progress.setTag(new Integer(img_count));
+				    
+					new CastInfoThread(_activity,info_table,maxcol,
+							c!=null ? c.getCast() : null,c!=null ? c.getCrew() : null,ts.getCreatedBy()).start();
+					
+					/*final Credits   cr = c;
 					
 					if(cr!=null ){
 						_activity.runOnUiThread(new Runnable() {
@@ -407,7 +416,7 @@ public class SeriesObjectFragment extends Fragment {
 					    		}
 					    	}
 						});
-					}				
+					}*/				
 	        	}		
 			}
  		
