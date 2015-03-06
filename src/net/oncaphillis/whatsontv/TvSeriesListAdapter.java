@@ -40,12 +40,6 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	
 	private static SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy");
 	
-	/** Load a bitmap from an URL.
-	 * 
-	 * @param url
-	 * @return Bitmap or null on failure
-	 */
-	
 	public TvSeriesListAdapter(Context context, int resource, List<TvSeries> objects,Bitmap defBitmap,Activity ac) {
 		super(context, resource, objects);
 
