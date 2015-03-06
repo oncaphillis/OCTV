@@ -59,7 +59,6 @@ public class MainFragment extends Fragment {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
 					Intent myIntent = new Intent(_activity, SeriesPagerActivity.class);
-					//Intent myIntent = new Intent(_activity, EpisodePagerActivity.class);
 					Bundle b        = new Bundle();
 					synchronized(MainActivity.ListAdapters[_idx]) {
 						int[]    ids   = new int[MainActivity.ListAdapters[_idx].getCount()];

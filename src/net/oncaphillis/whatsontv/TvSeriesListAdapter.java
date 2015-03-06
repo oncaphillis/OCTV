@@ -16,9 +16,11 @@ import net.oncaphillis.whatsontv.R;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -68,6 +70,26 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	ll.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					Intent myIntent = new Intent(_activity, EpisodePagerActivity.class);
+					Bundle b = new Bundle();
+					
+					/* synchronized(MainActivity.ListAdapters[_idx]) {
+						int[]    ids   = new int[MainActivity.ListAdapters[_idx].getCount()];
+						String[] names = new String[MainActivity.ListAdapters[_idx].getCount()];
+						
+						for(int ix=0;ix<MainActivity.ListAdapters[_idx].getCount();ix++) {
+							ids[ix]   = MainActivity.ListAdapters[_idx].getItem(ix).getId();
+							names[ix] = MainActivity.ListAdapters[_idx].getItem(ix).getName();
+						}
+						
+						b.putString(SeriesObjectFragment.ARG_TITLE, MainActivity.Titles[_idx]);
+						b.putIntArray("ids", ids);
+						b.putStringArray("names", names);
+						b.putInt("ix", position);
+					*/
+						myIntent.putExtras(b);
+						_activity.startActivity(myIntent);
+					// }
 				}
 	    	});
 	    	
