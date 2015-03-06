@@ -40,22 +40,8 @@ public class MainFragment extends Fragment {
 		
 		_idx  = b.getInt("idx");
 		
-		int cols = 1;
+		int cols = Environment.getColumns(_activity);
 
-		if(_activity!=null){
-			DisplayMetrics displaymetrics = new DisplayMetrics();
-			_activity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-			
-			float width  = displaymetrics.widthPixels * 160.0f / displaymetrics.xdpi;
-			
-			if(width > 400.0f)
-				cols=2;
-			if(width > 800.0f)
-				cols=3;
-			if(width > 1000.0f)
-				cols=4;
-		}
-		
 		_theView   = inflater.inflate(R.layout.main_fragment, container, false);
 				
 		_progressBar  = (ProgressBar)_theView.findViewById(R.id.load_progress);
@@ -73,6 +59,7 @@ public class MainFragment extends Fragment {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
 					Intent myIntent = new Intent(_activity, SeriesPagerActivity.class);
+					//Intent myIntent = new Intent(_activity, EpisodePagerActivity.class);
 					Bundle b        = new Bundle();
 					synchronized(MainActivity.ListAdapters[_idx]) {
 						int[]    ids   = new int[MainActivity.ListAdapters[_idx].getCount()];
