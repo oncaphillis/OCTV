@@ -64,9 +64,9 @@ class SeriesInfo {
 	        	if(s.getSeasons()!=null) {
 	        		ListIterator<TvSeason> season_iterator = s.getSeasons().listIterator(s.getSeasons().size());
 	        		TvEpisode episode = null;
-	        		
+	        		TvSeason season = null;
 	        		while( ! found && season_iterator.hasPrevious() && (episode==null || td.before(getAirDate(episode))) ) {
-		        		TvSeason season = season_iterator.previous();
+		        		season = season_iterator.previous();
 	        			season = Tmdb.get().loadSeason(s.getId(), season.getSeasonNumber());
 		        		if(season.getEpisodes()!=null) {
 
@@ -96,28 +96,39 @@ class SeriesInfo {
 			        			}
 			        			le = episode;
 			        		}
-		        			
-		        			if(!found && episode.getAirDate()!=null) {
-	        					EpisodeInfo ei = Tmdb.get().loadEpisode(s.getId(), season.getSeasonNumber(), episode.getEpisodeNumber());
-		        				
-		        				if(ei.getAirTime() != null) {
-		        					// Too large difference between Trakt.
-		        					_nearestAiring = ei.getAirTime();
-		        					_hasClock = true;
-		        				} else {
-		        					_nearestAiring = ei.getAirDate();
-		        				}
-		        				_nearestEpisodeSeason = season.getSeasonNumber();
-		        				_nearestEpisodeNumber = ei.getTmdb().getEpisodeNumber();
-		        				_nearestEpisodeTitle = ei.getTmdb().getName();
-		        			}
 		        		}
 		        	}
+	        		
+	        		if(!found && season!=null && episode!=null && episode.getAirDate()!=null) {
+    					EpisodeInfo ei = Tmdb.get().loadEpisode(s.getId(), season.getSeasonNumber(), episode.getEpisodeNumber());
+        				
+        				if(ei.getAirTime() != null) {
+        					// Too large difference between Trakt.
+        					_nearestAiring = ei.getAirTime();
+        					_hasClock = true;
+        				} else {
+        					_nearestAiring = ei.getAirDate();
+        				}
+        				_nearestEpisodeSeason = season.getSeasonNumber();
+        				_nearestEpisodeNumber = ei.getTmdb().getEpisodeNumber();
+        				_nearestEpisodeTitle  = ei.getTmdb().getName();
+        			}
 	        	}
 	        } else {
 	        	s = Tmdb.get().loadSeries(s.getId());
 	        	if(s.getSeasons()!=null && s.getSeasons().size()>0) {
-	        		TvSeason ts = Tmdb.get().loadSeason(s.getId(),s.getSeasons().get(s.getSeasons().size()-1).getSeasonNumber());
+	        		
+	        		
+	        		TvSeason ts = null;
+	        		int n = 1;
+	        		
+	        		while( s.getSeasons().size()-n >= 0 ) {
+	        			ts = Tmdb.get().loadSeason(s.getId(),s.getSeasons().get(s.getSeasons().size()-n).getSeasonNumber());
+	        			if(ts!=null && ts.getEpisodes().size()>0)
+	        				break;
+	        			n++;
+	        		}
+	        		
 	        		if(ts.getEpisodes()!=null && ts.getEpisodes().size()>0) {
 	        			TvEpisode eps = ts.getEpisodes().get(ts.getEpisodes().size()-1);
         				_nearestEpisodeSeason = ts.getSeasonNumber();
