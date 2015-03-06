@@ -77,8 +77,9 @@
 	                android:id="@+id/series_nearest_episode"
 	                android:layout_width="match_parent"
 	                android:layout_height="fill_parent"
-	                android:background="@color/oncaphillis_light_grey"
-	                android:orientation="vertical" >
+	                android:background="@drawable/list_entry_frame"
+	                android:orientation="vertical"
+	                android:padding="8dp" >
 
 	                <LinearLayout
 	                    android:layout_width="match_parent"
