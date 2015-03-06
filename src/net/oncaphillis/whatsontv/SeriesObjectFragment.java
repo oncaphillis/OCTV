@@ -95,21 +95,7 @@ public class SeriesObjectFragment extends Fragment {
         overview_webview.loadData("","text/html; charset=utf-8;", "utf-8");
         tv_progress.setVisibility(View.INVISIBLE);
         
-        int mc = 1;
- 		
-        if(_activity!=null) {
- 			DisplayMetrics displaymetrics = new DisplayMetrics();
- 			_activity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-			
- 			int width  = displaymetrics.widthPixels;
-
-			if(width>400)
-				mc=2;
-			if(width>600)
-				mc=3;
-			if(width>700)
-				mc=3;
- 		}
+        int mc = Environment.getColumns(_activity);
  		
  		final int maxcol = mc;
  		

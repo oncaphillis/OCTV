@@ -56,20 +56,8 @@ public class SearchActivity extends Activity {
 		_listAdapter = new TvSeriesListAdapter(this,
 				android.R.layout.simple_list_item_1,_mainList,_defBitmap,this);
 		
-		int cols = 1;
-	
-		DisplayMetrics displaymetrics = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-				
-		float width  = displaymetrics.widthPixels * 160.0f / displaymetrics.xdpi;
-				
-		if(width > 400.0f)
-			cols=2;
-		if(width > 800.0f)
-			cols=3;
-		if(width > 1000.0f)
-			cols=4;
-		
+		int cols = Environment.getColumns(this);
+
 		_gridView.setNumColumns(cols);
 		
 		_gridView.setAdapter(_listAdapter);
