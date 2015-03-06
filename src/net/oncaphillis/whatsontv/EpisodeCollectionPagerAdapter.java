@@ -22,7 +22,12 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
         fragment.setArguments(args);
         return fragment;
     }
-
+    
+	@Override
+    public CharSequence getPageTitle(int position) {
+        return "@"+Integer.toString(position);
+    }
+    
 	@Override
 	public int getCount() {
 		return 100;
