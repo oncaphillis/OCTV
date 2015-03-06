@@ -228,22 +228,26 @@ public class Tmdb {
 		
 		public Episode getTrakt()  {
 			if(_trakt_episode==null) {
-				List<SearchResult> l;
-				
-				synchronized(_lock) {
-					 l = Tmdb.get().trakt().search().idLookup(IdType.TMDB,Integer.toString(getTmdb().getId()), 1, null);
-				}
-				
-				if(l != null) {
-					for(SearchResult r : l) {
-						if(r.type.equals("episode") ) {
-							Episode eps = trakt().episodes().summary(Integer.toString(r.show.ids.trakt),r.episode.season, 
-									r.episode.number, Extended.FULL);
-							if(eps.first_aired!=null) {
-								_trakt_episode=eps;
+				try {
+					List<SearchResult> l;
+					
+					synchronized(_lock) {
+						 l = Tmdb.get().trakt().search().idLookup(IdType.TMDB,Integer.toString(getTmdb().getId()), 1, null);
+					}
+					
+					if(l != null) {
+						for(SearchResult r : l) {
+							if(r.type.equals("episode") ) {
+								Episode eps = trakt().episodes().summary(Integer.toString(r.show.ids.trakt),r.episode.season, 
+										r.episode.number, Extended.FULL);
+								if(eps.first_aired!=null) {
+									_trakt_episode=eps;
+								}
 							}
 						}
 					}
+				} catch(Throwable t) {
+					t.printStackTrace();
 				}
 			}
 			return _trakt_episode;
