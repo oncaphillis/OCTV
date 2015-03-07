@@ -76,8 +76,7 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 					Bundle b = new Bundle();
 					
 					synchronized(MainActivity.ListAdapters[_idx]) {
-						List<? extends SeriesInfo.SeasonNode> l = new SeriesInfo(MainActivity.ListAdapters[_idx].getItem(pos)).getSeasonsList();						
-						b.putSerializable("ids", (Serializable)l);
+						b.putSerializable("series",MainActivity.ListAdapters[_idx].getItem(pos).getId() );
 						myIntent.putExtras(b);
 						_activity.startActivity(myIntent);
 					}

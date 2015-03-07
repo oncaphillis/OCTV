@@ -14,7 +14,7 @@ public class EpisodePagerActivity extends FragmentActivity {
 
 	private EpisodeCollectionPagerAdapter _episodePagerAdapter = null;
 	private ViewPager _viewPager;
-	private List<? extends SeriesInfo.SeasonNode> _seasonList;
+	private int _series;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,9 +23,9 @@ public class EpisodePagerActivity extends FragmentActivity {
 		
 		Bundle b = getIntent().getExtras();
 		
-		_seasonList = (List<? extends SeasonNode>) b.getSerializable("ids");
+		_series = b.getInt("series");
 
-		_episodePagerAdapter  = new EpisodeCollectionPagerAdapter(getSupportFragmentManager(),this,_seasonList);
+		_episodePagerAdapter  = new EpisodeCollectionPagerAdapter(getSupportFragmentManager(),this,_series);
 		
 		_viewPager = (ViewPager) findViewById(R.id.series_page_layout);
         _viewPager.setAdapter(_episodePagerAdapter);

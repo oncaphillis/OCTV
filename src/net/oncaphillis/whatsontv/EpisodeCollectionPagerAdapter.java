@@ -1,5 +1,7 @@
 package net.oncaphillis.whatsontv;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import net.oncaphillis.whatsontv.SeriesInfo.EpisodeNode;
@@ -11,17 +13,30 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 	
-	private List<? extends SeriesInfo.SeasonNode> _seasonList = null;
+	private List<? extends SeriesInfo.SeasonNode> _seasonList = new ArrayList();
 	
-	public EpisodeCollectionPagerAdapter(FragmentManager fm, EpisodePagerActivity episodePagerActivity, List<? extends SeriesInfo.SeasonNode> seasonList) {
+	public EpisodeCollectionPagerAdapter(FragmentManager fm, EpisodePagerActivity episodePagerActivity,int series) {
 		super(fm);
-		_seasonList = seasonList;
+		final int s = series;
+		final FragmentStatePagerAdapter a = this;
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				List<? extends SeriesInfo.SeasonNode> l = new SeriesInfo(Tmdb.get().loadSeries(s)).getSeasonsList();						
+
+				synchronized(_seasonList ) {
+					_seasonList = l;
+					a.notifyDataSetChanged();
+				}				
+			}
+		}).start();
+		
 	}
-
-
+	
 	@Override
 	public Fragment getItem(int n) {
-        Fragment fragment = new EpisodeObjectFragment();
+		Fragment fragment = new EpisodeObjectFragment();
         Bundle args       = new Bundle();
         /*args.putInt(SeriesObjectFragment.ARG_IX, i);
         args.putIntArray("ids", _ids);
@@ -32,17 +47,24 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
     
 	@Override
     public CharSequence getPageTitle(int position) {
-        SeriesInfo.SeasonNode sn = _seasonList.get(position);
-        if(sn instanceof SeriesInfo.EpisodeNode) {
-        	SeriesInfo.EpisodeNode en = (SeriesInfo.EpisodeNode) sn;
-        	return Integer.toString(en.getSeason())+"x"+Integer.toString(en.getEpisode());
-        } else {
-        	return "#"+Integer.toString(position);
-        }
+		synchronized(_seasonList) {
+	        SeriesInfo.SeasonNode sn = _seasonList.get(position);
+	        if(sn!=null) {
+		        if(sn instanceof SeriesInfo.EpisodeNode) {
+		        	SeriesInfo.EpisodeNode en = (SeriesInfo.EpisodeNode) sn;
+		        	return Integer.toString(en.getSeason())+"x"+Integer.toString(en.getEpisode());
+		        } else {
+		        	return "#"+Integer.toString(position);
+		        }
+	        }
+		}
+		return "???";
 	}
 
 	@Override
 	public int getCount() {
-		return _seasonList.size();
+		synchronized(_seasonList) {
+			return _seasonList.size();
+		}
 	}
 }
