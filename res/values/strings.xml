@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">What\'s on TV</string>
+    <string name="app_name">OCTV</string>
     <string name="hello_world">Hello world!</string>
     <string name="search_hint">Search...</string>
     <string name="favorite">fac_button_text</string>
@@ -14,7 +14,7 @@
     <string name="action_search_string">search</string>
     <string name="title_activity_search">SearchActivity</string>
     <string name="title_activity_series_pager">Series</string>
-    <string name="title_activity_about">About What\'s On TV...</string>
+    <string name="title_activity_about">About OCTV...</string>
     <string name="title_activity_error">Error</string>
     <string name="nav_bar_open">Open Navigator</string>
     <string name="nav_bar_close">Close Navbar</string>
