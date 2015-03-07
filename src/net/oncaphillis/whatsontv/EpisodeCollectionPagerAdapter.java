@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.oncaphillis.whatsontv.SeriesInfo.EpisodeNode;
 import net.oncaphillis.whatsontv.SeriesInfo.SeasonNode;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,16 +20,22 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 		super(fm);
 		final int s = series;
 		final FragmentStatePagerAdapter a = this;
+		final Activity act =  episodePagerActivity;
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				List<? extends SeriesInfo.SeasonNode> l = new SeriesInfo(Tmdb.get().loadSeries(s)).getSeasonsList();						
+				List<? extends SeriesInfo.SeasonNode> l = new SeriesInfo(Tmdb.get().loadSeries(s)).getSeasonsEpisodeList();						
 
 				synchronized(_seasonList ) {
 					_seasonList = l;
-					a.notifyDataSetChanged();
 				}				
+				act.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						a.notifyDataSetChanged();
+					}
+				});
 			}
 		}).start();
 		

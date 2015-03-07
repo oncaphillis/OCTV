@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.TimeZone;
 
+import net.oncaphillis.whatsontv.SeriesInfo.SeasonNode;
 import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
 
 public class SeriesInfo {
@@ -159,7 +160,17 @@ public class SeriesInfo {
 		return Tmdb.get().loadSeason(_tvs.getId(), _tvs.getSeasons().get(n).getSeasonNumber());
 	}
 	
-	public List<? extends SeasonNode> getSeasonsList() {
+	public List<TvSeason> getSeasons() {
+		List<TvSeason> l = new ArrayList<TvSeason>();
+		if(_tvs!=null || _tvs.getSeasons()!=null) {
+			for(TvSeason s : _tvs.getSeasons()) {
+				l.add(Tmdb.get().loadSeason(_tvs.getId(), s.getSeasonNumber()));
+			}
+		}
+		return l;
+	}
+
+	public List<? extends SeasonNode> getSeasonsEpisodeList() {
 		
 		List<SeasonNode> l = new ArrayList();
 		
