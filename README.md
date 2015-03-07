@@ -1,6 +1,6 @@
 # OCTV
 
-A TV Program Guide based on <a href="http://themoviedb.org>Tmdb</a> and <a href="http://trakt.tv/">Trakt</a>
+A TV Program Guide based on <a href="http://themoviedb.org">Tmdb</a> and <a href="http://trakt.tv/">Trakt</a>
  
 * One may browse through currently playing or popular TV shows.
 
