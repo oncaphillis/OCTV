@@ -30,6 +30,7 @@ public class SeriesPagerActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_series_pager);
+
 		Bundle b = getIntent().getExtras();
         _seriesCollectionPagerAdapter =
                 new SeriesCollectionPagerAdapter(
@@ -37,8 +38,7 @@ public class SeriesPagerActivity extends FragmentActivity {
                         b.getInt(SeriesObjectFragment.ARG_IX),
                         b.getIntArray(SeriesObjectFragment.ARG_IDS),
                         b.getStringArray(SeriesObjectFragment.ARG_NAMES));
-                        
-        
+		
         _viewPager = (ViewPager) findViewById(R.id.series_page_layout);
         _viewPager.setAdapter(_seriesCollectionPagerAdapter);
         _viewPager.setCurrentItem(b.getInt(SeriesObjectFragment.ARG_IX));

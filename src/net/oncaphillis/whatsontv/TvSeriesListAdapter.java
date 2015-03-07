@@ -5,6 +5,7 @@ import info.movito.themoviedbapi.model.tv.Network;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -39,7 +40,7 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	private List<TvSeries> _list      = null; 
 	private Bitmap         _defBitmap = null;
 	private Activity       _activity  = null;
-	
+	private int _idx = 0; 
 	private static SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy");
 	
 	public TvSeriesListAdapter(Context context, int resource, List<TvSeries> objects,Bitmap defBitmap,Activity ac) {
@@ -63,6 +64,7 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 		
 		TvSeries the_series = getItem(position);
 		
+		final int pos = position;
 		
 	    if (the_series != null && Tmdb.get().api()!=null) {
 	    	LinearLayout ll = (LinearLayout)the_view.findViewById(R.id.series_nearest_episode);
@@ -73,23 +75,12 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 					Intent myIntent = new Intent(_activity, EpisodePagerActivity.class);
 					Bundle b = new Bundle();
 					
-					/* synchronized(MainActivity.ListAdapters[_idx]) {
-						int[]    ids   = new int[MainActivity.ListAdapters[_idx].getCount()];
-						String[] names = new String[MainActivity.ListAdapters[_idx].getCount()];
-						
-						for(int ix=0;ix<MainActivity.ListAdapters[_idx].getCount();ix++) {
-							ids[ix]   = MainActivity.ListAdapters[_idx].getItem(ix).getId();
-							names[ix] = MainActivity.ListAdapters[_idx].getItem(ix).getName();
-						}
-						
-						b.putString(SeriesObjectFragment.ARG_TITLE, MainActivity.Titles[_idx]);
-						b.putIntArray("ids", ids);
-						b.putStringArray("names", names);
-						b.putInt("ix", position);
-					*/
+					synchronized(MainActivity.ListAdapters[_idx]) {
+						List<? extends SeriesInfo.SeasonNode> l = new SeriesInfo(MainActivity.ListAdapters[_idx].getItem(pos)).getSeasonsList();						
+						b.putSerializable("ids", (Serializable)l);
 						myIntent.putExtras(b);
 						_activity.startActivity(myIntent);
-					// }
+					}
 				}
 	    	});
 	    	
