@@ -109,14 +109,17 @@ public class SeriesObjectFragment extends Fragment {
 					return;
 				}
 				
-				TvSeries t=null;
+				TvSeries series=null;
+				List<TvSeason> seasons = null;
 				try {
-					t = Tmdb.get().loadSeries(_seriesId);
+					series = Tmdb.get().loadSeries(_seriesId);
+					seasons = new SeriesInfo(series).getSeasons();
+					
 				} catch (Exception ex) {
 					return;
 				}
 				
-				final TvSeries  ts = t;;
+				final TvSeries  ts = series;;
 				final String    name           = ts.getName();
 				final String    overview       = ts.getOverview();
 				final String    poster         = ts.getPosterPath();
@@ -222,15 +225,21 @@ public class SeriesObjectFragment extends Fragment {
 					    			View v = (View)vi.inflate(R.layout.series_info_grid_entry,null);
 							        
 					    			TvSeason tv_season = i.next();
-
+					    			
+					    			tv_season = Tmdb.get().loadSeason(ts.getId(), tv_season.getSeasonNumber());
+					    			
 							        TextView       tt0 = (TextView)     v.findViewById(R.id.creator_name);
 							        TextView       tt1 = (TextView)     v.findViewById(R.id.person_role);
 								    ImageView       ii = (ImageView)    v.findViewById(R.id.creator_image);
 								    ProgressBar     pb = (ProgressBar)  v.findViewById(R.id.creator_image_progress);
 								    
 								    tt0.setText("#"+Integer.toString(tv_season.getSeasonNumber())+(tv_season.getAirDate() == null ? "" : " "+tv_season.getAirDate()));
-								    tt1.setText(tv_season.getOverview()==null ? "" : tv_season.getOverview());
 								    
+								    if(tv_season.getEpisodes() != null && !tv_season.getEpisodes().isEmpty() )
+								    	tt1.setText(Integer.toString(tv_season.getEpisodes().size())+" Episodes");
+								    else
+								    	tt1.setText("");
+								    	
 							    	ii.setTag(tv_season.getPosterPath());
 
 							    	trl.get(trl.size()-1).img.add(ii);
@@ -280,20 +289,14 @@ public class SeriesObjectFragment extends Fragment {
 					// Credits
 					//
 					
-					final String[] info_type={"Cast","Crew","Creator"};
 					Credits c;
 					try {
 						c = Tmdb.get().api().getTvSeries().getCredits(ts.getId(),null);
 					} catch(Exception ex) {
 						return;
 					}
-					final int img_count =  c.getCast().size()+c.getCrew().size()+ts.getCreatedBy().size()+tsa.size();
-				    tv_progress.setTag(new Integer(img_count));
-				    
 					new CastInfoThread(_activity,info_table,maxcol,
 							c!=null ? c.getCast() : null,c!=null ? c.getCrew() : null,ts.getCreatedBy()).start();
-					
-									
 	        	}		
 			}
  		
