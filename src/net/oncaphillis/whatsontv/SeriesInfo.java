@@ -5,8 +5,11 @@ import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
+import java.io.Serializable;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.TimeZone;
 
@@ -21,9 +24,30 @@ public class SeriesInfo {
 	private int _nearestEpisodeSeason = 0;
 	private int _nearestEpisodeNumber = 0;
 
-
+	public static class SeasonNode implements Serializable {
+		int _season;
+		public SeasonNode(int season) {
+			_season = season;
+		}
+		public int getSeason() {
+			return _season;
+		}
+	}
+	
+	public static class EpisodeNode extends SeasonNode implements Serializable {
+		int _episode;
+		public EpisodeNode(int season,int episode) {
+			super(season);
+			_episode = episode; 
+		}
+		public int getEpisode() {
+			return _episode;
+		}
+	}
+	
 	public SeriesInfo(TvSeries s) {
-		_tvs = s;
+		_tvs = Tmdb.get().loadSeries(s.getId());
+
 		if(_tvs.getNetworks()!=null) {
 			for(Network nw : _tvs.getNetworks() )  {
 				_nws += (_nws.isEmpty() ? "" : " ") + nw.getName();
@@ -129,7 +153,32 @@ public class SeriesInfo {
 		}
 	}
 	
-	Date getAirDate(TvEpisode e) {
+	public TvSeason getSeason(int n) {
+		if(_tvs == null || _tvs.getSeasons() == null || _tvs.getSeasons().size()>=n)
+			return null;
+		return Tmdb.get().loadSeason(_tvs.getId(), _tvs.getSeasons().get(n).getSeasonNumber());
+	}
+	
+	public List<? extends SeasonNode> getSeasonsList() {
+		
+		List<SeasonNode> l = new ArrayList();
+		
+		if(_tvs == null || _tvs.getSeasons() == null || _tvs.getSeasons().isEmpty() )
+			return l;
+
+		for(TvSeason s : _tvs.getSeasons()) {
+			s = Tmdb.get().loadSeason(_tvs.getId(), s.getSeasonNumber());
+			l.add(new SeasonNode(s.getSeasonNumber()));
+			if(s.getEpisodes()!=null && !s.getEpisodes().isEmpty()) {
+				for(TvEpisode e : s.getEpisodes()) {
+					l.add(new EpisodeNode(s.getSeasonNumber(),e.getEpisodeNumber()));
+				}
+			}
+		}
+		return l;
+	}
+	
+	public Date getAirDate(TvEpisode e) {
 		if(e.getAirDate()!=null) {
 			int delta = TimeZone.getDefault().getRawOffset() - TimeZone.getTimeZone("EST").getRawOffset();
 		
@@ -143,19 +192,15 @@ public class SeriesInfo {
 		
 		return null;
 	}
-	
-	Date getNearestAiring() {
+	public Date getNearestAiring() {
 		return _nearestAiring;
 	}
-
-	String getNetworks() {
+	public String getNetworks() {
 		return _nws;
 	}
-
 	public String getNearestEpisodeTitle() {
 		return _nearestEpisodeTitle;
 	}
-
 	public int getNearestEpisodeSeason() {
 		return _nearestEpisodeSeason;
 	}
