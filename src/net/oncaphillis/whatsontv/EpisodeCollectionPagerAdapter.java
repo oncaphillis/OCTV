@@ -16,17 +16,22 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 	
 	private List<? extends SeriesInfo.SeasonNode> _seasonList = new ArrayList();
 	
-	public EpisodeCollectionPagerAdapter(FragmentManager fm, EpisodePagerActivity episodePagerActivity,int series) {
+	public EpisodeCollectionPagerAdapter(FragmentManager fm, EpisodePagerActivity episodePagerActivity,int series,boolean nearest) {
 		super(fm);
 		final int s = series;
+		final boolean near = nearest;
 		final FragmentStatePagerAdapter a = this;
-		final Activity act =  episodePagerActivity;
+		final EpisodePagerActivity act =  episodePagerActivity;
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				List<? extends SeriesInfo.SeasonNode> l = new SeriesInfo(Tmdb.get().loadSeries(s)).getSeasonsEpisodeList();						
-
+				SeriesInfo si = new SeriesInfo(Tmdb.get().loadSeries(s));						
+				 
+				List<? extends SeriesInfo.SeasonNode> l = si.getSeasonsEpisodeList();
+				
+				final int c = near ? si.getNearestEpisodeCoordinate() : 0;
+				
 				synchronized(_seasonList ) {
 					_seasonList = l;
 				}				
@@ -34,20 +39,17 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 					@Override
 					public void run() {
 						a.notifyDataSetChanged();
+						act._viewPager.setCurrentItem(c);
 					}
 				});
 			}
 		}).start();
-		
 	}
 	
 	@Override
 	public Fragment getItem(int n) {
 		Fragment fragment = new EpisodeObjectFragment();
         Bundle args       = new Bundle();
-        /*args.putInt(SeriesObjectFragment.ARG_IX, i);
-        args.putIntArray("ids", _ids);
-        args.putStringArray("names", _names);*/
         fragment.setArguments(args);
         return fragment;
     }

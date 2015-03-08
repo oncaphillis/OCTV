@@ -1,9 +1,5 @@
 package net.oncaphillis.whatsontv;
 
-import java.util.List;
-
-import net.oncaphillis.whatsontv.SeriesInfo.SeasonNode;
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -13,8 +9,7 @@ import android.view.MenuItem;
 public class EpisodePagerActivity extends FragmentActivity {
 
 	private EpisodeCollectionPagerAdapter _episodePagerAdapter = null;
-	private ViewPager _viewPager;
-	private int _series;
+	public ViewPager _viewPager;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,9 +18,10 @@ public class EpisodePagerActivity extends FragmentActivity {
 		
 		Bundle b = getIntent().getExtras();
 		
-		_series = b.getInt("series");
-
-		_episodePagerAdapter  = new EpisodeCollectionPagerAdapter(getSupportFragmentManager(),this,_series);
+		int series = b.getInt("series");
+		boolean nearest = b.getBoolean("nearest");
+		
+		_episodePagerAdapter  = new EpisodeCollectionPagerAdapter(getSupportFragmentManager(),this,series,nearest);
 		
 		_viewPager = (ViewPager) findViewById(R.id.series_page_layout);
         _viewPager.setAdapter(_episodePagerAdapter);
