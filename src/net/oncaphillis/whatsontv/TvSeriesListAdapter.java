@@ -1,38 +1,25 @@
 package net.oncaphillis.whatsontv;
 
-import info.movito.themoviedbapi.model.Genre;
-import info.movito.themoviedbapi.model.tv.Network;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import net.oncaphillis.whatsontv.R;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
@@ -40,9 +27,7 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	private List<TvSeries> _list      = null; 
 	private Bitmap         _defBitmap = null;
 	private Activity       _activity  = null;
-	private int _idx = 0; 
-	private static SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy");
-	
+
 	public TvSeriesListAdapter(Context context, int resource, List<TvSeries> objects,Bitmap defBitmap,Activity ac) {
 		super(context, resource, objects);
 
@@ -75,10 +60,12 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 					Intent myIntent = new Intent(_activity, EpisodePagerActivity.class);
 					Bundle b = new Bundle();
 					
-					synchronized(MainActivity.ListAdapters[_idx]) {
-						b.putSerializable("series",MainActivity.ListAdapters[_idx].getItem(pos).getId() );
-						myIntent.putExtras(b);
-						_activity.startActivity(myIntent);
+					synchronized(_list) {
+						if(_list.get(pos)!=null) {
+							b.putSerializable("series",_list.get(pos).getId() );
+							myIntent.putExtras(b);
+							_activity.startActivity(myIntent);
+						}
 					}
 				}
 	    	});
