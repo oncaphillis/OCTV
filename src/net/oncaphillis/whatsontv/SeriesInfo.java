@@ -24,6 +24,7 @@ public class SeriesInfo {
 	private boolean _hasClock = false;
 	private int _nearestEpisodeSeason = 0;
 	private int _nearestEpisodeNumber = 0;
+	private List<SeasonNode> _seasonsEpisodeList = null;
 
 	public static class SeasonNode implements Serializable {
 		int _season;
@@ -79,7 +80,7 @@ public class SeriesInfo {
 	        		TvEpisode episode = null;
 	        		TvSeason season = null;
 	        		while( ! found && season_iterator.hasPrevious() && (episode==null || td.before(getAirDate(episode))) ) {
-		        		season = season_iterator.previous();
+	        			season = season_iterator.previous();
 	        			season = Tmdb.get().loadSeason(s.getId(), season.getSeasonNumber());
 		        		if(season.getEpisodes()!=null) {
 
@@ -116,7 +117,6 @@ public class SeriesInfo {
     					EpisodeInfo ei = Tmdb.get().loadEpisode(s.getId(), season.getSeasonNumber(), episode.getEpisodeNumber());
         				
         				if(ei.getAirTime() != null) {
-        					// Too large difference between Trakt.
         					_nearestAiring = ei.getAirTime();
         					_hasClock = true;
         				} else {
@@ -171,22 +171,23 @@ public class SeriesInfo {
 	}
 
 	public List<? extends SeasonNode> getSeasonsEpisodeList() {
-		
-		List<SeasonNode> l = new ArrayList();
-		
-		if(_tvs == null || _tvs.getSeasons() == null || _tvs.getSeasons().isEmpty() )
-			return l;
-
-		for(TvSeason s : _tvs.getSeasons()) {
-			s = Tmdb.get().loadSeason(_tvs.getId(), s.getSeasonNumber());
-			l.add(new SeasonNode(s.getSeasonNumber()));
-			if(s.getEpisodes()!=null && !s.getEpisodes().isEmpty()) {
-				for(TvEpisode e : s.getEpisodes()) {
-					l.add(new EpisodeNode(s.getSeasonNumber(),e.getEpisodeNumber()));
+		if(_seasonsEpisodeList == null) {
+			_seasonsEpisodeList  = new ArrayList();
+			
+			if(_tvs == null || _tvs.getSeasons() == null || _tvs.getSeasons().isEmpty() )
+				return _seasonsEpisodeList;
+	
+			for(TvSeason s : _tvs.getSeasons()) {
+				s = Tmdb.get().loadSeason(_tvs.getId(), s.getSeasonNumber());
+				_seasonsEpisodeList.add(new SeasonNode(s.getSeasonNumber()));
+				if(s.getEpisodes()!=null && !s.getEpisodes().isEmpty()) {
+					for(TvEpisode e : s.getEpisodes()) {
+						_seasonsEpisodeList.add(new EpisodeNode(s.getSeasonNumber(),e.getEpisodeNumber()));
+					}
 				}
 			}
 		}
-		return l;
+		return _seasonsEpisodeList;
 	}
 	
 	public Date getAirDate(TvEpisode e) {
@@ -220,5 +221,15 @@ public class SeriesInfo {
 	}
 	public boolean hasClock() {
 		return _hasClock ;
+	}
+	public int getNearestEpisodeCoordinate() {
+		int n = 0;
+		for(SeasonNode s : getSeasonsEpisodeList()) {
+			if(s instanceof EpisodeNode && ((EpisodeNode)s).getSeason()==getNearestEpisodeSeason() && ((EpisodeNode)s).getEpisode() == getNearestEpisodeNumber() ) {
+				return n;
+			}
+			n++;
+		}
+		return 0;
 	}
 }
