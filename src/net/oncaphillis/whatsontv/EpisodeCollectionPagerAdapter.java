@@ -61,7 +61,7 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 		        	SeriesInfo.EpisodeNode en = (SeriesInfo.EpisodeNode) sn;
 		        	return Integer.toString(en.getSeason())+"x"+Integer.toString(en.getEpisode());
 		        } else {
-		        	return "#"+Integer.toString(position);
+		        	return "#"+Integer.toString(sn.getSeason());
 		        }
 	        }
 		}
