@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.TimeZone;
 
-import net.oncaphillis.whatsontv.SeriesInfo.SeasonNode;
 import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
 
 public class SeriesInfo {
@@ -71,10 +70,8 @@ public class SeriesInfo {
 	        
 	        Date td = TimeTool.getToday();
 	        
-	        String sxx=new String();
 	        boolean found = false;
 
-	        
 	        if( ! td.after( _nearestAiring )  ) {
 	        	
 	        	if(s.getSeasons()!=null) {
@@ -96,9 +93,6 @@ public class SeriesInfo {
 		        			while(!found && episode_iterator.hasPrevious()) {
 		        				
 		        				episode = episode_iterator.previous();
-		        		        
-		        				if(_tvs.getId()==1399)
-		        		        	sxx+="@";
 		        		        
 		        				if(episode.getAirDate()!=null && le!=null && getAirDate(episode).before(td) ) {
 			        				
@@ -156,7 +150,7 @@ public class SeriesInfo {
 	        			TvEpisode eps = ts.getEpisodes().get(ts.getEpisodes().size()-1);
         				_nearestEpisodeSeason = ts.getSeasonNumber();
         				_nearestEpisodeNumber = eps.getEpisodeNumber();
-	        			_nearestEpisodeTitle = sxx+":"+eps.getName();
+	        			_nearestEpisodeTitle = eps.getName();
 	        			_nearestAiring = Tmdb.getAirDate(eps);
 	        		}
 	        	}
