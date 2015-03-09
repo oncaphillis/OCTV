@@ -325,22 +325,34 @@ public class Tmdb {
 	private CacheMap<Integer,TvSeries> _series  = new CacheMap<Integer,TvSeries>(5000) {
 		@Override
 		TvSeries load(Integer key) {
-			return api().getTvSeries().getSeries(key, getLanguage(), TvMethod.external_ids,TvMethod.images,TvMethod.credits);
+			try {
+				return api().getTvSeries().getSeries(key, getLanguage(), TvMethod.external_ids,TvMethod.images,TvMethod.credits);
+			} catch(Throwable ta) {
+				return null;
+			}
 		}
 	};
 
 	private CacheMap<SeasonKey,TvSeason>   _seasons  = new CacheMap<SeasonKey,TvSeason>(5000) {
 		@Override
 		TvSeason load(SeasonKey key) {
-			return api().getTvSeasons().getSeason(key.series, key.season, getLanguage(),
-					SeasonMethod.external_ids, SeasonMethod.credits);
+			try {
+				return api().getTvSeasons().getSeason(key.series, key.season, getLanguage(),
+						SeasonMethod.external_ids, SeasonMethod.credits);
+			} catch(Throwable ta) {
+				return null;
+			}
 		}
 	};
 	private CacheMap<EpisodeKey,EpisodeInfo> _episodes = new CacheMap<EpisodeKey,EpisodeInfo>(5000) {
 		@Override
 		EpisodeInfo load(EpisodeKey key) {
-			return new EpisodeInfo(api().getTvEpisodes().getEpisode(key.series,key.season,key.episode, 
-					getLanguage(), EpisodeMethod.credits,EpisodeMethod.external_ids,EpisodeMethod.images),null);
+			try {
+				return new EpisodeInfo(api().getTvEpisodes().getEpisode(key.series,key.season,key.episode, 
+						getLanguage(), EpisodeMethod.credits,EpisodeMethod.external_ids,EpisodeMethod.images),null);
+			} catch(Throwable ta) {
+			}
+			return null;
 		}
 	};
 	
