@@ -45,11 +45,6 @@ public class SeriesObjectFragment extends Fragment {
     public static final String ARG_NAMES = "names";
     public static final String ARG_IDS   = "ids";
     public static final String ARG_TITLE   = "actiontitle";
-	
-    /*private static final int CAST    = 0;
-    private static final int CREW    = 1;
-    private static final int CREATOR = 2;
-      */
     
     private static final String _prefix = "<html>"+
 										   " <body style='background-color: #000000; color: #ffffff'>";
