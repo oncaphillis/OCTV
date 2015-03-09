@@ -15,10 +15,12 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 	
 	private List<? extends SeriesInfo.SeasonNode> _seasonList = new ArrayList();
+	private int _series;
 	
-	public EpisodeCollectionPagerAdapter(FragmentManager fm, EpisodePagerActivity episodePagerActivity,int series,boolean nearest) {
+	public EpisodeCollectionPagerAdapter(FragmentManager fm, EpisodePagerActivity episodePagerActivity,
+			int series,boolean nearest) {
 		super(fm);
-		final int s = series;
+		_series = series;
 		final boolean near = nearest;
 		final FragmentStatePagerAdapter a = this;
 		final EpisodePagerActivity act =  episodePagerActivity;
@@ -26,7 +28,7 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 
 			@Override
 			public void run() {
-				SeriesInfo si = new SeriesInfo(Tmdb.get().loadSeries(s));						
+				SeriesInfo si = new SeriesInfo(Tmdb.get().loadSeries(_series));						
 				 
 				List<? extends SeriesInfo.SeasonNode> l = si.getSeasonsEpisodeList();
 				
@@ -50,6 +52,18 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 	public Fragment getItem(int n) {
 		Fragment fragment = new EpisodeObjectFragment();
         Bundle args       = new Bundle();
+        if( _seasonList != null ) {
+        	synchronized( _seasonList ) {
+        		if(n < _seasonList.size()) {
+        			SeriesInfo.SeasonNode sn = _seasonList.get(n);
+    				args.putInt("series", _series);
+    				args.putInt("season", sn.getSeason());
+  					if(sn instanceof SeriesInfo.EpisodeNode) {
+  						args.putInt("episode", ((SeriesInfo.EpisodeNode)sn).getEpisode());
+  					}
+        		}
+        	}
+        }
         fragment.setArguments(args);
         return fragment;
     }
