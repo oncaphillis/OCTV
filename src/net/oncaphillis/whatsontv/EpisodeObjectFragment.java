@@ -35,16 +35,18 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-public class EpisodeObjectFragment extends Fragment {
+public class EpisodeObjectFragment extends EntityInfoFragment {
 
-	private Activity _activity;
 	private View _rootView = null;
 	private int _series;
 	private int _season;
 	private int _episode;
 	
-	static final String _prefix = "";
-	static final String _postfix = "";
+    private static final String _prefix = "<html>"+
+			   " <body style='background-color: #000000; color: #ffffff'>";
+
+    private static final String _postfix = "</body></html>";
+
 	
 	@Override
     public View onCreateView(LayoutInflater inflater,
@@ -70,14 +72,18 @@ public class EpisodeObjectFragment extends Fragment {
         new Thread(new Runnable() {
 			@Override
 			public void run() {
-				EpisodeInfo e = Tmdb.get().loadEpisode(_series, _season, _episode);
-				if(e!=null) {
+				final TvSeries s = Tmdb.get().loadSeries(_series);
+				final EpisodeInfo e = Tmdb.get().loadEpisode(_series, _season, _episode);
+
+				if(s!= null && e!=null) {
+					final Bitmap bm = Tmdb.get().loadPoster(1, e.getTmdb().getStillPath());
 					final String overview = e.getTmdb().getOverview();
-					if(_activity!=null) {
-						_activity.runOnUiThread(new Runnable() {
+					if(getActivity()!=null) {
+						getActivity().runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								overview_webview.loadData(_prefix/*+getBitmapHtml(bm)*/+
+								tv_header.setText(s.getName()+":"+e.getTmdb().getName());
+								overview_webview.loadData(_prefix+getBitmapHtml(bm)+
 							    				StringEscapeUtils.escapeHtml4(overview) +  
 							        			_postfix, "text/html; charset=utf-8;", "UTF-8");
 		
@@ -91,10 +97,4 @@ public class EpisodeObjectFragment extends Fragment {
 
         return _rootView;
     }
-	
-	@Override
-	public void onAttach(Activity act) {
-        _activity = act;
-        super.onAttach(act);
-	}
 }

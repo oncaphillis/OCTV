@@ -5,11 +5,9 @@ import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
-import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,22 +15,13 @@ import java.util.List;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import net.oncaphillis.whatsontv.R;
-import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.util.Base64;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.ExpandableListView;
-import android.widget.GridLayout;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -40,7 +29,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-public class SeriesObjectFragment extends Fragment {
+public class SeriesObjectFragment extends EntityInfoFragment {
     public static final String ARG_IX    = "ix";
     public static final String ARG_NAMES = "names";
     public static final String ARG_IDS   = "ids";
@@ -50,7 +39,7 @@ public class SeriesObjectFragment extends Fragment {
 										   " <body style='background-color: #000000; color: #ffffff'>";
 	private static final String _postfix = "</body></html>";
 	
-	private Activity _activity;
+
 	private View _rootView;
 	private int  _seriesId;
 	private String _seriesName;
@@ -91,7 +80,7 @@ public class SeriesObjectFragment extends Fragment {
         overview_webview.loadData("","text/html; charset=utf-8;", "utf-8");
         tv_progress.setVisibility(View.INVISIBLE);
         
-        int mc = Environment.getColumns(_activity);
+        int mc = Environment.getColumns(this.getActivity());
  		
  		final int maxcol = mc;
  		
@@ -126,8 +115,8 @@ public class SeriesObjectFragment extends Fragment {
 				final Bitmap bm = Tmdb.get().loadPoster(1, ts.getPosterPath());
 				final TableLayout  info_table = ((TableLayout) _rootView.findViewById(R.id.series_page_info_table));
 				
-				if(_activity!=null) {
-					_activity.runOnUiThread(new Runnable() {
+				if(getActivity()!=null) {
+					getActivity().runOnUiThread(new Runnable() {
 				        @Override
 				        public void run() {
 
@@ -176,7 +165,7 @@ public class SeriesObjectFragment extends Fragment {
 				    
 					if(tsa!=null && tsa.size()!=0) {
 						
-						_activity.runOnUiThread(new Runnable() {
+						getActivity().runOnUiThread(new Runnable() {
 					    	@Override
 						    public void run() {		
 							    
@@ -259,7 +248,7 @@ public class SeriesObjectFragment extends Fragment {
 												if(n.img!=null) {
 													Iterator<ImageView> i2 = n.img.iterator();
 													for(int j = 0;j<n.img.size();j++) {
-														new BitmapDownloaderTask(n.img.get(j), _activity, n.pb.get(j), null,tv_progress).execute();
+														new BitmapDownloaderTask(n.img.get(j), getActivity(), n.pb.get(j), null,tv_progress).execute();
 													}
 													n.img=null;
 													n.pb=null;
@@ -271,7 +260,7 @@ public class SeriesObjectFragment extends Fragment {
 											}
 										}
 										ImageView iv = (ImageView)ll.findViewById(R.id.series_table_header_expand);
-										iv.setImageDrawable(_activity.getResources().getDrawable(f ? R.drawable.down : R.drawable.right));
+										iv.setImageDrawable(getActivity().getResources().getDrawable(f ? R.drawable.down : R.drawable.right));
 									}
  					    		});
 					    	}
@@ -290,7 +279,7 @@ public class SeriesObjectFragment extends Fragment {
 					} catch(Exception ex) {
 						return;
 					}
-					new CastInfoThread(_activity,info_table,maxcol,
+					new CastInfoThread(getActivity(),info_table,maxcol,
 							c!=null ? c.getCast() : null,c!=null ? c.getCrew() : null,ts.getCreatedBy()).start();
 	        	}		
 			}
@@ -299,24 +288,4 @@ public class SeriesObjectFragment extends Fragment {
 
         return _rootView;
     }
-	
-	@Override
-	public void onAttach(Activity act) {
-        _activity = act;
-        super.onAttach(act);
-	}
-	private String getBitmapHtml(Bitmap bm) {
-		if(bm==null)
-			return "";
-		
-	    // Convert bitmap to Base64 encoded image for web
-	    
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-	    bm.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-	    byte[] byteArray = byteArrayOutputStream.toByteArray();
-	    String imgageBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
-	    
-	    return "<img style='padding-right:0.5cm;padding-bottom:0.5cm;float:left;' src='"+
-	    		"data:image/png;base64," + imgageBase64+"' />";
-	}
 }
