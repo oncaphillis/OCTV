@@ -232,7 +232,7 @@ public class Tmdb {
 					List<SearchResult> l;
 					
 					synchronized(_lock) {
-						 l = Tmdb.get().trakt().search().idLookup(IdType.TMDB,Integer.toString(getTmdb().getId()), 1, null);
+						 l = trakt().search().idLookup(IdType.TMDB,Integer.toString(getTmdb().getId()), 1, null);
 					}
 					
 					if(l != null) {
