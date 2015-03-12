@@ -27,6 +27,13 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical" >
 
+			    <net.oncaphillis.whatsontv.PropScaleImageView
+ 			        android:id="@+id/episode_stillpath"
+			        android:layout_width="fill_parent"
+			        android:layout_height="wrap_content"
+			        android:scaleType="centerCrop"
+			        android:src="@drawable/no_image" />
+
                 <WebView
                     android:id="@+id/episode_fragment_overview"
                     android:layout_width="match_parent"
