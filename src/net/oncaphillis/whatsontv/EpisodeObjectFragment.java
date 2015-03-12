@@ -61,6 +61,8 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 		_rootView    = inflater.inflate(R.layout.episode_fragment, container, false);
 		
 		final WebView  overview_webview    = ((WebView) _rootView.findViewById(R.id.episode_fragment_overview));
+		final ImageView episode_still      = ((ImageView) _rootView.findViewById(R.id.episode_stillpath));
+		
         final TextView tv_diag             = ((TextView) _rootView.findViewById(R.id.episode_fragment_id));
         final TextView tv_header           = ((TextView) _rootView.findViewById(R.id.episode_header));
         
@@ -69,6 +71,8 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
         final TextView tv_last_aired       = ((TextView) _rootView.findViewById(R.id.episode_page_last_aired));
         final TextView tv_genres           = ((TextView) _rootView.findViewById(R.id.episode_page_genres));
 		
+
+        
         new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -76,14 +80,18 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 				final EpisodeInfo e = Tmdb.get().loadEpisode(_series, _season, _episode);
 
 				if(s!= null && e!=null) {
+			        episode_still.setTag(e.getTmdb().getStillPath());
+			        new BitmapDownloaderTask(episode_still, getActivity(), null, null, null).execute();
+
 					final Bitmap bm = Tmdb.get().loadPoster(1, e.getTmdb().getStillPath());
 					final String overview = e.getTmdb().getOverview();
 					if(getActivity()!=null) {
 						getActivity().runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
+								
 								tv_header.setText(s.getName()+":"+e.getTmdb().getName());
-								overview_webview.loadData(_prefix+getBitmapHtml(bm)+
+								overview_webview.loadData(_prefix+
 							    				StringEscapeUtils.escapeHtml4(overview) +  
 							        			_postfix, "text/html; charset=utf-8;", "UTF-8");
 		
