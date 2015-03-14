@@ -17,6 +17,7 @@ class BitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
 	private WeakReference<ImageView> _imageView;
 	private Activity         _act;
 	private ProgressBar     _pb_group;
+	private int _size = 0;
 	
     public BitmapDownloaderTask(ImageView imageView, Activity act,ProgressBar pb, Bitmap defBitmap,ProgressBar pb_group) {
         _imageView = new WeakReference<ImageView>(imageView);
@@ -25,14 +26,19 @@ class BitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
         _pb        = pb;
         _act       = act;
         _pb_group  = pb_group;
+        _size      = 0;
     }
-
+    public BitmapDownloaderTask(ImageView imageView, int s, Activity act,ProgressBar pb, Bitmap defBitmap,ProgressBar pb_group) {
+    	this(imageView,act,pb,defBitmap,pb_group);
+    	_size = s;
+    }
+    
     @Override
     protected Bitmap doInBackground(String... params) {
     	if(_imageView!=null && _imageView.get()!=null &&
     			_imageView.get().getTag()!=null &&
     			_imageView.get().getTag().toString().equals(_path)) 
-    		return Tmdb.get().loadPoster(0,_path,_act,_pb);      		 
+    		return Tmdb.get().loadPoster(_size,_path,_act,_pb);      		 
     	return null;
     }
 

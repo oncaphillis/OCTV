@@ -81,9 +81,8 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 
 				if(s!= null && e!=null) {
 			        episode_still.setTag(e.getTmdb().getStillPath());
-			        new BitmapDownloaderTask(episode_still, getActivity(), null, null, null).execute();
+			        new BitmapDownloaderTask(episode_still, 3, getActivity(), null, null, null).execute();
 
-					final Bitmap bm = Tmdb.get().loadPoster(1, e.getTmdb().getStillPath());
 					final String overview = e.getTmdb().getOverview();
 					if(getActivity()!=null) {
 						getActivity().runOnUiThread(new Runnable() {
