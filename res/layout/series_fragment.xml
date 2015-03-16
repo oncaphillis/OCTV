@@ -24,7 +24,6 @@
                 android:id="@+id/series_page_network"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="AA"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textStyle="bold" />
 
@@ -33,7 +32,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:text="CC"
                 android:textColor="@color/oncaphillis_orange"
                 android:textStyle="bold" />
 
@@ -92,7 +90,7 @@
                                 android:orientation="vertical" >
 
                                 <TextView
-                                	android:id="@+id/series_page_voting"
+                                    android:id="@+id/series_page_vote"
                                     android:layout_width="fill_parent"
                                     android:layout_height="wrap_content"
                                     android:gravity="center_vertical|center_horizontal|center"
@@ -101,7 +99,7 @@
                                     android:textStyle="bold" />
 
                                 <TextView
-                                    android:id="@+id/series_page_voting_count"
+                                    android:id="@+id/series_page_vote_count"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_horizontal"
@@ -157,7 +155,7 @@
                                 android:orientation="vertical" >
 
                                 <TextView
-                                    android:id="@+id/series_episode_page_voting_portrait"
+                                    android:id="@+id/series_page_episode_voteportrait"
                                     android:layout_width="fill_parent"
                                     android:layout_height="wrap_content"
                                     android:gravity="center_vertical|center_horizontal|center"
@@ -166,7 +164,7 @@
                                     android:textStyle="bold" />
 
                                 <TextView
-                                    android:id="@+id/series_episode_page_voting_count_portrait"
+                                    android:id="@+id/series_page_episode_vote_count_portrait"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_horizontal"
@@ -193,7 +191,7 @@
                                         android:id="@+id/series_page_first_tag_portrait"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="first" />
+                                        android:text="@string/first" />
 
                                     <TextView
                                         android:id="@+id/series_page_first_aired_portrait"
@@ -211,7 +209,7 @@
                                         android:id="@+id/series_page_nearest_tag_portrait"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="last" />
+                                        android:text="@string/last" />
 
                                     <TextView
                                         android:id="@+id/series_page_last_aired_portrait"
@@ -225,7 +223,6 @@
                                 android:id="@+id/series_page_nearest_title_portrait"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Medium Text"
                                 android:textAppearance="?android:attr/textAppearanceMedium" />
                         </LinearLayout>
                     </LinearLayout>
@@ -322,7 +319,7 @@
                                 android:orientation="vertical" >
 
                                 <TextView
-                                    android:id="@+id/series_episode_page_voting"
+                                    android:id="@+id/series_page_episode_vote"
                                     android:layout_width="fill_parent"
                                     android:layout_height="wrap_content"
                                     android:gravity="center_vertical|center_horizontal|center"
@@ -331,11 +328,11 @@
                                     android:textStyle="bold" />
 
                                 <TextView
-                                    android:id="@+id/series_episode_page_voting_count"
+                                    android:id="@+id/series_page_episode_vote_count"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_horizontal"
-                                    android:text="0000"
+                                    android:text="0"
                                     android:textColor="#ff000000" />
                             </LinearLayout>
                         </RelativeLayout>
@@ -358,7 +355,7 @@
                                         android:id="@+id/series_page_first_tag"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="first" />
+                                        android:text="@string/first" />
 
                                     <TextView
                                         android:id="@+id/series_page_first_aired"
@@ -376,7 +373,7 @@
                                         android:id="@+id/series_page_nearest_tag"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="last" />
+                                        android:text="@string/last" />
 
                                     <TextView
                                         android:id="@+id/series_page_last_aired"
@@ -390,7 +387,6 @@
                                 android:id="@+id/series_page_nearest_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Medium Text"
                                 android:textAppearance="?android:attr/textAppearanceMedium" />
                         </LinearLayout>
                     </LinearLayout>
@@ -431,7 +427,6 @@
                                 android:id="@+id/series_page_nearest_summary"
                                 android:layout_width="fill_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Summary"
                                 android:textAppearance="?android:attr/textAppearanceMedium" />
                         </LinearLayout>
 
