@@ -3,10 +3,12 @@ package net.oncaphillis.whatsontv;
 import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.oncaphillis.whatsontv.CastInfoThread.InfoNode;
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,7 +79,7 @@ public class CastInfoThread extends Thread {
 				        }
 				        	_table.addView(tr);
 				        
-				        List<InfoNode> trl = new ArrayList();
+				        List<InfoNode> trl = new ArrayList<InfoNode>();
 				        
 						while(it.hasNext()) {
 							if(cc>=_maxcol)
