@@ -1,12 +1,8 @@
 package net.oncaphillis.whatsontv;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import net.oncaphillis.whatsontv.SeriesInfo.EpisodeNode;
-import net.oncaphillis.whatsontv.SeriesInfo.SeasonNode;
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,7 +10,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 	
-	private List<? extends SeriesInfo.SeasonNode> _seasonList = new ArrayList();
+	private List<? extends SeriesInfo.SeasonNode> _seasonList = new ArrayList<SeriesInfo.SeasonNode>();
 	private int _series;
 	
 	public EpisodeCollectionPagerAdapter(FragmentManager fm, EpisodePagerActivity episodePagerActivity,
