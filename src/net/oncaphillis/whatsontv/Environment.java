@@ -29,20 +29,23 @@ public class Environment {
 	};
 	
 	public static int getColumns(Activity activity) {
-        if( activity!=null) {
+        
+		if( activity!=null) {
         	
     		DisplayMetrics displaymetrics = new DisplayMetrics();
     		activity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
     				
     		float width  = displaymetrics.widthPixels * 160.0f / displaymetrics.xdpi;
-    				
-    		if(width > 1000.0f)
+ 
+    		if(width > 1200.0f)
     			return 4;
-    		if(width > 800.0f)
+    		
+    		if(width > 900.0f)
     			return 3;
-    		if(width > 400.0f)
+    		
+    		if(width > 600.0f)
     			return 2;
- 		}
+        }
         return 1;
 	}
 }
