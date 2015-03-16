@@ -25,18 +25,7 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 	private WeakReference<TextView> _timeStateText;
 
 	private Activity _activity;
-	
-	private static DateFormat _timeFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm") {
-		{
-			this.setTimeZone(TimeZone.getDefault());
-		}
-	};
-	
-	private static DateFormat _dateFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy") {
-		{
-			this.setTimeZone(TimeZone.getDefault());
-		}
-	};
+
 	
 	public SeriesInfoDownLoaderTask(TextView networkText, TextView timeText,TextView lastEpisodeText, TextView timeState,Activity activity) {
 		_networkText = new WeakReference(networkText);
@@ -69,7 +58,7 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 			if(_timeText != null && _timeText.get() != null && _timeText.get().getTag()!=null && _timeText.get().getTag() instanceof Integer) {
 				if(si.getNearestAiring()!=null) {
 					
-					DateFormat df = si.hasClock() ? _timeFormater : _dateFormater;
+					DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.DateFormater;
 					
 					Date td = TimeTool.getToday();
 					_timeText.get().setText(df.format(si.getNearestAiring()) );					

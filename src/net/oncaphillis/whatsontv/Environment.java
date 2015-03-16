@@ -1,5 +1,9 @@
 package net.oncaphillis.whatsontv;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+
 import android.app.Activity;
 import android.util.DisplayMetrics;
 
@@ -10,6 +14,19 @@ public class Environment {
 	public static boolean isDebug() {
 		return true;
 	} 
+	
+	
+	static DateFormat TimeFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm") {
+		{
+			this.setTimeZone(TimeZone.getDefault());
+		}
+	};
+	
+	static DateFormat DateFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy") {
+		{
+			this.setTimeZone(TimeZone.getDefault());
+		}
+	};
 	
 	public static int getColumns(Activity activity) {
         if( activity!=null) {
