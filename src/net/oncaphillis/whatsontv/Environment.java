@@ -8,6 +8,12 @@ import android.app.Activity;
 import android.util.DisplayMetrics;
 
 public class Environment {
+	
+	protected static final int CAST    = 0;
+	protected static final int CREW    = 1;
+	protected static final int CREATOR = 2;
+	protected static final int GUEST   = 3;
+	
 	public static String VERSION   ="1.0";
 	public static String COPYRIGHT ="&copy; 2015 Sebastian Kloska (<a href='http://www.oncaphillis.net/'>www.oncaphillis.net</a>; <a href='mailto:sebastian.kloska@snafu.de'>sebastian.kloska@snafu.de</a>)";
 

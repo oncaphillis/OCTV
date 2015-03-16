@@ -9,5 +9,6 @@
         <item >Cast</item>
         <item >Crew</item>
         <item >Creator</item>
+       <item >Guest</item>
     </string-array>
 </resources>

@@ -21,5 +21,8 @@
     <string name="title_activity_login">Login...</string>
     <string name="title_activity_setup">Setup</string>
     <string name="title_activity_episode_pager">Episodes</string>
-
+	<string name="first">first</string>
+    <string name="next">next</string>
+	<string name="last">last</string>
+        
 </resources>
