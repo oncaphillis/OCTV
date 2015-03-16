@@ -1,21 +1,13 @@
 package net.oncaphillis.whatsontv;
 
-import info.movito.themoviedbapi.model.Credits;
-import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
-import info.movito.themoviedbapi.model.tv.TvSeason;
-import info.movito.themoviedbapi.model.tv.TvSeries;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,31 +24,23 @@ public class CastInfoThread extends Thread {
 	private TableLayout _table = null;
 	private int _maxcol = 1;
     
-	private static final int CAST    = 0;
-    private static final int CREW    = 1;
-    private static final int CREATOR = 2;
-    
-    static final String[] _info_type={"Cast","Crew","Creator"};
-    
-    private List< ? extends Person > _credits[] = new List[3];
+    private List< ? extends Person > _credits[] = null;
+    private String[] _titles = null;
     
 	class InfoNode {
 		public TableRow row = null;
-		public ArrayList<ImageView>   img = new ArrayList();
-		public ArrayList<ProgressBar> pb  = new ArrayList();
+		public ArrayList<ImageView>   img = new ArrayList<ImageView>();
+		public ArrayList<ProgressBar> pb  = new ArrayList<ProgressBar>();
 	};
 	
 	CastInfoThread(Activity activity,TableLayout table,int maxcol,
-			List<? extends Person> cast,List<? extends Person> crew,List<? extends Person> creator) {
+			List<? extends Person> [] credits,String[] titles) {
 		_activity = activity;
-		_table = table;
-		_maxcol = maxcol; 
-		for(int i=0;i<_credits.length;i++) {
-			_credits[i]=null;
-		}
-		_credits[0] = cast; 
-		_credits[1] = crew; 
-		_credits[2] = creator; 
+		_table    = table;
+		_maxcol   = maxcol; 
+
+		_credits = credits; 
+		_titles = titles;
 	}
 
 	@Override
@@ -85,8 +69,13 @@ public class CastInfoThread extends Thread {
 				        params.span = _maxcol;
 				        header.setLayoutParams(params);
 				        
-				        txt.setText(_info_type[person_group]);
-				        _table.addView(tr);
+				        if(_titles != null && person_group < _titles.length) {
+				        	txt.setText(Integer.toString(_credits[person_group].size())+" "
+				        			+_titles[person_group]);
+				        } else {
+				        	txt.setText(Integer.toString(_credits[person_group].size()));
+				        }
+				        	_table.addView(tr);
 				        
 				        List<InfoNode> trl = new ArrayList();
 				        
@@ -104,25 +93,18 @@ public class CastInfoThread extends Thread {
 								tr.setVisibility(View.GONE);
 							}
 
-							String nn;
-							String rr;
-							String pp;
+							Person p = it.next();
 							
-							if(person_group==CAST) {
-								PersonCast p = (PersonCast)it.next();
-								nn = p.getName();
-								rr = p.getCharacter();
-								pp = p.getProfilePath();
-							} else if(person_group==CREW) {
-								PersonCrew p = (PersonCrew)it.next();
-								nn = p.getName();
-								rr = p.getJob();
-								pp = p.getProfilePath();
+							String nn = p.getName(); 
+							String pp = p.getProfilePath();
+							String rr = null;
+							
+							if(p instanceof PersonCast) {
+								rr = ((PersonCast)p).getCharacter();
+							} else if(p instanceof PersonCrew) {
+								rr = ((PersonCrew)p).getJob();
 							} else  {
-								Person p = (Person)it.next();
-								nn = p.getName();
 								rr = null;
-								pp = p.getProfilePath();
 							} 
 							
 							View v = (View)vi.inflate(R.layout.series_info_grid_entry,null);

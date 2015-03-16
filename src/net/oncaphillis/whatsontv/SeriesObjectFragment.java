@@ -77,17 +77,35 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         }
         
 		final WebView  overview_webview    = ((WebView) _rootView.findViewById(R.id.series_fragment_overview));
-
         final TextView tv_header           = ((TextView) _rootView.findViewById(R.id.series_header));
-        final TextView tv_rating           = ((TextView) _rootView.findViewById(R.id.series_page_voting));
-        final TextView tv_voting_count     = ((TextView) _rootView.findViewById(R.id.series_page_voting_count));
-        final TextView tv_first_aired      = ((TextView) _rootView.findViewById(R.id.series_page_first_aired));
-        final TextView tv_last_aired       = ((TextView) _rootView.findViewById(R.id.series_page_last_aired));
         final TextView tv_general_info           = ((TextView) _rootView.findViewById(R.id.series_page_genres));
         final ProgressBar tv_progress      = ((ProgressBar) _rootView.findViewById(R.id.series_fragment_progress));
-        final TextView tv_nearest = ((TextView) _rootView.findViewById(R.id.series_page_nearest_title));
-        final ImageView tv_nearest_still = ((ImageView)_rootView.findViewById(R.id.series_page_nearest_still));
-        final TextView tv_nearest_summary = ((TextView)_rootView.findViewById(R.id.series_page_nearest_summary));
+
+        boolean landscape = false;
+        
+        int voting = landscape ? R.id.series_page_voting : R.id.series_page_voting_portrait;
+        int voting_count = landscape ? R.id.series_page_voting_count : R.id.series_page_voting_count_portrait;
+        int first_aired = landscape ? R.id.series_page_first_aired : R.id.series_page_first_aired_portrait;
+        int last_aired = landscape ? R.id.series_page_last_aired : R.id.series_page_last_aired_portrait;
+        int nearest_title = landscape ? R.id.series_page_nearest_title : R.id.series_page_nearest_title_portrait;
+        int nearest_still = landscape ? R.id.series_page_nearest_still : R.id.series_page_nearest_still_portrait;
+        int nearest_summary = landscape ? R.id.series_page_nearest_summary : R.id.series_page_nearest_summary_portrait;
+        
+        final TextView tv_rating           = ((TextView) _rootView.findViewById(voting));
+        final TextView tv_voting_count     = ((TextView) _rootView.findViewById(voting_count));
+        final TextView tv_first_aired      = ((TextView) _rootView.findViewById(first_aired));
+        final TextView tv_last_aired       = ((TextView) _rootView.findViewById(last_aired));
+        final TextView tv_nearest = ((TextView) _rootView.findViewById(nearest_title));
+        final ImageView tv_nearest_still = ((ImageView)_rootView.findViewById(nearest_still));
+        final TextView tv_nearest_summary = ((TextView)_rootView.findViewById(nearest_summary));
+        
+        if(landscape) {
+        	LinearLayout ll = ((LinearLayout)_rootView.findViewById(R.id.series_page_episode_layout_portrait));
+        	ll.setVisibility(View.GONE);
+        } else {
+        	LinearLayout ll = ((LinearLayout)_rootView.findViewById(R.id.series_page_episode_layout_landscape));
+        	ll.setVisibility(View.GONE);
+        }
         tv_header.setText(_seriesName);
         
         if(Environment.isDebug())
@@ -144,7 +162,8 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 				//
 				
 				final Bitmap bm = Tmdb.get().loadPoster(1, _series.getPosterPath());
-				final TableLayout  info_table = ((TableLayout) _rootView.findViewById(R.id.series_page_info_table));
+				final TableLayout  series_info_table = ((TableLayout) _rootView.findViewById(R.id.series_page_info_table));
+				final TableLayout  episode_info_table = ((TableLayout) _rootView.findViewById(R.id.series_page_nearest_info_table));
 				
 				if(_nearest_still_path != null) {
 					tv_nearest_still.setTag(_nearest_still_path);
@@ -223,14 +242,14 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					    	@Override
 						    public void run() {		
 							    
-					    		final LayoutInflater vi = LayoutInflater.from(info_table.getContext());
+					    		final LayoutInflater vi = LayoutInflater.from(series_info_table.getContext());
 							    
 					    		Iterator<TvSeason> i = tsa.iterator();
 					    		
 						        LinearLayout header = (LinearLayout) vi.inflate(R.layout.series_table_header,null);
 						        TextView txt = (TextView)header.findViewById(R.id.series_table_header_text);
 						        
-						        TableRow tr = new TableRow(info_table.getContext());
+						        TableRow tr = new TableRow(series_info_table.getContext());
 						    
 						        tr.addView(header);
 						        
@@ -238,8 +257,8 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 						        params.span = maxcol;
 						        header.setLayoutParams(params);
 						        
-						        txt.setText("Seasons");
-						        info_table.addView(tr);
+						        txt.setText(Integer.toString(tsa.size())+" Seasons");
+						        series_info_table.addView(tr);
 								
 							    int cc = 0;
 							    
@@ -251,9 +270,9 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					    			}
 					    			 
 					    			if(cc == 0) {					    				
-					    				tr = new TableRow(info_table.getContext());
+					    				tr = new TableRow(series_info_table.getContext());
 										tr.setOrientation(LinearLayout.HORIZONTAL);
-										info_table.addView(tr);
+										series_info_table.addView(tr);
 										tr.setVisibility(View.GONE);
 										InfoNode nd=new InfoNode();
 										nd.row = tr;
@@ -333,12 +352,27 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					} catch(Exception ex) {
 						return;
 					}
-					new CastInfoThread(getActivity(),info_table,maxcol,
-							c!=null ? c.getCast() : null,c!=null ? c.getCrew() : null,_series.getCreatedBy()).start();
+
+					if(c!=null) {
+						List<? extends Person>[] cc = new ArrayList[3];
+						
+						cc[0] = c != null ? c.getCast() : null;
+						cc[1] = c != null ? c.getCrew() : null;
+						cc[2] = _series.getCreatedBy();
+	
+						new CastInfoThread(getActivity(),series_info_table,maxcol,cc,null).start();
+					}
+
+					c = _series_info.getNearestEpisode().getCredits();
+
+					if(c!=null) {
+						List<? extends Person>[] cc = new ArrayList[1];
+						cc[0] = c != null ? c.getGuestStars() : null;	
+						new CastInfoThread(getActivity(),episode_info_table,maxcol,cc,null).start();
+					}
 	        	}		
 			}
- 		
- 		}).start();
+ 		} ).start();
 
         return _rootView;
     }
