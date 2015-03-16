@@ -52,6 +52,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 	private List<TvSeason> _seasons = null;
 
 	private SeriesInfo _series_info;
+	private int _maxcol = 1;
 	
 
  	class InfoNode {
@@ -81,7 +82,14 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         final TextView tv_general_info           = ((TextView) _rootView.findViewById(R.id.series_page_genres));
         final ProgressBar tv_progress      = ((ProgressBar) _rootView.findViewById(R.id.series_fragment_progress));
 
-        boolean landscape = false;
+        boolean landscape = true;
+
+        _maxcol  = Environment.getColumns(this.getActivity());
+        
+        if(_maxcol==1)
+        	landscape = false;
+        else
+        	_maxcol/=2;
         
         int voting = landscape ? R.id.series_page_voting : R.id.series_page_voting_portrait;
         int voting_count = landscape ? R.id.series_page_voting_count : R.id.series_page_voting_count_portrait;
@@ -113,10 +121,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         
         overview_webview.loadData("","text/html; charset=utf-8;", "utf-8");
         tv_progress.setVisibility(View.INVISIBLE);
-        
-        int mc = Environment.getColumns(this.getActivity());
- 		
- 		final int maxcol = mc;
+         		
  		
  		new Thread(new Runnable() {
         	
@@ -254,7 +259,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 						        tr.addView(header);
 						        
 						        TableRow.LayoutParams params = (TableRow.LayoutParams)header.getLayoutParams();
-						        params.span = maxcol;
+						        params.span = _maxcol;
 						        header.setLayoutParams(params);
 						        
 						        txt.setText(Integer.toString(tsa.size())+" Seasons");
@@ -265,7 +270,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 							    ArrayList<InfoNode> trl = new ArrayList();
 							    
 					    		while(i.hasNext()) {
-					    			if(cc >= maxcol) {
+					    			if(cc >= _maxcol) {
 					    				cc = 0;
 					    			}
 					    			 
@@ -356,11 +361,13 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					if(c!=null) {
 						List<? extends Person>[] cc = new ArrayList[3];
 						
+						String[] titles = getActivity().getResources().getStringArray(R.array.cast_titles);
+						
 						cc[0] = c != null ? c.getCast() : null;
 						cc[1] = c != null ? c.getCrew() : null;
 						cc[2] = _series.getCreatedBy();
 	
-						new CastInfoThread(getActivity(),series_info_table,maxcol,cc,null).start();
+						new CastInfoThread(getActivity(),series_info_table,_maxcol,cc,titles).start();
 					}
 
 					c = _series_info.getNearestEpisode().getCredits();
@@ -368,7 +375,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					if(c!=null) {
 						List<? extends Person>[] cc = new ArrayList[1];
 						cc[0] = c != null ? c.getGuestStars() : null;	
-						new CastInfoThread(getActivity(),episode_info_table,maxcol,cc,null).start();
+						new CastInfoThread(getActivity(),episode_info_table,_maxcol,cc,null).start();
 					}
 	        	}		
 			}
