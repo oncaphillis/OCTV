@@ -24,6 +24,7 @@ public class SeriesInfo {
 	private int _nearestEpisodeSeason = 0;
 	private int _nearestEpisodeNumber = 0;
 	private List<SeasonNode> _seasonsEpisodeList = null;
+	private EpisodeInfo _nearestEpisodeInfo;
 
 	public static class SeasonNode implements Serializable {
 		int _season;
@@ -235,5 +236,18 @@ public class SeriesInfo {
 			n++;
 		}
 		return 0;
+	}
+
+	public EpisodeInfo getNearestEpisodeInfo() {
+		if(_nearestEpisodeInfo == null) {
+			_nearestEpisodeInfo = Tmdb.get().loadEpisode(this._tvs.getId(), this.getNearestEpisodeSeason(), this.getNearestEpisodeNumber());
+		}
+		return _nearestEpisodeInfo;
+	}
+	
+	public TvEpisode getNearestEpisode() {
+		if(getNearestEpisodeInfo()!=null)
+			return getNearestEpisodeInfo().getTmdb();
+		return null;
 	}
 }
