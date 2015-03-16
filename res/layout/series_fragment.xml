@@ -48,11 +48,167 @@
 
                    <TableLayout
                        android:id="@+id/series_page_info_table"
-                       android:layout_width="match_parent"
+                       android:layout_width="fill_parent"
                        android:layout_height="wrap_content"
-                       android:layout_weight="1"
                        android:stretchColumns="*" />
                     
+                   <LinearLayout
+                       android:id="@+id/series_page_episode_layout_portrait"
+                       android:layout_width="fill_parent"
+                       android:layout_height="fill_parent"
+                       android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" >
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/oncaphillis_light_grey"
+                        android:orientation="horizontal" >
+
+                        <RelativeLayout
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:layout_margin="8dp"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginRight="8dp" >
+
+                            <ImageView
+                                android:id="@+id/series_vote_star_portrait"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_centerInParent="true"
+                                android:src="@drawable/vote_star" />
+
+                            <LinearLayout
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:orientation="vertical" >
+
+                                <TextView
+                                    android:id="@+id/series_page_voting_portrait"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical|center_horizontal|center"
+                                    android:text="-/-"
+                                    android:textColor="#ff000000"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/series_page_voting_count_portrait"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:text="0000"
+                                    android:textColor="#ff000000" />
+                            </LinearLayout>
+                        </RelativeLayout>
+
+                        <LinearLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" >
+
+                            <TableLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" >
+
+                                <TableRow
+                                    android:id="@+id/tableRow1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content" >
+
+                                    <TextView
+                                        android:id="@+id/series_page_first_tag_portrait"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="first" />
+
+                                    <TextView
+                                        android:id="@+id/series_page_first_aired_portrait"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                                </TableRow>
+
+                                <TableRow
+                                    android:id="@+id/tableRow2"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content" >
+
+                                    <TextView
+                                        android:id="@+id/series_page_nearest_tag_portrait"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="last" />
+
+                                    <TextView
+                                        android:id="@+id/series_page_last_aired_portrait"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                                </TableRow>
+                            </TableLayout>
+
+                            <TextView
+                                android:id="@+id/series_page_nearest_title_portrait"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Medium Text"
+                                android:textAppearance="?android:attr/textAppearanceMedium" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <TableLayout
+                        android:id="@+id/series_page_info_table__portrait"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:stretchColumns="*" >
+                    </TableLayout>
+                </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical" >
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical" >
+
+                            <net.oncaphillis.whatsontv.PropScaleImageView
+                                android:id="@+id/series_page_nearest_still_portrait"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
+                            <TextView
+                                android:id="@+id/series_page_nearest_summary_portrait"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Summary"
+                                android:textAppearance="?android:attr/textAppearanceMedium" />
+                        </LinearLayout>
+
+                        <TableLayout
+                            android:id="@+id/series_page_nearest_info_table_portrait"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:stretchColumns="*" >
+                        </TableLayout>
+                    </LinearLayout>
+
+            </LinearLayout>
+            <!--   -->
                 </LinearLayout>
 
 
@@ -60,6 +216,7 @@
                 </ScrollView>
 
             <LinearLayout
+                android:id="@+id/series_page_episode_layout_landscape"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
@@ -127,7 +284,7 @@
                                 android:layout_height="wrap_content" >
 
                                 <TableRow
-                                    android:id="@+id/tableRow1"
+                                    android:id="@+id/tableRow1_portrait"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content" >
 
@@ -145,7 +302,7 @@
                                 </TableRow>
 
                                 <TableRow
-                                    android:id="@+id/tableRow2"
+                                    android:id="@+id/tableRow2_portrait"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content" >
 
@@ -213,7 +370,7 @@
                         </LinearLayout>
 
                         <TableLayout
-                            android:id="@+id/series_page_nearest_info_table_landscape"
+                            android:id="@+id/series_page_nearest_info_table"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
