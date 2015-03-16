@@ -3,8 +3,7 @@ package net.oncaphillis.whatsontv;
 import info.movito.themoviedbapi.model.Credits;
 import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.people.Person;
-import info.movito.themoviedbapi.model.people.PersonCast;
-import info.movito.themoviedbapi.model.people.PersonCrew;
+import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
@@ -16,7 +15,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import net.oncaphillis.whatsontv.R;
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -57,8 +55,8 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 
  	class InfoNode {
 		public TableRow row = null;
-		public ArrayList<ImageView>   img = new ArrayList();
-		public ArrayList<ProgressBar> pb  = new ArrayList();
+		public ArrayList<ImageView>   img = new ArrayList<ImageView>();
+		public ArrayList<ProgressBar> pb  = new ArrayList<ProgressBar>();
 	};
 	
 	@Override
@@ -79,9 +77,13 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         
 		final WebView  overview_webview    = ((WebView) _rootView.findViewById(R.id.series_fragment_overview));
         final TextView tv_header           = ((TextView) _rootView.findViewById(R.id.series_header));
-        final TextView tv_general_info           = ((TextView) _rootView.findViewById(R.id.series_page_genres));
+        final TextView tv_network     = ((TextView) _rootView.findViewById(R.id.series_page_network));
+        final TextView tv_genres     = ((TextView) _rootView.findViewById(R.id.series_page_genres));
         final ProgressBar tv_progress      = ((ProgressBar) _rootView.findViewById(R.id.series_fragment_progress));
-
+        
+        final TextView tv_voting           = ((TextView) _rootView.findViewById(R.id.series_page_vote));
+        final TextView tv_voting_count     = ((TextView) _rootView.findViewById(R.id.series_page_vote_count));
+        
         boolean landscape = true;
 
         _maxcol  = Environment.getColumns(this.getActivity());
@@ -91,21 +93,26 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         else
         	_maxcol/=2;
         
-        int voting = landscape ? R.id.series_page_voting : R.id.series_page_voting_portrait;
-        int voting_count = landscape ? R.id.series_page_voting_count : R.id.series_page_voting_count_portrait;
         int first_aired = landscape ? R.id.series_page_first_aired : R.id.series_page_first_aired_portrait;
         int last_aired = landscape ? R.id.series_page_last_aired : R.id.series_page_last_aired_portrait;
         int nearest_title = landscape ? R.id.series_page_nearest_title : R.id.series_page_nearest_title_portrait;
         int nearest_still = landscape ? R.id.series_page_nearest_still : R.id.series_page_nearest_still_portrait;
         int nearest_summary = landscape ? R.id.series_page_nearest_summary : R.id.series_page_nearest_summary_portrait;
+        int episode_vote = landscape ? R.id.series_page_episode_vote : R.id.series_page_episode_vote_count_portrait;
+        int episode_vote_count = landscape ? R.id.series_page_episode_vote_count : R.id.series_page_episode_vote_count_portrait;
+        int next_last_tag = landscape ? R.id.series_page_nearest_tag : R.id.series_page_nearest_tag_portrait;
         
-        final TextView tv_rating           = ((TextView) _rootView.findViewById(voting));
-        final TextView tv_voting_count     = ((TextView) _rootView.findViewById(voting_count));
         final TextView tv_first_aired      = ((TextView) _rootView.findViewById(first_aired));
         final TextView tv_last_aired       = ((TextView) _rootView.findViewById(last_aired));
         final TextView tv_nearest = ((TextView) _rootView.findViewById(nearest_title));
         final ImageView tv_nearest_still = ((ImageView)_rootView.findViewById(nearest_still));
         final TextView tv_nearest_summary = ((TextView)_rootView.findViewById(nearest_summary));
+        final TextView tv_next_last_tag = ((TextView)_rootView.findViewById(next_last_tag));
+        final TextView tv_episode_vote = ((TextView)_rootView.findViewById(episode_vote));
+        final TextView tv_episode_vote_count = ((TextView)_rootView.findViewById(episode_vote_count));
+
+        final String nextText = getResources().getString(R.string.next);
+        final String lastText = getResources().getString(R.string.last);
         
         if(landscape) {
         	LinearLayout ll = ((LinearLayout)_rootView.findViewById(R.id.series_page_episode_layout_portrait));
@@ -117,7 +124,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         tv_header.setText(_seriesName);
         
         if(Environment.isDebug())
-        	tv_general_info.setText("#"+Integer.toString(_seriesId));
+        	tv_network.setText("#"+Integer.toString(_seriesId));
         
         overview_webview.loadData("","text/html; charset=utf-8;", "utf-8");
         tv_progress.setVisibility(View.INVISIBLE);
@@ -127,7 +134,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         	
 			private String _nearest_title;
 			private int _nearest_season;
-			private int _nearest_episode;
+			private TvEpisode _nearest_episode; 
 			private String  _nearest_still_path;
 			private String _nearest_summary;
 
@@ -142,6 +149,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					_series = Tmdb.get().loadSeries(_seriesId);
 					_series_info  = new SeriesInfo(_series); 
 					_nearest_still_path = _series_info.getNearestEpisode().getStillPath();
+					_nearest_episode = _series_info.getNearestEpisode();
 					_nearest_summary = _series_info.getNearestEpisode().getOverview();
 					_seasons = _series_info.getSeasons();
 					if(Environment.isDebug())
@@ -159,7 +167,6 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 				_nearest = _series_info.getNearestAiring();
 				_nearest_title   = _series_info.getNearestEpisodeTitle();
 				_nearest_season  = _series_info.getNearestEpisodeSeason();
-				_nearest_episode = _series_info.getNearestEpisodeNumber();
 				
 				
 				
@@ -195,7 +202,8 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					        			gen += (i++==0 ? "" : ",")+it.next().getName();
 					        		}
 					        		
-					        		tv_general_info.setText(_networks+" "+gen);
+					        		tv_network.setText(_networks);
+					        		tv_genres.setText(gen);
 					        	}
 					        	
 					        	String fa = _series.getFirstAirDate();
@@ -204,26 +212,41 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					        		tv_first_aired.setText(fa);
 					        	
 					        	if(_nearest != null && _today!=null) {
-					        		if(_nearest.before(_today))
+					        		
+					        		if(_nearest.before(_today)) {
 					        			tv_last_aired.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_white));
-					        		else
+					        			tv_next_last_tag.setText(lastText);
+					        		} else {
 					        			tv_last_aired.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_orange));
-					        			
+					        			tv_next_last_tag.setText(nextText);
+					        		}
+					        		
 					        		tv_last_aired.setText(Environment.TimeFormater.format(_nearest));
 					        		tv_nearest.setText(Integer.toString(_nearest_season)+"x"+
-					        				Integer.toString(_nearest_episode)+" "+_nearest_title);
+					        				Integer.toString(_nearest_episode.getEpisodeNumber())+" "+_nearest_title);
 					        		
+									if(_nearest_episode != null && _nearest_episode.getVoteCount()!=0) {
+										tv_episode_vote.setText(String.format("%.1f", _nearest_episode.getVoteAverage())+"/"+"10");
+										tv_episode_vote_count.setText(Integer.toString(_nearest_episode.getVoteCount()));
+									} else {
+										tv_episode_vote.setText("-/-");
+										tv_episode_vote_count.setText("0");										
+									}
+									
 					        		if(_nearest_summary != null)
 					        			tv_nearest_summary.setText(_nearest_summary);
+
+					        	
 					        	}
 					        	
 					        	if(_series.getVoteCount()!=0) {
-					        		tv_rating.setText(String.format("%.1f",_series.getVoteAverage())+"/"+Integer.toString(10) );
+					        		tv_voting.setText(String.format("%.1f",_series.getVoteAverage())+"/"+Integer.toString(10) );
 					        		tv_voting_count.setText(Integer.toString(_series.getVoteCount()));
 					        	} else {
-					        		tv_rating.setText("-/-");
+					        		tv_voting.setText("-/-");
 					        		tv_voting_count.setText("0");
 					        	}
+
 
 					        	tv_header.setText(name);
 
@@ -369,13 +392,20 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 	
 						new CastInfoThread(getActivity(),series_info_table,_maxcol,cc,titles).start();
 					}
-
-					c = _series_info.getNearestEpisode().getCredits();
+					
+					if(_nearest_episode != null)
+						c = _nearest_episode.getCredits();
 
 					if(c!=null) {
 						List<? extends Person>[] cc = new ArrayList[1];
+						
+						String s[] = getActivity().getResources().getStringArray(R.array.cast_titles);
+						
+						String a[] = new String[] {s[Environment.GUEST]};
+
 						cc[0] = c != null ? c.getGuestStars() : null;	
-						new CastInfoThread(getActivity(),episode_info_table,_maxcol,cc,null).start();
+						
+						new CastInfoThread(getActivity(),episode_info_table,_maxcol,cc,a).start();
 					}
 	        	}		
 			}
