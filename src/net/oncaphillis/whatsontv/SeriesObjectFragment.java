@@ -7,6 +7,7 @@ import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -225,7 +226,9 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					        			tv_next_last_tag.setText(nextText);
 					        		}
 					        		
-					        		tv_last_aired.setText(Environment.TimeFormater.format(_nearest));
+					        		DateFormat df = _series_info.hasClock() ? Environment.TimeFormater : Environment.DateFormater;
+					        		
+					        		tv_last_aired.setText(df.format(_nearest));
 					        		tv_nearest.setText(Integer.toString(_nearest_season)+"x"+
 					        				Integer.toString(_nearest_episode.getEpisodeNumber())+" "+_nearest_title);
 					        		
