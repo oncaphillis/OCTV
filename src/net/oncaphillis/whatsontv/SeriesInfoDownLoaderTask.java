@@ -3,19 +3,10 @@ package net.oncaphillis.whatsontv;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.lang.ref.WeakReference;
-import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.TimeZone;
-
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo> {
@@ -42,7 +33,7 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 		SeriesInfo si = null;
 		if(_networkText != null && _networkText.get() != null && _networkText.get().getTag()!=null && _networkText.get().getTag() instanceof Integer) {
 			TvSeries s = Tmdb.get().loadSeries((Integer)_networkText.get().getTag());
-			si = new SeriesInfo(s);			
+			si = new SeriesInfo(s);
 		}
 		return si;
 	}	
