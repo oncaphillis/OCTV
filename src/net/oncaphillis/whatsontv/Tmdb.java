@@ -221,7 +221,7 @@ public class Tmdb {
 	private TraktV2          _trakt   = null;
 	private BitmapHash       _hash    = new BitmapHash();
 	private List<Timezone> _timezones = null;
-	
+	private TraktReaderThread _trakt_reader = new TraktReaderThread();
 	static  Set<Integer>  _ss = new TreeSet<Integer>();
 	static EpisodeKey     _d  = null;
 	
@@ -247,24 +247,7 @@ public class Tmdb {
 		public Episode getTrakt()  {
 			
 			if(Environment.useTrakt() && _trakt_episode == null && ! _trakt_not_found) {
-				try {
-					List<SearchResult> l;
-					l = trakt().search().idLookup(IdType.TMDB,Integer.toString(getTmdb().getId()), 1, null);
-					if(l != null) {
-						for(SearchResult r : l) {
-							if(r.type.equals("episode") ) {
-								Episode eps = trakt().episodes().summary(Integer.toString(r.show.ids.trakt),r.episode.season, 
-										r.episode.number, Extended.FULL);
-								if(eps.first_aired!=null) {
-									_trakt_episode=eps;
-								}
-							}
-						}
-						_trakt_not_found = _trakt_episode == null;
-					}
-				} catch(Throwable t) {
-					t.printStackTrace();
-				}
+				_trakt_episode = Tmdb.get().trakt_reader().get(getTmdb().getId());
 			}
 
 			return _trakt_episode;
@@ -385,9 +368,12 @@ public class Tmdb {
 		final Semaphore mutex = new Semaphore(0);
 		_key = TmdbKey.APIKEY;
 
+		_trakt_reader.start();
+		
 		// This may trigger net access. Therefor we place it
 		// into its own thread. 
 		if(_api == null) {
+			
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -487,6 +473,9 @@ public class Tmdb {
 		return _api;
 	}
 	
+	public TraktReaderThread trakt_reader() {
+		return _trakt_reader;
+	}
 	TraktV2 trakt() {
 		return _trakt;
 	}
