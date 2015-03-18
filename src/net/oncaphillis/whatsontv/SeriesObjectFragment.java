@@ -204,6 +204,10 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					        		
 					        		tv_network.setText(_networks);
 					        		tv_genres.setText(gen);
+					    	    	tv_header.setText( _series.getName() +
+					    	    			(_series.getOriginalName()!=null 
+					    	    			&& !_series.getOriginalName().equals("") 
+					    	    			&& !_series.getOriginalName().equals(_series.getName()) ? " ("+_series.getOriginalName()+")" : ""));
 					        	}
 					        	
 					        	String fa = _series.getFirstAirDate();
@@ -248,7 +252,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					        	}
 
 
-					        	tv_header.setText(name);
+					        	// tv_header.setText(name);
 
 					        	overview_webview.loadData(_prefix+getBitmapHtml(bm)+
 					    				StringEscapeUtils.escapeHtml4(overview) +  

@@ -106,7 +106,10 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 				}
 	    	}
 	    	
-	    	tt_series_title.setText( the_series.getName() );
+	    	tt_series_title.setText( the_series.getName() + 
+	    			(the_series.getOriginalName()!=null 
+	    			&& !the_series.getOriginalName().equals("") 
+	    			&& !the_series.getOriginalName().equals(the_series.getName()) ? " ("+the_series.getOriginalName()+")" : ""));
 	    	tt_first_aired.setText( fa );
 	    	
 	    	if(tt1.getTag() == null || !(tt1.getTag() instanceof Integer) || !((Integer)tt1.getTag()).equals(the_series.getId()) ) {
