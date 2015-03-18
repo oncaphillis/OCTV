@@ -54,4 +54,8 @@ public class Environment {
         }
         return 1;
 	}
+
+	public static boolean useTrakt() {
+		return false;
+	}
 }
