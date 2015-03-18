@@ -2,11 +2,9 @@ package net.oncaphillis.whatsontv;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,11 +12,12 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
-
-import org.joda.time.DateTime;
 
 import com.uwetrottmann.trakt.v2.TraktV2;
 import com.uwetrottmann.trakt.v2.entities.Episode;
@@ -26,7 +25,6 @@ import com.uwetrottmann.trakt.v2.entities.SearchResult;
 import com.uwetrottmann.trakt.v2.enums.Extended;
 import com.uwetrottmann.trakt.v2.enums.IdType;
 
-import net.oncaphillis.whatsontv.Tmdb.SeasonKey;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -60,6 +58,12 @@ abstract class CacheMap<K,V> {
 		_max = max;
 	}
 	
+	/** Store a new value under K. Either creates a new node
+	 * or overwrites the Value in an old one.
+	 * @param id
+	 * @param value
+	 */
+	
 	public void put(K id,V value) {
 		if(_map.get(id)!=null) {
 			_map.get(id).value = value;
@@ -71,7 +75,7 @@ abstract class CacheMap<K,V> {
 	public V get(K key) {
 		Node n;
 		
-		if((n = _map.get(key)) == null) {
+		if((n = _map.get(key)) == null) {			
 			V v = load(key);
 			if(v!=null) {
 				_map.put(key,n=new Node(v));
@@ -113,9 +117,14 @@ class BitmapHash {
 	private class Node {
 		public int count = 0;
 		public Bitmap bm = null;
-		public Node(int c,Bitmap b) {
-			count = c;
+		public Map<String,Node> map;
+ 		public String path;
+ 		public Date date;
+		public Node(Bitmap b, String p,Map<String, Node> hm) {
 			bm = b;
+			map = hm;
+			path = p;
+			date = new Date();
 		}
 	};
 	
@@ -125,8 +134,9 @@ class BitmapHash {
 	private class NodeComparator implements Comparator<Node> {
 		@Override
 		public int compare(Node lhs, Node rhs) {
-			return lhs.count < rhs.count ? -1 : lhs.count > rhs.count ? 1 : 
-				lhs.bm.getByteCount() < rhs.bm.getByteCount() ? -1 : lhs.bm.getByteCount() > rhs.bm.getByteCount() ? 1 : 0; 
+			return lhs.date.before(rhs.date) ? -1 : rhs.date.before(lhs.date) ? 1 : 0;
+			//return lhs.count < rhs.count ? -1 : lhs.count > rhs.count ? 1 : 
+			//	lhs.bm.getByteCount() < rhs.bm.getByteCount() ? -1 : lhs.bm.getByteCount() > rhs.bm.getByteCount() ? 1 : 0; 
 		}
 	};
 	
@@ -138,36 +148,37 @@ class BitmapHash {
 	
 	static final int MAX_SIZE=5000000; 
 	
+	/** Stores a new Bitmap under a given Key. If the max size of 
+	 * the cache is exceeded we delete images until we are below
+	 * the treshold.
+	 * 
+	 * @param bm
+	 * @param size
+	 * @param path
+	 */
+	
 	void put(Bitmap bm,int size,String path) {
 
 		HashMap<String,Node> hm0 = null;
+		
+		// Create a new sub-hash for the given size 
+		// if needed.
 		
 		if((hm0 = _bmHash.get(size))==null) {
 			_bmHash.put(size,hm0 = new HashMap<String,Node>());
 		}
 		
+		// Delete nodes until the current cash size is ok.
 		while( (!_queue.isEmpty()) && (_size+bm.getByteCount() > MAX_SIZE) ) {
+			
 			Node n = _queue.remove();
-			Iterator<Integer> a = _bmHash.keySet().iterator();
-
-			while(a!=null && a.hasNext()) {
-				int ai=a.next();
-				Iterator<String> b = _bmHash.get(ai).keySet().iterator();
-				while(b.hasNext()) {
-					String bs = b.next();
-					if(_bmHash.get(ai).get(bs) == n ) {
-						_size -= _bmHash.get(ai).get(bs).bm.getByteCount();
-						_bmHash.get(ai).remove(bs);
-						a = null;
-						break;
-					}
-				}
-			}
+			n.map.remove(n.path);
+			_size -= n.bm.getByteCount();
 		}
 		
 		Node n = null;
 		
-		hm0.put(path, n=new Node(0,bm));
+		hm0.put(path, n=new Node(bm,path,hm0));
 		_queue.add(n);
 		
 		_size += bm.getByteCount();
@@ -211,11 +222,13 @@ public class Tmdb {
 	private BitmapHash       _hash    = new BitmapHash();
 	private List<Timezone> _timezones = null;
 	
-	private static Object _lock = new Object();
-
+	static  Set<Integer>  _ss = new TreeSet<Integer>();
+	static EpisodeKey     _d  = null;
+	
 	public class EpisodeInfo {
 		private TvEpisode _tmdb_episode;
 		private Episode _trakt_episode;
+		private boolean _trakt_not_found = false;
 		
 		EpisodeInfo (TvEpisode tmdb,Episode trakt)  {
 			_tmdb_episode = tmdb;
@@ -225,16 +238,18 @@ public class Tmdb {
 		public TvEpisode getTmdb()  {
 			return _tmdb_episode;
 		}
+		/** 
+		 * Lazy loading of TraktT.TV Episode info.
+		 * 
+		 * @return Episode
+		 */
 		
 		public Episode getTrakt()  {
-			if(_trakt_episode==null) {
+			
+			if(Environment.useTrakt() && _trakt_episode == null && ! _trakt_not_found) {
 				try {
 					List<SearchResult> l;
-					
-					synchronized(_lock) {
-						 l = trakt().search().idLookup(IdType.TMDB,Integer.toString(getTmdb().getId()), 1, null);
-					}
-					
+					l = trakt().search().idLookup(IdType.TMDB,Integer.toString(getTmdb().getId()), 1, null);
 					if(l != null) {
 						for(SearchResult r : l) {
 							if(r.type.equals("episode") ) {
@@ -245,11 +260,13 @@ public class Tmdb {
 								}
 							}
 						}
+						_trakt_not_found = _trakt_episode == null;
 					}
 				} catch(Throwable t) {
 					t.printStackTrace();
 				}
 			}
+
 			return _trakt_episode;
 		}
 		
@@ -299,7 +316,9 @@ public class Tmdb {
 		int season;
 	};
 	
+	
 	class EpisodeKey {
+		
 		EpisodeKey(int series, int season,int episode) {
 			this.series  = series;
 			this.season  = season;
@@ -313,8 +332,8 @@ public class Tmdb {
 		
 		@Override
 		public boolean equals(Object o) {
-			return o instanceof EpisodeKey ? ((EpisodeKey)o).series == series && ((EpisodeKey)o).season == season && 
-					((EpisodeKey)o).episode == episode : false;
+			return o instanceof EpisodeKey ? ((EpisodeKey)o).series == this.series && ((EpisodeKey)o).season == this.season && 
+					((EpisodeKey)o).episode == this.episode : false;
 		}
 		
 		int	series;
