@@ -24,19 +24,15 @@ public class TraktReaderThread extends Thread {
 	public void run()  {
 
 		while(true) {
+
+			int n = 0;
 		
 			try {
 				_lock.acquire();
-			} catch (InterruptedException e1) {
-			}
-			
-			int n = 0;
+				synchronized(this) {
+					n = _list.peekFirst();
+				}
 
-			synchronized(this) {
-				n = _list.peekFirst();
-			}
-
-			try {
 				Episode eps = null;
 				List<SearchResult> l;
 
@@ -65,10 +61,9 @@ public class TraktReaderThread extends Thread {
 					if(_list.isEmpty())
 						inform();
 				}
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-				}
+				
+				Thread.sleep(100);
+
 			} catch(Throwable t) {
 				synchronized(this) {
 					_list.removeFirst();
