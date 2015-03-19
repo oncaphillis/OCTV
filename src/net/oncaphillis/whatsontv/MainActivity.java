@@ -76,7 +76,7 @@ import info.movito.themoviedbapi.tools.MovieDbException;
 public class MainActivity extends FragmentActivity {
 	
 	private ViewPager _viewPager = null;
-	
+	private Runnable _traktListener;
 	private MainPagerAdapter _mainPagerAdapter = null;
 	
 	public static final String[] Titles={"Today","On the Air","Hi Vote","Popular" };
@@ -204,7 +204,23 @@ public class MainActivity extends FragmentActivity {
 		Preferences = getPreferences(MODE_PRIVATE);
 		
 		initNavbar();
-		
+		final Activity act = this; 
+		Tmdb.get().trakt_reader().register(_traktListener = new Runnable() {
+			@Override
+			public void run() {
+				
+				act.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						for(int i=0;i<ListAdapters.length;i++) {
+							ListAdapters[i].notifyDataSetChanged();
+						}
+					}
+				});
+			}
+		});
+
 		try {			
 			_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image);
 
