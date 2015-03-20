@@ -41,15 +41,12 @@ public class Environment {
     		DisplayMetrics displaymetrics = new DisplayMetrics();
     		activity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
     				
-    		float width  = displaymetrics.widthPixels * 160.0f / displaymetrics.xdpi;
+    		float width  = displaymetrics.widthPixels / displaymetrics.xdpi;
  
-    		if(width > 1200.0f)
-    			return 4;
-    		
-    		if(width > 900.0f)
+    		if(width > 7.0f)
     			return 3;
     		
-    		if(width > 600.0f)
+    		if(width > 4.0f)
     			return 2;
         }
         return 1;
