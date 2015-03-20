@@ -94,14 +94,9 @@ public class TraktReaderThread extends Thread {
 	}
 
 	private void inform() {
-		Runnable o;
 		synchronized(this) {
 			for(Runnable r : _listeners.keySet()) {
-				try {
-					r.run();
-				} catch(Throwable t) {
-					o= r;
-				}
+				r.run();
 			}
 		}
 	}
