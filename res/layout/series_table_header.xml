@@ -1,30 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/oncaphillis_blue"
-    android:orientation="horizontal" 
+    android:layout_span="2"
     android:layout_weight="1"
-	android:layout_span="2"
-    >
+    android:background="@color/oncaphillis_light_grey"
+    android:orientation="horizontal" >
 
-    <TextView
-        android:id="@+id/series_table_header_text"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:text="Large Text"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/actionbar_text_color"
-        android:textColorLink="@color/actionbar_text_color" />
+        android:background="@android:drawable/dialog_holo_dark_frame" >
 
-    <ImageView
-        android:id="@+id/series_table_header_expand"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_gravity="right|center_vertical"
-        android:layout_margin="8dp"
-        android:src="@drawable/right" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/oncaphillis_blue" >
+
+            <TextView
+                android:id="@+id/series_table_header_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_weight="100"
+                android:text="Large Text"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/actionbar_text_color"
+                android:textColorLink="@color/actionbar_text_color" />
+
+            <ImageView
+                android:id="@+id/series_table_header_expand"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="8dp"
+                android:layout_weight="0"
+                android:src="@drawable/right" />
+        </LinearLayout>
+
+    </LinearLayout>
     
 </LinearLayout>

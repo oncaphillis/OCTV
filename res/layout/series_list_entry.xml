@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:background="@color/oncaphillis_grey" >
 
 	<LinearLayout
 	    android:layout_width="fill_parent"
@@ -10,7 +11,7 @@
 	    android:layout_marginLeft="4dp"
 	    android:layout_marginRight="4dp"
 	    android:layout_marginTop="4dp"
-	    android:background="@color/oncaphillis_grey"
+	    android:background="@color/oncaphillis_light_grey"
 	    android:minHeight="80dp"
 	    android:orientation="horizontal"
 	    android:padding="4dp"
@@ -77,9 +78,8 @@
 	                android:id="@+id/series_nearest_episode"
 	                android:layout_width="match_parent"
 	                android:layout_height="fill_parent"
-	                android:background="@drawable/list_entry_frame"
-	                android:orientation="vertical"
-	                android:padding="8dp" >
+	                android:background="@android:drawable/dialog_holo_dark_frame"
+	                android:orientation="vertical" >
 
 	                <LinearLayout
 	                    android:layout_width="match_parent"
@@ -107,6 +107,7 @@
 	                    android:layout_width="fill_parent"
 	                    android:layout_height="fill_parent"
 	                    android:layout_weight="2"
+	                    android:padding="2dp"
 	                    android:text="Medium Text"
 	                    android:textAppearance="?android:attr/textAppearanceMedium" />
 

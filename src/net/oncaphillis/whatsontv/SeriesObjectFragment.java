@@ -88,16 +88,13 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         int nearest_title = landscape ? R.id.series_page_nearest_title : R.id.series_page_nearest_title_portrait;
         int nearest_still = landscape ? R.id.series_page_nearest_still : R.id.series_page_nearest_still_portrait;
         int nearest_summary = landscape ? R.id.series_page_nearest_summary : R.id.series_page_nearest_summary_portrait;
-        int episode_vote = landscape ? R.id.series_page_episode_vote : R.id.series_page_episode_vote_count_portrait;
-        int episode_vote_count = landscape ? R.id.series_page_episode_vote_count : R.id.series_page_episode_vote_count_portrait;
+
         int next_last_tag = landscape ? R.id.series_page_nearest_tag : R.id.series_page_nearest_tag_portrait;
         
         final TextView tv_first_aired      = ((TextView) rootView.findViewById(first_aired));
         final TextView tv_nearest = ((TextView) rootView.findViewById(nearest_title));
         final ImageView tv_nearest_still = ((ImageView)rootView.findViewById(nearest_still));
         final TextView tv_next_last_tag = ((TextView)rootView.findViewById(next_last_tag));
-        final TextView tv_episode_vote = ((TextView)rootView.findViewById(episode_vote));
-        final TextView tv_episode_vote_count = ((TextView)rootView.findViewById(episode_vote_count));
 
         final TextView tv_nearest_summary = ((TextView)rootView.findViewById(nearest_summary));
         final TextView tv_last_aired      = ((TextView) rootView.findViewById(last_aired));
@@ -256,14 +253,6 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 											tv_nearest_summary.setText(	nearest_episode.getOverview() );
 										} else {
 											tv_nearest_summary.setText(	"..." );
-										}
-
-										if(nearest_episode.getVoteCount()!=0) {
-											tv_episode_vote.setText(String.format("%.1f",  nearest_episode.getVoteAverage())+"/"+"10");
-											tv_episode_vote_count.setText(Integer.toString( nearest_episode.getVoteCount()));
-										} else {
-											tv_episode_vote.setText("-/-");
-											tv_episode_vote_count.setText("0");										
 										}
 									}
 					        		refresh0.run();

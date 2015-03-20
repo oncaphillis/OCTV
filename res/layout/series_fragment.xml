@@ -121,62 +121,20 @@
                        android:layout_width="fill_parent"
                        android:layout_height="fill_parent"
                        android:layout_margin="2dp"
-                       android:background="@drawable/list_entry_frame"
-                       android:orientation="vertical"
-                       android:padding="2dp" >
+                       android:background="@color/oncaphillis_light_grey"
+                       android:orientation="vertical" >
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bottom_border"
+                    android:background="@android:drawable/dialog_holo_dark_frame"
                     android:orientation="vertical" >
 
                     <LinearLayout
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="2dp"
-                        android:background="@color/oncaphillis_light_grey"
-                        android:orientation="horizontal" >
-
-                        <RelativeLayout
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:layout_margin="8dp"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginRight="8dp" >
-
-                            <ImageView
-                                android:id="@+id/series_episode_vote_star_portrait"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerHorizontal="true"
-                                android:layout_centerInParent="true"
-                                android:src="@drawable/vote_star" />
-
-                            <LinearLayout
-                                android:layout_width="fill_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:orientation="vertical" >
-
-                                <TextView
-                                    android:id="@+id/series_page_episode_voteportrait"
-                                    android:layout_width="fill_parent"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center_vertical|center_horizontal|center"
-                                    android:text="-/-"
-                                    android:textColor="#ff000000"
-                                    android:textStyle="bold" />
-
-                                <TextView
-                                    android:id="@+id/series_page_episode_vote_count_portrait"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center_horizontal"
-                                    android:text="0"
-                                    android:textColor="#ff000000" />
-                            </LinearLayout>
-                        </RelativeLayout>
+                        android:orientation="horizontal"
+                        android:padding="4dp" >
 
                         <LinearLayout
                             android:layout_width="fill_parent"
@@ -287,14 +245,13 @@
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
-                android:background="@drawable/list_entry_frame"
                 android:orientation="vertical" >
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="2dp"
-                    android:background="@drawable/bottom_border"
+                    android:background="@color/oncaphillis_light_grey"
                     android:baselineAligned="true"
                     android:orientation="vertical"
                     android:padding="2dp" >
@@ -303,52 +260,13 @@
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:background="@color/oncaphillis_light_grey"
+                        android:background="@android:drawable/dialog_holo_dark_frame"
                         android:orientation="horizontal" >
-
-                        <RelativeLayout
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:layout_margin="8dp"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginRight="8dp" >
-
-                            <ImageView
-                                android:id="@+id/series_episode_vote_star"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerHorizontal="true"
-                                android:layout_centerInParent="true"
-                                android:src="@drawable/vote_star" />
-
-                            <LinearLayout
-                                android:layout_width="fill_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:orientation="vertical" >
-
-                                <TextView
-                                    android:id="@+id/series_page_episode_vote"
-                                    android:layout_width="fill_parent"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center_vertical|center_horizontal|center"
-                                    android:text="-/-"
-                                    android:textColor="#ff000000"
-                                    android:textStyle="bold" />
-
-                                <TextView
-                                    android:id="@+id/series_page_episode_vote_count"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center_horizontal"
-                                    android:text="0"
-                                    android:textColor="#ff000000" />
-                            </LinearLayout>
-                        </RelativeLayout>
 
                         <LinearLayout
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
+                            android:layout_margin="4dp"
                             android:orientation="vertical" >
 
                             <TableLayout
@@ -394,31 +312,25 @@
 
                             <TextView
                                 android:id="@+id/series_page_nearest_title"
-                                android:layout_width="wrap_content"
+                                android:layout_width="fill_parent"
                                 android:layout_height="wrap_content"
                                 android:textAppearance="?android:attr/textAppearanceMedium" />
                         </LinearLayout>
                     </LinearLayout>
-
-                    <TableLayout
-                        android:id="@+id/series_page_info_table_h"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:stretchColumns="*" >
-                    </TableLayout>
                 </LinearLayout>
 
                 <ScrollView
                     android:id="@+id/scrollView1"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:layout_margin="2dp" >
+                    android:layout_margin="2dp"
+                    android:background="@color/oncaphillis_light_grey" >
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
+                        android:background="@android:drawable/dialog_holo_dark_frame"
                         android:orientation="vertical" >
 
                         <LinearLayout
