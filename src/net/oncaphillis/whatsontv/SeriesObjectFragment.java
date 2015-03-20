@@ -145,8 +145,12 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					nearest_still_path = series_info.getNearestEpisode().getStillPath();
 					nearest_episode = series_info.getNearestEpisode();
 					seasons = series_info.getSeasons();
+					
 					if(Environment.isDebug())
 		        		networks = "#"+Integer.toString(seriesId)+((series.getPosterPath()==null) ? " \u2205" : "\u753b")+" ";
+					else
+						networks = "";
+					
 					networks += new SeriesInfo(series).getNetworks();
 				} catch (Exception ex) {
 					return;

@@ -34,6 +34,6 @@ public class SeriesCollectionPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return "#"+(position+1)+"_"+_names[position];
+        return (Environment.isDebug() ? "#"+(position+1)+"_" : "" )+_names[position];
     }
 }
