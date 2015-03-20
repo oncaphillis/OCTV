@@ -250,4 +250,8 @@ public class SeriesInfo {
 			return getNearestEpisodeInfo().getTmdb();
 		return null;
 	}
+
+	public TvSeries getTmdb() {
+		return _tvs;
+	}
 }

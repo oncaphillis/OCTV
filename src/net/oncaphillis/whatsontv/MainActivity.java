@@ -1,24 +1,10 @@
 package net.oncaphillis.whatsontv;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import net.oncaphillis.whatsontv.R;
-import net.oncaphillis.whatsontv.SearchThread.Current;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.support.v4.app.Fragment;
@@ -30,53 +16,31 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
-import android.widget.GridView;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import info.movito.themoviedbapi.*;
-import info.movito.themoviedbapi.TmdbTV.TvMethod;
-import info.movito.themoviedbapi.model.core.ResponseStatusException;
 import info.movito.themoviedbapi.model.tv.*;
-import info.movito.themoviedbapi.tools.MovieDbException;
+
+
 
 public class MainActivity extends FragmentActivity {
 	
 	private ViewPager _viewPager = null;
-	private Runnable _traktListener;
+
 	private MainPagerAdapter _mainPagerAdapter = null;
 	
 	public static final String[] Titles={"Today","On the Air","Hi Vote","Popular" };
@@ -205,21 +169,6 @@ public class MainActivity extends FragmentActivity {
 		
 		initNavbar();
 		final Activity act = this; 
-		Tmdb.get().trakt_reader().register(_traktListener = new Runnable() {
-			@Override
-			public void run() {
-				
-				act.runOnUiThread(new Runnable() {
-
-					@Override
-					public void run() {
-						for(int i=0;i<ListAdapters.length;i++) {
-							ListAdapters[i].notifyDataSetChanged();
-						}
-					}
-				});
-			}
-		});
 
 		try {			
 			_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image);

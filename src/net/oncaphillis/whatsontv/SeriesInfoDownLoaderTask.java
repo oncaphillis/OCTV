@@ -43,10 +43,9 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 		
 		// dates reported by Tmdb are in EST. We need this to compare
 		// the last aired
-		// Calendar today1 = TimeTool.toTimeZone(TimeTool.getToday(),"EST");
-
 		if(si!=null) {
 			if(_timeText != null && _timeText.get() != null && _timeText.get().getTag()!=null && _timeText.get().getTag() instanceof Integer) {
+				
 				if(si.getNearestAiring()!=null) {
 					
 					DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.DateFormater;
@@ -61,6 +60,31 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 					} else {
 						if(_timeStateText.get()!=null)
 							_timeStateText.get().setText("next");
+
+						if(!si.hasClock()) {
+							final TvSeries tvs = si.getTmdb();
+							if(tvs!=null) {
+								Runnable r = new Runnable() {
+									@Override
+
+									public void run() {
+										SeriesInfo si = new SeriesInfo(tvs);
+										DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.DateFormater;
+										final String t = df.format(si.getNearestAiring());
+										_activity.runOnUiThread(new Runnable() {
+											@Override
+											public void run() {
+												if( _timeText.get() != null) {
+													_timeText.get().setText(t);
+												}
+											}
+										});
+									}
+								};
+								_timeText.get().setTag(r);
+								Tmdb.get().trakt_reader().register(r);
+							}
+						}
 						_timeText.get().setTextColor(_activity.getResources().getColor(R.color.oncaphillis_orange));
 					}
 				}
