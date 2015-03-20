@@ -10,27 +10,6 @@
         android:layout_margin="2dp"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/series_header"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Title"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <TextView
-            android:id="@+id/series_page_network"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/series_page_genres"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/oncaphillis_orange"
-            android:textStyle="bold" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="fill_parent" >
@@ -46,6 +25,30 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical" >
+
+                    <TextView
+                        android:id="@+id/series_header"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Title"
+                        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                    <TextView
+                        android:id="@+id/series_page_network"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/series_page_genres"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@color/oncaphillis_orange"
+                        android:textStyle="bold" />
  
                    <WebView
                     android:id="@+id/series_fragment_overview"
@@ -100,6 +103,7 @@
                                     android:text="0"
                                     android:textColor="#ff000000" />
                             </LinearLayout>
+
                         </RelativeLayout>
                         
                    </LinearLayout>
@@ -108,7 +112,9 @@
                        android:id="@+id/series_page_info_table"
                        android:layout_width="fill_parent"
                        android:layout_height="wrap_content"
-                       android:stretchColumns="*" />
+                       android:stretchColumns="*" >
+
+                   </TableLayout>
                     
                    <LinearLayout
                        android:id="@+id/series_page_episode_layout_portrait"
