@@ -153,48 +153,6 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					return;
 				}
 
-		        final Runnable refresh0=new Runnable() {
-		        	String tx = seriesName;
-		        	private String s0 = "";
-					private String s1 = "";
-
-					@Override
-					public void run() {
-						if(tv_nearest_summary != null && series!=null && getActivity()!=null) {
-							final SeriesInfo si = new SeriesInfo(series);
-							if(si.getNearestEpisodeInfo()!=null) {
-								
-								if(si.getNearestEpisodeInfo().getTmdb()!=null && si.getNearestEpisodeInfo().getTmdb().getOverview()!=null) {
-									s0 = si.getNearestEpisodeInfo().getTmdb().getOverview();
-								}
-								if(si.getNearestEpisodeInfo().getTrakt()!=null && si.getNearestEpisodeInfo().getTrakt().overview!=null) {
-									s1 = si.getNearestEpisodeInfo().getTrakt().overview;
-								}
-								
-								
-								getActivity().runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-						        		Date today = TimeTool.getToday();
-										Date nearest = si.getNearestAiring();
-						        		if(!today.before(nearest)) {
-						        			tv_last_aired.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_white));
-						        			tv_next_last_tag.setText(lastText);
-						        		} else {
-						        			tv_last_aired.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_orange));
-						        			tv_next_last_tag.setText(nextText);
-						        		}
-						        		DateFormat df = series_info.hasClock() ? Environment.TimeFormater : Environment.DateFormater;
-						        		tv_last_aired.setText(df.format(nearest));
-									}
-								});
-							}
-						}
-					}
-		        };
-		        
-		        rootView.setTag(refresh0);
-		        Tmdb.get().trakt_reader().register(refresh0);
 		        
 				final String    name           = series.getName();
 				final String    overview       = series.getOverview();
@@ -205,6 +163,8 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 
 				nearest_title   = series_info.getNearestEpisodeTitle();
 				nearest_season  = series_info.getNearestEpisodeSeason();
+				final Date today = TimeTool.getToday();
+				final Date nearest = series_info.getNearestAiring();
 				
 				// Load main image and HTML code
 				//
@@ -245,19 +205,52 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					        	if(fa != null)
 					        		tv_first_aired.setText(fa);
 					        		
-					        		tv_nearest.setText(Integer.toString(nearest_season)+"x"+
-					        				Integer.toString(nearest_episode.getEpisodeNumber())+" "+nearest_title);
+				        		tv_nearest.setText(Integer.toString(nearest_season)+"x"+
+				        				Integer.toString(nearest_episode.getEpisodeNumber())+" "+nearest_title);
 
-									if(nearest_episode != null) {
-										if(nearest_episode.getOverview()!=null) {
-											tv_nearest_summary.setText(	nearest_episode.getOverview() );
-										} else {
-											tv_nearest_summary.setText(	"..." );
-										}
+								if(nearest_episode != null) {
+									
+									if(nearest_episode.getOverview()!=null) {
+										tv_nearest_summary.setText(	nearest_episode.getOverview() );
+									} else {
+										tv_nearest_summary.setText(	"..." );
 									}
-					        		refresh0.run();
-					        	//}
-					        	
+
+									
+					        		if(!today.before(nearest)) {
+					        			tv_last_aired.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_white));
+					        			tv_next_last_tag.setText(lastText);
+					        		} else {
+										tv_last_aired.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_orange));
+					        			tv_next_last_tag.setText(nextText);
+
+					        			if(!series_info.hasClock()) {
+
+					        				Runnable r = new Runnable() {
+					        					TvSeries tvs = series_info.getTmdb();
+					        					@Override
+												public void run() {
+													SeriesInfo si = new SeriesInfo(tvs);
+													DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.TimeFormater;
+													final String s = df.format(si.getNearestAiring());
+					        						if(getActivity()!=null) {
+														getActivity().runOnUiThread(new Runnable() {
+															@Override
+															public void run() {
+																tv_last_aired.setText(s);
+															}
+														});
+													}
+												}
+					        				};
+						        			tv_last_aired.setTag(r);
+					        				Tmdb.get().trakt_reader().register(r);
+					        			}
+					        		}
+					        		DateFormat df = series_info.hasClock() ? Environment.TimeFormater : Environment.DateFormater;
+					        		tv_last_aired.setText(df.format(nearest));
+								}
+				        	
 					        	if(series.getVoteCount()!=0) {
 					        		tv_voting.setText(String.format("%.1f",series.getVoteAverage())+"/"+Integer.toString(10) );
 					        		tv_voting_count.setText(Integer.toString(series.getVoteCount()));
