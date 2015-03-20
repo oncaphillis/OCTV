@@ -7,6 +7,7 @@ import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
+import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -227,19 +228,21 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					        			if(!series_info.hasClock()) {
 
 					        				Runnable r = new Runnable() {
-					        					TvSeries tvs = series_info.getTmdb();
+					        					final Runnable _me = this;
+					        					WeakReference<TextView> view = new WeakReference(tv_last_aired);
+					        					TvSeries  tvs = series_info.getTmdb();
 					        					@Override
 												public void run() {
-													SeriesInfo si = new SeriesInfo(tvs);
-													DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.TimeFormater;
-													final String s = df.format(si.getNearestAiring());
-					        						if(getActivity()!=null) {
-														getActivity().runOnUiThread(new Runnable() {
-															@Override
-															public void run() {
-																tv_last_aired.setText(s);
-															}
-														});
+				        							SeriesInfo si = new SeriesInfo(tvs);
+				        							DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.TimeFormater;
+				        							final String s = df.format(si.getNearestAiring());
+				        							if(getActivity()!=null && view.get() != null && view.get().getTag() == _me) {
+				        								getActivity().runOnUiThread(new Runnable() {
+				        									@Override
+				        									public void run() {
+				        										tv_last_aired.setText(s);
+				        									}
+				        								});
 													}
 												}
 					        				};

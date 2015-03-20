@@ -63,10 +63,11 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 
 						if(!si.hasClock()) {
 							final TvSeries tvs = si.getTmdb();
+							
 							if(tvs!=null) {
 								Runnable r = new Runnable() {
+									final Runnable _me = this;
 									@Override
-
 									public void run() {
 										SeriesInfo si = new SeriesInfo(tvs);
 										DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.DateFormater;
@@ -74,7 +75,7 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 										_activity.runOnUiThread(new Runnable() {
 											@Override
 											public void run() {
-												if( _timeText.get() != null) {
+												if( _timeText.get() != null && _timeText.get().getTag() != null && _timeText.get().getTag() == _me) {
 													_timeText.get().setText(t);
 												}
 											}
