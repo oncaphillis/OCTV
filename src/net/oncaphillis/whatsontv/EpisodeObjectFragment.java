@@ -63,14 +63,9 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 		final WebView  overview_webview    = ((WebView) _rootView.findViewById(R.id.episode_fragment_overview));
 		final ImageView episode_still      = ((ImageView) _rootView.findViewById(R.id.episode_stillpath));
 		
-        final TextView tv_diag             = ((TextView) _rootView.findViewById(R.id.episode_fragment_id));
-        final TextView tv_header           = ((TextView) _rootView.findViewById(R.id.episode_header));
+        final TextView tv_header           = ((TextView) _rootView.findViewById(R.id.episode_fragment_title));
         
         final TextView tv_rating           = ((TextView) _rootView.findViewById(R.id.episode_page_voting));
-        final TextView tv_first_aired      = ((TextView) _rootView.findViewById(R.id.episode_page_first_aired));
-        final TextView tv_last_aired       = ((TextView) _rootView.findViewById(R.id.episode_page_last_aired));
-        final TextView tv_genres           = ((TextView) _rootView.findViewById(R.id.episode_page_genres));
-		
 
         
         new Thread(new Runnable() {
