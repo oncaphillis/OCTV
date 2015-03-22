@@ -22,6 +22,12 @@ public class Environment {
 	} 
 	
 	
+	static DateFormat TmdbDateFormater   = new SimpleDateFormat("yyyy-MM-dd") {
+		{
+			this.setTimeZone(TimeZone.getTimeZone("UTC"));
+		}
+	};
+
 	static DateFormat TimeFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm") {
 		{
 			this.setTimeZone(TimeZone.getDefault());
