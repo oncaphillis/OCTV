@@ -10,6 +10,7 @@ import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -19,7 +20,7 @@ import java.util.concurrent.Semaphore;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import net.oncaphillis.whatsontv.R;
-import net.oncaphillis.whatsontv.SeriesObjectFragment.InfoNode;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,6 +36,192 @@ import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+class SeasonsInfoThread extends Thread {
+	Activity _activity;
+	TvSeries _series;
+	TableLayout _table; 
+	int _maxcol = 1;
+
+ 	class InfoNode {
+		public TableRow row = null;
+		public ArrayList<ImageView>   img = new ArrayList<ImageView>();
+		public ArrayList<ProgressBar> pb  = new ArrayList<ProgressBar>();
+		public ArrayList<TextView>    tx0 = new ArrayList<TextView>();
+		public ArrayList<TextView>    tx1 = new ArrayList<TextView>();
+		public ArrayList<TvSeason>    se  = new ArrayList<TvSeason>();
+ 	};
+ 	
+ 	SeasonsInfoThread(Activity ac,TableLayout tl, int mc, TvSeries ts) {
+ 		super();
+ 		_activity = ac;
+ 		_maxcol = mc;
+ 		_series = ts;
+ 		_table = tl; 
+ 	}
+ 	
+ 	@Override
+ 	public void run() {
+
+		final List<TvSeason> tsa = _series.getSeasons();
+
+		if(tsa!=null && tsa.size()!=0) {
+			
+			_activity.runOnUiThread(new Runnable() {
+		    	@Override
+			    public void run() {		
+				    
+		    		final LayoutInflater vi = LayoutInflater.from(_table.getContext());
+				    
+		    		Iterator<TvSeason> i = tsa.iterator();
+		    		
+			        LinearLayout header = (LinearLayout) vi.inflate(R.layout.series_table_header,null);
+			        
+			        
+			        TextView txt = (TextView)header.findViewById(R.id.series_table_header_text);
+			        TableRow tr  = new TableRow(_table.getContext());
+			        tr.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
+			        tr.addView(header);
+			        
+			        TableRow.LayoutParams params = (TableRow.LayoutParams)header.getLayoutParams();
+			        params.span = _maxcol;
+			        header.setLayoutParams(params);
+			        
+			        txt.setText(Integer.toString(tsa.size())+" Seasons");
+			        _table.addView(tr);
+					
+				    int cc = 0;
+				    
+				    ArrayList<InfoNode> trl = new ArrayList<InfoNode>();
+				    
+		    		while(i.hasNext()) {
+		    			if(cc >= _maxcol) {
+		    				cc = 0;
+		    			}
+		    			 
+		    			if(cc == 0) {					    				
+		    				tr = new TableRow(_table.getContext());
+		    				tr.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
+							tr.setOrientation(LinearLayout.HORIZONTAL);
+							_table.addView(tr);
+							tr.setVisibility(View.GONE);
+							InfoNode nd=new InfoNode();
+							nd.row = tr;
+							trl.add(nd);
+		    			}
+				        
+		    			View v = (View)vi.inflate(R.layout.series_info_grid_entry,null);
+				        
+		    			TvSeason tv_season = i.next();
+		    										    			
+	    				TextView       tt0 = (TextView)     v.findViewById(R.id.creator_name);
+	    				TextView       tt1 = (TextView)     v.findViewById(R.id.person_role);
+	    				ImageView       ii = (ImageView)    v.findViewById(R.id.creator_image);
+	    				ProgressBar     pb = (ProgressBar)  v.findViewById(R.id.creator_image_progress);
+		    			
+	    				
+	    				String s=tv_season.getAirDate();
+	    				if(s!=null) {
+		    				try {
+								Date d = Environment.TmdbDateFormater.parse(tv_season.getAirDate());
+								s=Environment.DateFormater.format(d);
+		    				} catch (ParseException e) {
+							}
+	    				} else {
+	    					s="";
+	    				}
+	    				
+					    tt0.setText((tv_season.getName()==null ? "#"+Integer.toString(tv_season.getSeasonNumber()) : "")+" "+s
+					    		+(tv_season.getName()!=null ? " "+tv_season.getName() : ""));
+					    
+					    
+					    if(tv_season.getEpisodes() != null && !tv_season.getEpisodes().isEmpty() )
+					    	tt1.setText(Integer.toString(tv_season.getEpisodes().size())+" Episodes");
+					    else
+					    	tt1.setText("");
+					    	
+				    	ii.setTag(tv_season.getPosterPath());
+	
+				    	trl.get(trl.size()-1).img.add(ii);
+				    	trl.get(trl.size()-1).pb.add(pb);
+				    	trl.get(trl.size()-1).tx0.add(tt0);
+				    	trl.get(trl.size()-1).tx1.add(tt1);
+				    	trl.get(trl.size()-1).se.add(tv_season);
+				    										    	
+				    	tr.addView(v);
+		    			
+					    cc++;
+		    		}
+		    		
+		    		final List<InfoNode> ftrl = trl;
+			    		header.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							LinearLayout ll = (LinearLayout) v;
+							Iterator<InfoNode> i = ftrl.iterator();
+							boolean f = false;
+							while(i.hasNext()) {
+								InfoNode n = i.next();
+								if(n.row.getVisibility()!=View.VISIBLE) {
+									n.row.setVisibility(View.VISIBLE);
+									if(n.img!=null) {
+										Iterator<ImageView> i2 = n.img.iterator();
+										for(int j = 0;j<n.img.size();j++) {
+											new BitmapDownloaderTask(n.img.get(j), _activity, n.pb.get(j), null,null).execute();
+											final TextView _t0 = n.tx0.get(j);
+											final TextView _t1 = n.tx1.get(j);
+											final int _si = _series.getId();
+											new AsyncTask<TvSeason,Void,TvSeason>() {
+												
+												@Override
+												protected TvSeason doInBackground(
+													TvSeason... params) {
+													if(params.length>0) {
+														TvSeason s =  Tmdb.get().loadSeason(_si, params[0].getSeasonNumber());
+														return s;
+													}
+													else
+														return null;
+												}
+												@Override
+	
+												protected void onPostExecute(TvSeason result) {
+													if(result!=null && result.getEpisodes() != null) {
+									    				String s=result.getAirDate();
+									    				if(s!=null) {
+										    				try {
+																Date d = Environment.TmdbDateFormater.parse(result.getAirDate());
+																s=Environment.DateFormater.format(d);
+										    				} catch (ParseException e) {
+															}
+									    				} else {
+									    					s="????";
+									    				}
+													    _t0.setText((result.getName()==null ? "#"+Integer.toString(result.getSeasonNumber()) : "")+s
+													    		+(result.getName()!=null ? " "+result.getName() : ""));
+														_t1.setText(Integer.toString(result.getEpisodes().size())+" Episodes" );
+													}
+												}
+											}.execute(n.se.get(j));
+										}
+										n.img=null;
+										n.pb=null;
+									}
+									f = true;
+								}
+								else {
+									n.row.setVisibility(View.GONE);
+								}
+							}
+							ImageView iv = (ImageView)ll.findViewById(R.id.series_table_header_expand);
+							iv.setImageDrawable(_activity.getResources().getDrawable(f ? R.drawable.down : R.drawable.right));
+						}
+			    	});
+		    	}
+			});
+		}
+	}
+}
 
 public class SeriesObjectFragment extends EntityInfoFragment {
     public static final String ARG_IX    = "ix";
@@ -47,15 +235,6 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 	
 	private int _maxcol = 1;
 
- 	class InfoNode {
-		public TableRow row = null;
-		public ArrayList<ImageView>   img = new ArrayList<ImageView>();
-		public ArrayList<ProgressBar> pb  = new ArrayList<ProgressBar>();
-		public ArrayList<TextView>    tx  = new ArrayList<TextView>();
-		public ArrayList<TvSeason>    se  = new ArrayList<TvSeason>();
- 	};
-	
-	
 	@Override
     public View onCreateView(LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState) {
@@ -339,14 +518,13 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 										Credits c = null;
 										
 										if(nearest_episode != null && (c = nearest_episode.getCredits())!=null) {
-
-											List<? extends Person>[] cc = new ArrayList[1];
+											
 											
 											String s[] = getActivity().getResources().getStringArray(R.array.cast_titles);
 											
-											String a[] = new String[] {s[Environment.GUEST]};
+											String a[] = new String[] {s[Environment.CREW],s[Environment.GUEST]};
 
-											cc[0] = c != null ? c.getGuestStars() : null;	
+											List<? extends Person>[]  cc = new List[] {c.getCrew(),c.getGuestStars()};	
 											
 											new CastInfoThread(getActivity(),episode_info_table,_maxcol,cc,a).start();
 										}
@@ -359,141 +537,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					// SEASONS
 					//
 					final TableLayout  seasons_info_table = ((TableLayout) rootView.findViewById(R.id.series_page_seasons_table));
-
-					new Thread(new Runnable() {
-						@Override
-						public void run() {
-
-							final List<TvSeason> tsa = series.getSeasons();
-
-							if(tsa!=null && tsa.size()!=0) {
-								
-								getActivity().runOnUiThread(new Runnable() {
-							    	@Override
-								    public void run() {		
-									    
-							    		final LayoutInflater vi = LayoutInflater.from(seasons_info_table.getContext());
-									    
-							    		Iterator<TvSeason> i = tsa.iterator();
-							    		
-								        LinearLayout header = (LinearLayout) vi.inflate(R.layout.series_table_header,null);
-								        
-								        
-								        TextView txt = (TextView)header.findViewById(R.id.series_table_header_text);
-								        TableRow tr = new TableRow(seasons_info_table.getContext());
-								    
-								        tr.addView(header);
-								        
-								        TableRow.LayoutParams params = (TableRow.LayoutParams)header.getLayoutParams();
-								        params.span = _maxcol;
-								        header.setLayoutParams(params);
-								        
-								        txt.setText(Integer.toString(tsa.size())+" Seasons");
-								        seasons_info_table.addView(tr);
-										
-									    int cc = 0;
-									    
-									    ArrayList<InfoNode> trl = new ArrayList<InfoNode>();
-									    
-							    		while(i.hasNext()) {
-							    			if(cc >= _maxcol) {
-							    				cc = 0;
-							    			}
-							    			 
-							    			if(cc == 0) {					    				
-							    				tr = new TableRow(seasons_info_table.getContext());
-												tr.setOrientation(LinearLayout.HORIZONTAL);
-												seasons_info_table.addView(tr);
-												tr.setVisibility(View.GONE);
-												InfoNode nd=new InfoNode();
-												nd.row = tr;
-												trl.add(nd);
-							    			}
-									        
-							    			View v = (View)vi.inflate(R.layout.series_info_grid_entry,null);
-									        
-							    			TvSeason tv_season = i.next();
-							    										    			
-						    				TextView       tt0 = (TextView)     v.findViewById(R.id.creator_name);
-						    				TextView       tt1 = (TextView)     v.findViewById(R.id.person_role);
-						    				ImageView       ii = (ImageView)    v.findViewById(R.id.creator_image);
-						    				ProgressBar     pb = (ProgressBar)  v.findViewById(R.id.creator_image_progress);
-							    			
-										    tt0.setText("#"+Integer.toString(tv_season.getSeasonNumber())+(tv_season.getAirDate() == null ? "" : " "+tv_season.getAirDate()));
-										    
-										    if(tv_season.getEpisodes() != null && !tv_season.getEpisodes().isEmpty() )
-										    	tt1.setText(Integer.toString(tv_season.getEpisodes().size())+" Episodes");
-										    else
-										    	tt1.setText("");
-										    	
-									    	ii.setTag(tv_season.getPosterPath());
-		
-									    	trl.get(trl.size()-1).img.add(ii);
-									    	trl.get(trl.size()-1).pb.add(pb);
-									    	trl.get(trl.size()-1).tx.add(tt1);
-									    	trl.get(trl.size()-1).se.add(tv_season);
-									    										    	
-									    	tr.addView(v);
-							    			
-										    cc++;
-							    		}
-							    		
-							    		final List<InfoNode> ftrl = trl;
-		 					    		header.setOnClickListener(new OnClickListener() {
-											@Override
-											public void onClick(View v) {
-												LinearLayout ll = (LinearLayout) v;
-												Iterator<InfoNode> i = ftrl.iterator();
-												boolean f = false;
-												while(i.hasNext()) {
-													InfoNode n = i.next();
-													if(n.row.getVisibility()!=View.VISIBLE) {
-														n.row.setVisibility(View.VISIBLE);
-														if(n.img!=null) {
-															Iterator<ImageView> i2 = n.img.iterator();
-															for(int j = 0;j<n.img.size();j++) {
-																new BitmapDownloaderTask(n.img.get(j), getActivity(), n.pb.get(j), null,tv_progress).execute();
-																final TextView _tv =  n.tx.get(j);
-																final int _si = series.getId();
-																new AsyncTask<TvSeason,Void,TvSeason>() {
-																	
-																	@Override
-																	protected TvSeason doInBackground(
-																		TvSeason... params) {
-																		if(params.length>0) {
-																			TvSeason s =  Tmdb.get().loadSeason(_si, params[0].getSeasonNumber());
-																			return s;
-																		}
-																		else
-																			return null;
-																	}
-																	@Override
-
-																	protected void onPostExecute(TvSeason result) {
-																		if(result!=null && result.getEpisodes() != null)
-																			_tv.setText(Integer.toString(result.getEpisodes().size())+" Episodes"+(result.getName()!=null ? " "+result.getName() : "") );
-																	}
-
-																}.execute(n.se.get(j));
-															}
-															n.img=null;
-															n.pb=null;
-														}
-														f = true;
-													}
-													else {
-														n.row.setVisibility(View.GONE);
-													}
-												}
-												ImageView iv = (ImageView)ll.findViewById(R.id.series_table_header_expand);
-												iv.setImageDrawable(getActivity().getResources().getDrawable(f ? R.drawable.down : R.drawable.right));
-											}
-		 					    		});
-							    	}
-								});
-							}
-						}
-					}).start();
+					new SeasonsInfoThread(getActivity(),seasons_info_table,_maxcol,series).start();
 	        	}		
 			}
  		} ).start();
