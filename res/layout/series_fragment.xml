@@ -109,6 +109,14 @@
                    </LinearLayout>
 
                    <TableLayout
+                       android:id="@+id/series_page_seasons_table"
+                       android:layout_width="fill_parent"
+                       android:layout_height="wrap_content"
+                       android:layout_weight="1" >
+
+                   </TableLayout>
+
+                   <TableLayout
                        android:id="@+id/series_page_info_table"
                        android:layout_width="fill_parent"
                        android:layout_height="wrap_content"
