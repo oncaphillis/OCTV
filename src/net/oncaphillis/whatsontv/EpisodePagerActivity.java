@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TableLayout;
 
 public class EpisodePagerActivity extends FragmentActivity {
 
@@ -22,10 +23,14 @@ public class EpisodePagerActivity extends FragmentActivity {
 		boolean nearest = b.getBoolean("nearest");
 		
 		_episodePagerAdapter  = new EpisodeCollectionPagerAdapter(getSupportFragmentManager(),this,series,nearest);
-		
 		_viewPager = (ViewPager) findViewById(R.id.series_page_layout);
         _viewPager.setAdapter(_episodePagerAdapter);
         _viewPager.setCurrentItem(0);
+        
+		TableLayout tl = (TableLayout) this.findViewById(R.id.episode_pager_info_table);
+		
+		new SeasonsInfoThread(this,tl,1,false,series).start();
+
 	}
 
 	@Override
