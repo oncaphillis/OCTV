@@ -2,8 +2,10 @@
 <resources>
 
     <string name="app_name">OCTV</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="search_hint">Search...</string>
+    <string name="aired">aired</string>
+    <string name="aires">aires</string>
+        
+    <string name="search_hint">Search&#8230;</string>
     <string name="favorite">fac_button_text</string>
     <string name="fav_button_text">favorite</string>
     <string name="run_button_text">running</string>
@@ -14,15 +16,17 @@
     <string name="action_search_string">search</string>
     <string name="title_activity_search">SearchActivity</string>
     <string name="title_activity_series_pager">Series</string>
-    <string name="title_activity_about">About OCTV...</string>
+    <string name="title_activity_about">About OCTV&#8230;</string>
     <string name="title_activity_error">Error</string>
     <string name="nav_bar_open">Open Navigator</string>
     <string name="nav_bar_close">Close Navbar</string>
-    <string name="title_activity_login">Login...</string>
+    <string name="title_activity_login">Login&#8230;</string>
     <string name="title_activity_setup">Setup</string>
     <string name="title_activity_episode_pager">Episodes</string>
 	<string name="first">first</string>
-    <string name="next">next</string>
+	
 	<string name="last">last</string>
-        
+	<string name="next">next</string>
+	<string name="no_overview_available">No Overview available</string>
+
 </resources>
