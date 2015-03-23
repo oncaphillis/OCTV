@@ -7,22 +7,42 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="1dp"
         android:layout_weight="2"
         android:background="@color/oncaphillis_light_grey"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/episode_seasons_count"
-            android:layout_width="fill_parent"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/oncaphillis_blue"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:background="@android:drawable/dialog_holo_dark_frame"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="24dp"
+                android:background="@color/oncaphillis_blue"
+                android:orientation="vertical"
+                android:padding="4dp" >
+
+                <TextView
+                    android:id="@+id/episode_seasons_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@color/oncaphillis_blue"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/oncaphillis_white" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <ScrollView
             android:id="@+id/scrollView1"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
-            android:layout_margin="2dp"
             android:layout_weight="2" >
 
             <TableLayout
@@ -35,24 +55,68 @@
         </ScrollView>
 
     </LinearLayout>
-    
-	<android.support.v4.view.ViewPager
-	    xmlns:android="http://schemas.android.com/apk/res/android"
-	    android:id="@+id/series_page_layout"
-	    android:layout_width="0dp"
-	    android:layout_height="match_parent"
-	    android:layout_weight="5"
-	    android:background="@color/oncaphillis_light_grey" >
 
-	    <android.support.v4.view.PagerTitleStrip
-	        android:id="@+id/series_pager_title_strip"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="top"
-	        android:background="@+color/oncaphillis_blue"
-	        android:paddingBottom="4dp"
-	        android:paddingTop="4dp"
-	        android:textColor="#ffffffff" />
-	    
-	 </android.support.v4.view.ViewPager>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="1dp"
+        android:layout_marginRight="2dp"
+        android:layout_weight="4"
+        android:background="@color/oncaphillis_light_grey"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/dialog_holo_dark_frame"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:background="@color/oncaphillis_blue"
+                    android:orientation="vertical"
+                    android:padding="4dp" >
+
+                <TextView
+                    android:id="@+id/episode_title_bg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@color/oncaphillis_blue"
+                    android:text=""
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/oncaphillis_white" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <android.support.v4.view.ViewPager
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/series_page_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="1dp" >
+     			<!--   android:background="@color/oncaphillis_orange" -->
+                <android.support.v4.view.PagerTitleStrip
+                    android:id="@+id/series_pager_title_strip"
+                    android:layout_width="match_parent"
+                    android:layout_height="31dp"
+                    android:layout_gravity="top"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:textColor="#ffffffff"
+                    >
+
+                </android.support.v4.view.PagerTitleStrip>
+            </android.support.v4.view.ViewPager>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
 </LinearLayout>
