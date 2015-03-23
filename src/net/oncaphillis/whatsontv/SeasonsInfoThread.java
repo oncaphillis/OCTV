@@ -22,7 +22,16 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+/** Fills a TableLayout with all data from all seasons
+ * of a given Series.
+ * 
+ * @author kloska
+ *
+ */
+
 class SeasonsInfoThread extends Thread {
+
+
 	Activity _activity;
 	TvSeries _series = null;
 	TableLayout _table; 
@@ -64,7 +73,7 @@ class SeasonsInfoThread extends Thread {
  	public void run() {
 
 
-		if(_series==null) {
+ 		if(_series==null) {
 			_series = Tmdb.get().loadSeries(_seriesN);
 		}
 		
@@ -150,12 +159,13 @@ class SeasonsInfoThread extends Thread {
 		    		
 		    		final List<InfoNode> ftrl = trl;
 		    		if (header!=null) {
-			    		header.setOnClickListener(new OnClickListener() {
-							@Override
+		    			header.setOnClickListener(new OnClickListener() {
+		    				private boolean expanded = false;
+		    				@Override
 							public void onClick(View v) {
-								boolean f = true;
+		    					expanded = expanded ? false : true; 
 								ImageView iv = (ImageView)((LinearLayout)v).findViewById(R.id.series_table_header_expand);
-								iv.setImageDrawable(_activity.getResources().getDrawable(f ? R.drawable.down : R.drawable.right));
+								iv.setImageDrawable(_activity.getResources().getDrawable(expanded ? R.drawable.down : R.drawable.right));
 								loadData(ftrl);
 							}
 				    	});
@@ -163,7 +173,10 @@ class SeasonsInfoThread extends Thread {
 						loadData(ftrl);
 		    		}
 		    	}
-
+		    	
+		    	// Lazy load the data for the table rows.
+		    	// displaying the seasons data.
+		    	
 		    	private void loadData(List<InfoNode> ftrl) {
 
 		    		Iterator<InfoNode> i = ftrl.iterator();
@@ -208,6 +221,9 @@ class SeasonsInfoThread extends Thread {
 						}
 					}
 		    	}
+		    	
+		    	// Fill a pair of TextViews with data from a 
+		    	// TvSeason object.
 		    	
 				private void setText(TextView date, TextView name,
 						TvSeason tv_season) {
