@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.oncaphillis.whatsontv.SeriesObjectFragment.InfoNode;
 import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
 
 import org.apache.commons.lang3.StringEscapeUtils;
