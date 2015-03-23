@@ -25,7 +25,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:layout_weight="100"
-                android:text="Large Text"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/actionbar_text_color"
                 android:textColorLink="@color/actionbar_text_color" />
