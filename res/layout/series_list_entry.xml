@@ -69,14 +69,12 @@
 	                android:layout_height="wrap_content"
 	                android:maxLines="3"
 	                android:shadowColor="@color/list_item1_color"
-	                android:text="Large Text"
 	                android:textSize="20sp" />
 
 	            <TextView
 	                android:id="@+id/series_network"
 	                android:layout_width="fill_parent"
 	                android:layout_height="wrap_content"
-	                android:text="Network"
 	                android:textAppearance="?android:attr/textAppearanceSmall" />
 
 	            <LinearLayout
@@ -96,15 +94,16 @@
 	                        android:layout_height="wrap_content"
 	                        android:gravity="center_vertical"
 	                        android:padding="4dp"
-	                        android:text="next"
+	                        android:text="@string/next"
 	                        android:textStyle="bold" />
 
 	                    <TextView
 	                        android:id="@+id/series_time"
 	                        android:layout_width="fill_parent"
 	                        android:layout_height="wrap_content"
-	                        android:text="Time"
+	                        android:maxLines="1"
 	                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
 	                </LinearLayout>
 
 	                <TextView
@@ -112,9 +111,10 @@
 	                    android:layout_width="fill_parent"
 	                    android:layout_height="fill_parent"
 	                    android:layout_weight="2"
+	                    android:maxLines="3"
 	                    android:padding="2dp"
-	                    android:text="Medium Text"
 	                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
 	            </LinearLayout>
 	        </LinearLayout>
 	    </LinearLayout>
