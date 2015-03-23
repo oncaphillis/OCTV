@@ -8,6 +8,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+/**
+ * Adapter for Episode Paging. Reads basic Episode and Season Info
+ * of a series in background and triggers the UI as soon as possible.
+ * via  notifyDataSetChanged.
+ * 
+ * @author kloska
+ *
+ */
 public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 	
 	private List<? extends SeriesInfo.SeasonNode> _seasonList = new ArrayList<SeriesInfo.SeasonNode>();
@@ -26,17 +34,17 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 			public void run() {
 				SeriesInfo si = new SeriesInfo(Tmdb.get().loadSeries(_series));						
 				 
-				List<? extends SeriesInfo.SeasonNode> l = si.getSeasonsEpisodeList();
+				final List<? extends SeriesInfo.SeasonNode> l = si.getSeasonsEpisodeList();
 				
 				final int c = near ? si.getNearestEpisodeCoordinate() : 0;
 				
-				synchronized(_seasonList ) {
-					_seasonList = l;
-				}				
 				act.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						a.notifyDataSetChanged();
+						synchronized( a ) {
+							_seasonList = l;
+							a.notifyDataSetChanged();
+						}
 						act._viewPager.setCurrentItem(c);
 					}
 				});
@@ -48,8 +56,8 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 	public Fragment getItem(int n) {
 		Fragment fragment = new EpisodeObjectFragment();
         Bundle args       = new Bundle();
-        if( _seasonList != null ) {
-        	synchronized( _seasonList ) {
+        synchronized( this ) {
+        	if( _seasonList != null ) {
         		if(n < _seasonList.size()) {
         			SeriesInfo.SeasonNode sn = _seasonList.get(n);
     				args.putInt("series", _series);
@@ -66,7 +74,7 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
     
 	@Override
     public CharSequence getPageTitle(int position) {
-		synchronized(_seasonList) {
+		synchronized(this) {
 	        SeriesInfo.SeasonNode sn = _seasonList.get(position);
 	        if(sn!=null) {
 		        if(sn instanceof SeriesInfo.EpisodeNode) {
@@ -82,7 +90,7 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 
 	@Override
 	public int getCount() {
-		synchronized(_seasonList) {
+		synchronized(this) {
 			return _seasonList.size();
 		}
 	}
