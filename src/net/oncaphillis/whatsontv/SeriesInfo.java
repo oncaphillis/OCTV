@@ -99,7 +99,7 @@ public class SeriesInfo {
 			        				
 		        					EpisodeInfo ei = Tmdb.get().loadEpisode(s.getId(), ls.getSeasonNumber(), le.getEpisodeNumber());
 			        				
-			        				if(ei.getAirTime() != null) {
+			        				if(ei!=null && ei.getAirTime() != null) {
 			        					_nearestAiring = ei.getAirTime();
 			        					_hasClock = true;
 			        				} else {
