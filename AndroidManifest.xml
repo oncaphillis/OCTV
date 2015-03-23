@@ -3,7 +3,7 @@
     package="net.oncaphillis.whatsontv"
     android:installLocation="preferExternal"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="pre1.0" >
 
     <uses-sdk
         android:minSdkVersion="14"
