@@ -1,10 +1,8 @@
 package net.oncaphillis.whatsontv;
 
-import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -14,6 +12,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+/**
+ * Tread responsible for the download of TvSeries data (search or list)
+ * page by page.
+ * 
+ * The concrete download call is managed via injection by a  Pager
+ * class which loads one page of data at a time.
+ * 
+ * @author kloska
+ *
+ */
 public class SearchThread extends Thread {
 	
 	static final int MAX_SEARCH = 2000;
@@ -106,7 +114,8 @@ public class SearchThread extends Thread {
 				_activity.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						_listAdapters[fj].addAll(li);						
+						_listAdapters[fj].addAll(li);	
+						_listAdapters[fj].notifyDataSetChanged();
 						if( tv != null ) {
 							tv.setText(Integer.toString(_listAdapters[fj].getCount()));
 						}
