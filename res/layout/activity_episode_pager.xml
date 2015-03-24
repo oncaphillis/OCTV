@@ -5,6 +5,7 @@
     android:orientation="horizontal" >
 
     <LinearLayout
+        android:id="@+id/episode_seasons_tree"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginLeft="2dp"
