@@ -239,7 +239,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 							    @Override
 							    // Once the image is downloaded, associates it to the imageView
 							    protected void onPostExecute(Bitmap bm) {
-							    	_web.loadData(_prefix+" @@ "+getBitmapHtml(bm)+
+							    	_web.loadData(_prefix+getBitmapHtml(bm)+
 						    				StringEscapeUtils.escapeHtml4(overview) +  
 						        			_postfix, "text/html; charset=utf-8;", "UTF-8");
 							    	_web.reload();
