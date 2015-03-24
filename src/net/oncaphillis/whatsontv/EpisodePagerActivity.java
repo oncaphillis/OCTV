@@ -1,10 +1,13 @@
 package net.oncaphillis.whatsontv;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 
 public class EpisodePagerActivity extends FragmentActivity {
@@ -28,6 +31,11 @@ public class EpisodePagerActivity extends FragmentActivity {
         _viewPager.setCurrentItem(0);
         
 		TableLayout tl = (TableLayout) this.findViewById(R.id.episode_pager_info_table);
+		LinearLayout ll = (LinearLayout) this.findViewById(R.id.episode_seasons_tree);
+		
+		if(Environment.getColumns(this)==1) {
+			ll.setVisibility(View.GONE);
+		}
 		
 		new SeasonsInfoThread(this,tl,1,false,series).start();
 
