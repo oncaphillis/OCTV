@@ -12,13 +12,28 @@ import com.uwetrottmann.trakt.v2.entities.SearchResult;
 import com.uwetrottmann.trakt.v2.enums.Extended;
 import com.uwetrottmann.trakt.v2.enums.IdType;
 
+/**
+ * We use track.tv to pull the time value for a given episode
+ * from the net since TMDB only provides the date.
+ * However since trakt.tv appears to be slow and sometimes
+ * unreliable we do a very laaazy load.
+ * 
+ * This Thread behaves like a container for trakt.tv episode
+ * records. Whenever a record is missing we immediately return
+ * null but place the key in a queue for later download.
+ * Whenever all requested keys are downloaded we inform 
+ * objects that they may want to update their data.
+ * 
+ * @author kloska
+ *
+ */
+
 public class TraktReaderThread extends Thread {
 	private Semaphore _lock          = new Semaphore(0);
-
 	private Map<Integer,Episode> _map = new HashMap<Integer,Episode>(); 
 	private LinkedList<Integer> _list = new LinkedList<Integer>();
 	private WeakHashMap<Runnable,Void> _listeners = new WeakHashMap<Runnable,Void>();
-	
+	private String _e ;
 	
 	@Override
 	public void run()  {
@@ -49,7 +64,6 @@ public class TraktReaderThread extends Thread {
 							if(eps.first_aired!=null) {
 								synchronized(this) {
 									_map.put(n,eps);
-
 								}
 							}
 						}
@@ -57,9 +71,13 @@ public class TraktReaderThread extends Thread {
 				}
 
 				synchronized(this) {
-					_list.removeFirst();
-					if(_list.isEmpty())
-						inform();
+					try {
+						_list.removeFirst();
+						if(_list.isEmpty())
+							inform();
+					} catch(Throwable t) {
+						_e = t.getMessage();
+					}
 				}
 				
 				Thread.sleep(100);
