@@ -63,7 +63,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         final TextView tv_network     = ((TextView) rootView.findViewById(R.id.series_page_network));
         final TextView tv_genres     = ((TextView) rootView.findViewById(R.id.series_page_genres));
         final ProgressBar tv_progress      = ((ProgressBar) rootView.findViewById(R.id.series_fragment_progress));
-        
+        final String no_overview = getResources().getString(R.string.no_overview_available);
         
         boolean landscape = true;
 
@@ -195,8 +195,9 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					final String    _networks = networks;
 			        final TextView  tv_voting           = ((TextView) rootView.findViewById(R.id.series_page_vote));
 			        final TextView  tv_voting_count     = ((TextView) rootView.findViewById(R.id.series_page_vote_count));
-			        final String    overview = series.getOverview();
+			        final String    overview = series.getOverview()==null || series.getOverview()=="" ? no_overview : series.getOverview();
 
+			        
 					getActivity().runOnUiThread(new Runnable() {
 			        	@Override
 						public void run() {
@@ -218,11 +219,13 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 				        	
 							if(fa != null)
 				        		tv_first_aired.setText(fa);
-
+							
+							// First load the overview without Bitmap 
 							overview_webview.loadData(_prefix+
 				    				StringEscapeUtils.escapeHtml4(overview) +  
 				        			_postfix, "text/html; charset=utf-8;", "UTF-8");
-
+							
+							// Then initialize lazy load of Bitmap + text
 							new AsyncTask<String,Void,Bitmap>() {
 								final String _path = series.getPosterPath();
 								final WebView _web = overview_webview;
@@ -281,7 +284,8 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 									if(nearest_episode != null) {
 										
 										if(nearest_episode.getOverview()!=null) {
-											tv_nearest_summary.setText(	nearest_episode.getOverview() );
+											tv_nearest_summary.setText(	nearest_episode.getOverview() == null || nearest_episode.getOverview() == "" ? 
+													no_overview : nearest_episode.getOverview() );
 										} else {
 											tv_nearest_summary.setText(	"..." );
 										}
