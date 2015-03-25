@@ -1,9 +1,14 @@
 package net.oncaphillis.whatsontv;
 
 import info.movito.themoviedbapi.model.tv.TvSeries;
+
 import java.util.Date;
+
 import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
+
 import org.apache.commons.lang3.StringEscapeUtils;
+
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -102,8 +107,10 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 			        
 			        if(getActivity()!=null) {
 			        	final Date _date = date;
-						getActivity().runOnUiThread(new Runnable() {
+						final Activity act = getActivity();
+			        	getActivity().runOnUiThread(new Runnable() {
 							
+								
 							float  _voteAverage = episode.getTmdb().getVoteAverage();
 							int    _voteCount = episode.getTmdb().getVoteCount();
 							String _overview = episode.getTmdb().getOverview();
@@ -112,6 +119,8 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 							
 							@Override
 							public void run() {
+								String episodes_for = act.getResources().getString(R.string.episodes_for);
+								act.setTitle(String.format(episodes_for,series.getName()));
 								
 								Date today = TimeTool.getToday();
 								

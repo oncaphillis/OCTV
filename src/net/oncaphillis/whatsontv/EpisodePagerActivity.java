@@ -28,12 +28,14 @@ public class EpisodePagerActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_episode_pager);
-		
 		Bundle b = getIntent().getExtras();
 		
 		int series = b.getInt("series");
 		boolean nearest = b.getBoolean("nearest");
-		
+
+		String episodes = getResources().getString(R.string.episodes);
+		this.setTitle(episodes);
+
 		_episodePagerAdapter  = new EpisodeCollectionPagerAdapter(getSupportFragmentManager(),this,series,nearest);
 		_viewPager = (ViewPager) findViewById(R.id.series_page_layout);
         _viewPager.setAdapter(_episodePagerAdapter);
@@ -47,6 +49,7 @@ public class EpisodePagerActivity extends FragmentActivity {
 		_DrawerLayout = (DrawerLayout) findViewById(R.id.episodes_drawer_layout);
 	    _DrawerTable  = (TableLayout) findViewById(R.id.episodes_drawer_table);
 		_DrawerScrollView = (ScrollView) findViewById(R.id.episodes_drawer_scrollview);
+		
 	    if(Environment.getColumns(this)==1) {
 			ll.setVisibility(View.GONE);
 			new SeasonsInfoThread(this,_DrawerTable,1,false,series,tv_seasons_count).start();
