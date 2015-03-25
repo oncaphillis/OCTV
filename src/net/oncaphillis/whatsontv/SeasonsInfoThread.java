@@ -37,6 +37,7 @@ class SeasonsInfoThread extends Thread {
 	TableLayout _table; 
 	int _maxcol = 1;
 	int _seriesN = -1;
+	TextView _count = null;
 	
 	boolean _withHeader = false;
 	
@@ -59,7 +60,7 @@ class SeasonsInfoThread extends Thread {
  		_withHeader = withHeader;
  	}
  	
- 	SeasonsInfoThread(Activity ac,TableLayout tl, int mc, boolean withHeader,int s0) {
+ 	SeasonsInfoThread(Activity ac,TableLayout tl, int mc, boolean withHeader,int s0, TextView tv_seasons_count) {
  		super();
  		_activity = ac;
  		_maxcol = mc;
@@ -67,6 +68,7 @@ class SeasonsInfoThread extends Thread {
  		_table = tl; 
  		_seriesN = s0;
  		_withHeader = withHeader;
+ 		_count =  tv_seasons_count;
  	}
 
  	@Override
@@ -89,6 +91,12 @@ class SeasonsInfoThread extends Thread {
 			    public void run() {		
 	    			final LayoutInflater vi = LayoutInflater.from(_table.getContext());
 	    			LinearLayout header = null;
+	    			
+	    			String seasons_count = _activity.getResources().getString(R.string.seasons_count);
+	    			
+	    			if(_count!=null) {
+	    				_count.setText(String.format(seasons_count, tsa.size()));
+	    			}
 	    			
 	    			if(_withHeader) {
 		    			header = (LinearLayout) vi.inflate(R.layout.series_table_header,null);

@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
+import android.widget.TextView;
 
 public class EpisodePagerActivity extends FragmentActivity {
 
@@ -30,6 +31,8 @@ public class EpisodePagerActivity extends FragmentActivity {
         _viewPager.setAdapter(_episodePagerAdapter);
         _viewPager.setCurrentItem(0);
         
+        TextView tv_seasons_count = ((TextView)this.findViewById(R.id.episode_seasons_count));
+        
 		TableLayout tl = (TableLayout) this.findViewById(R.id.episode_pager_info_table);
 		LinearLayout ll = (LinearLayout) this.findViewById(R.id.episode_seasons_tree);
 		
@@ -37,7 +40,7 @@ public class EpisodePagerActivity extends FragmentActivity {
 			ll.setVisibility(View.GONE);
 		}
 		
-		new SeasonsInfoThread(this,tl,1,false,series).start();
+		new SeasonsInfoThread(this,tl,1,false,series,tv_seasons_count).start();
 
 	}
 
