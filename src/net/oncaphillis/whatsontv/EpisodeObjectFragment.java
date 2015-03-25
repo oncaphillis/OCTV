@@ -127,7 +127,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 								if(_overview == null || _overview == "")
 									_overview = no_overview;
 								
-								tv_header.setText(series.getName()+":"+episode.getTmdb().getName());
+								tv_header.setText(episode.getTmdb().getName());
 								overview_webview.loadData(_prefix+
 							    				StringEscapeUtils.escapeHtml4(_overview) +  
 							        			_postfix, "text/html; charset=utf-8;", "UTF-8");
