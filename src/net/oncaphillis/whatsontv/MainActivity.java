@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import net.oncaphillis.whatsontv.R;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -43,17 +44,7 @@ public class MainActivity extends FragmentActivity {
 
 	private MainPagerAdapter _mainPagerAdapter = null;
 	
-	public static final String[] Titles={"Today","On the Air","Hi Vote","Popular" };
-
-	static public ArrayAdapter<TvSeries>[]          ListAdapters = new ArrayAdapter[Titles.length];
-	
-	static public Map<Integer,List<TvSeries>>[] StoredResults = new HashMap[Titles.length];
-	
-	//static public Integer[] Counts = new Integer[Titles.length];
-	
-	static private List<TvSeries>[] MainList = new List[Titles.length];
-	
-	static private Pager[] ThePager = new Pager[Titles.length];
+	static private Pager[] ThePager = null;
 	
 	static private Bitmap _defBitmap = null;
 
@@ -141,6 +132,11 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void checkOnline() { 
+		
+
+		if(ThePager==null)
+			ThePager = new Pager[Environment.Titles.length];
+
 		if(!isOnline()) {
 			final MainActivity a=this;
 			new AlertDialog.Builder(this)
@@ -162,6 +158,8 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		Environment.init(this);
 		
 		setContentView(R.layout.activity_main_pager);
 
@@ -181,21 +179,21 @@ public class MainActivity extends FragmentActivity {
 	        
 	        checkOnline();
 	        
-	        for(int i=0;i< Titles.length ;i++) {
+	        for(int i=0;i< Environment.Titles.length ;i++) {
 				final int j = i;
-	        	if(StoredResults[i]==null)
-					StoredResults[i] = new SeriesStorage();
+	        	if(Environment.StoredResults[i]==null)
+	        		Environment.StoredResults[i] = new SeriesStorage();
 	
-	        	if(MainList[i]==null)
-					MainList[i] = new ArrayList<TvSeries>();
+	        	if(Environment.MainList[i]==null)
+	        		Environment.MainList[i] = new ArrayList<TvSeries>();
 				
-	        	if(ListAdapters[i]==null)
-					ListAdapters[i] = new TvSeriesListAdapter(this,
-						android.R.layout.simple_list_item_1,MainList[i],_defBitmap,this);
+	        	if(Environment.ListAdapters[i]==null)
+	        		Environment.ListAdapters[i] = new TvSeriesListAdapter(this,
+						android.R.layout.simple_list_item_1,Environment.MainList[i],_defBitmap,this);
 	        	
 	        	final int idx = i;
 	        	if(ThePager[i]==null) {
-	        		ThePager[i] = new CachingPager(StoredResults[i]) {
+	        		ThePager[i] = new CachingPager(Environment.StoredResults[i]) {
 						public TvResultsPage request(int page) {
 			        		switch(idx) {
 			        		case 0:
@@ -216,7 +214,7 @@ public class MainActivity extends FragmentActivity {
 	        	}
 	        }
 
-	        SearchThread = new SearchThread(this,ListAdapters,ThePager,null,null);
+	        SearchThread = new SearchThread(this,Environment.ListAdapters,ThePager,null,null);
 		        
 		    final FragmentActivity a = this; 
 		        
@@ -408,8 +406,8 @@ public class MainActivity extends FragmentActivity {
 
 	@Override
 	protected void  onSaveInstanceState (Bundle outState){
-		synchronized(StoredResults) {
-			outState.putSerializable("savedstate", StoredResults);
+		synchronized(Environment.StoredResults) {
+			outState.putSerializable("savedstate", Environment.StoredResults);
 		}
 		super.onSaveInstanceState (outState);
 	}

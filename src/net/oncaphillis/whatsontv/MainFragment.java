@@ -51,25 +51,25 @@ public class MainFragment extends Fragment {
 		
 		_mainGridView.setNumColumns(cols);
 		
-			Object o = MainActivity.ListAdapters[_idx];
+			Object o = Environment.ListAdapters[_idx];
 				
-			_mainGridView.setAdapter(MainActivity.ListAdapters[_idx]);
+			_mainGridView.setAdapter(Environment.ListAdapters[_idx]);
 			
 			_mainGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
 					Intent myIntent = new Intent(_activity, SeriesPagerActivity.class);
 					Bundle b        = new Bundle();
-					synchronized(MainActivity.ListAdapters[_idx]) {
-						int[]    ids   = new int[MainActivity.ListAdapters[_idx].getCount()];
-						String[] names = new String[MainActivity.ListAdapters[_idx].getCount()];
+					synchronized(Environment.ListAdapters[_idx]) {
+						int[]    ids   = new int[Environment.ListAdapters[_idx].getCount()];
+						String[] names = new String[Environment.ListAdapters[_idx].getCount()];
 						
-						for(int ix=0;ix<MainActivity.ListAdapters[_idx].getCount();ix++) {
-							ids[ix]   = MainActivity.ListAdapters[_idx].getItem(ix).getId();
-							names[ix] = MainActivity.ListAdapters[_idx].getItem(ix).getName();
+						for(int ix=0;ix<Environment.ListAdapters[_idx].getCount();ix++) {
+							ids[ix]   = Environment.ListAdapters[_idx].getItem(ix).getId();
+							names[ix] = Environment.ListAdapters[_idx].getItem(ix).getName();
 						}
 						
-						b.putString(SeriesObjectFragment.ARG_TITLE, MainActivity.Titles[_idx]);
+						b.putString(SeriesObjectFragment.ARG_TITLE, Environment.Titles[_idx]);
 						b.putIntArray("ids", ids);
 						b.putStringArray("names", names);
 						b.putInt("ix", position);

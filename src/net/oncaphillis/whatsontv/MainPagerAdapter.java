@@ -24,11 +24,11 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return MainActivity.Titles.length;
+        return Environment.Titles.length;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return MainActivity.Titles[position];
+        return Environment.Titles[position];
     }
 }

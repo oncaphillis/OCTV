@@ -1,11 +1,19 @@
 package net.oncaphillis.whatsontv;
 
+import info.movito.themoviedbapi.model.tv.TvSeries;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.DisplayMetrics;
+import android.widget.ArrayAdapter;
 
 public class Environment {
 	
@@ -16,6 +24,11 @@ public class Environment {
 	
 	public static String VERSION   ="1.0";
 	public static String COPYRIGHT ="&copy; 2015 Sebastian Kloska (<a href='http://www.oncaphillis.net/'>www.oncaphillis.net</a>; <a href='mailto:sebastian.kloska@snafu.de'>sebastian.kloska@snafu.de</a>)";
+
+	static public String[] Titles = null;
+	static public ArrayAdapter<TvSeries>[]      ListAdapters  = null;
+	static public Map<Integer,List<TvSeries>>[] StoredResults = null;
+	static public List<TvSeries>[] MainList = null;
 
 	public static boolean isDebug() {
 		return true;
@@ -60,5 +73,32 @@ public class Environment {
 
 	public static boolean useTrakt() {
 		return true;
+	}
+
+
+	public static void init(Activity a) {
+		
+		try {
+			VERSION = a.getPackageManager().getPackageInfo(a.getPackageName(), 0).versionName;
+		} catch (NameNotFoundException e) {
+		}
+		
+		if(Titles==null) {
+			String today    = a.getResources().getString(R.string.today);
+			String on_air   = a.getResources().getString(R.string.on_the_air);
+			String hi_voted = a.getResources().getString(R.string.hi_voted);
+			String popular  = a.getResources().getString(R.string.popular);
+			
+			Titles = new String[] {today,on_air,hi_voted,popular };
+		}
+		
+		if(ListAdapters==null)
+			ListAdapters  = new ArrayAdapter[Titles.length];
+		
+		if(StoredResults==null)
+			StoredResults = new HashMap[Titles.length];
+		
+		if(MainList==null)
+			MainList = new List[Titles.length];
 	}
 }
