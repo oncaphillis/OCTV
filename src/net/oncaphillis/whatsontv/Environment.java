@@ -23,6 +23,7 @@ public class Environment {
 	protected static final int GUEST   = 3;
 	
 	public static String VERSION   ="1.0";
+	public static String NAME ="";
 	public static String COPYRIGHT ="&copy; 2015 Sebastian Kloska (<a href='http://www.oncaphillis.net/'>www.oncaphillis.net</a>; <a href='mailto:sebastian.kloska@snafu.de'>sebastian.kloska@snafu.de</a>)";
 
 	static public String[] Titles = null;
@@ -80,6 +81,8 @@ public class Environment {
 		
 		try {
 			VERSION = a.getPackageManager().getPackageInfo(a.getPackageName(), 0).versionName;
+			NAME = a.getResources().getString(R.string.app_name);
+			
 		} catch (NameNotFoundException e) {
 		}
 		
