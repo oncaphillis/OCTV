@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <ProgressBar
+        android:id="@+id/series_load_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+ <RelativeLayout 
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
-<LinearLayout
+  <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="@color/oncaphillis_light_grey"
@@ -32,7 +43,7 @@
                     android:textColor="@color/oncaphillis_white" />
                 </LinearLayout>
             </LinearLayout>
-</LinearLayout>
+  </LinearLayout>
 
 <android.support.v4.view.ViewPager
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -56,5 +67,7 @@
         android:orientation="vertical" >
     </LinearLayout>  
  </android.support.v4.view.ViewPager>
+
+
  </RelativeLayout>
-  
+</LinearLayout>
