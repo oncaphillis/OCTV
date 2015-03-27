@@ -12,6 +12,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
+        <ProgressBar
+            android:id="@+id/search_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
         <GridView
             android:id="@+id/search_table"
             android:layout_width="match_parent"

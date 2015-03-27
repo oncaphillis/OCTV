@@ -8,28 +8,21 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.oncaphillis.whatsontv.R;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.SearchView;
-import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.ListView;
+import android.widget.ProgressBar;
 
 public class SearchActivity extends Activity {
 
@@ -40,6 +33,9 @@ public class SearchActivity extends Activity {
 	private Menu                   _menu = null;
 	private SearchThread           _searchThread = null;
 	private String                 _query = "";
+	private ProgressBar _progressBar = null;
+
+	private TaskObserver _progressObserver = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +46,39 @@ public class SearchActivity extends Activity {
 	    actionBar.setDisplayHomeAsUpEnabled(true);
 	    
 		_gridView    = (GridView)    findViewById(R.id.search_table);
-		_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image); 
+		_progressBar = ( ProgressBar ) findViewById( R.id.search_progress);
+		_progressBar.setIndeterminate(true);
 		
+		_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image); 
+
+		final Activity act = this;
+		_progressObserver = new TaskObserver() {
+			@Override
+			void beginProgress() {
+				if(_progressBar!=null)
+					act.runOnUiThread(new Runnable() {
+
+						@Override
+						public void run() {
+							_progressBar.setVisibility(View.VISIBLE);
+						}
+						
+					});
+			}
+
+			@Override
+			void endProgress() {
+				if(_progressBar!=null)
+					act.runOnUiThread(new Runnable() {
+
+						@Override
+						public void run() {
+							_progressBar.setVisibility(View.GONE);
+												}
+					});
+			}
+		};
+
 	    /// Set up our special		
 		_listAdapter = new TvSeriesListAdapter(this,
 				android.R.layout.simple_list_item_1,_mainList,_defBitmap,this);
@@ -144,12 +171,12 @@ public class SearchActivity extends Activity {
 
 			@Override
 			int getTotal() {
-				// TODO Auto-generated method stub
 				return _Total;
 			}			
 		},null,null);
 		
 		_searchThread.start();
+		_progressObserver.add(_searchThread);
 		_searchThread.release();
 	}
 	
@@ -170,20 +197,6 @@ public class SearchActivity extends Activity {
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		
-	    // Inflate the menu items for use in the action bar
-	    
-		/*MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.main, menu);
-	    
-	    SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-	    SearchView searchView       = (SearchView) menu.findItem(R.id.search).getActionView();
-	    
-	    if(searchView != null) {
-	    	searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-	    	searchView.setIconifiedByDefault(true);
-	    }
-	    */
 	    return super.onCreateOptionsMenu(menu);
 	}
 	
