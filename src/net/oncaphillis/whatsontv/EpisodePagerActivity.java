@@ -1,17 +1,14 @@
 package net.oncaphillis.whatsontv;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -20,17 +17,42 @@ public class EpisodePagerActivity extends FragmentActivity {
 
 	private EpisodeCollectionPagerAdapter _episodePagerAdapter = null;
 	public ViewPager _viewPager;
-	private DrawerLayout _DrawerLayout;
-	private ListView _DrawerList;
-	private TableLayout _DrawerTable;
-	private ScrollView _DrawerScrollView;
+
+	private TableLayout _drawerTable;
+	private ScrollView _drawerScrollView;
+	private ProgressBar _progressBar;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.activity_episode_pager);
 		Bundle b = getIntent().getExtras();
 		
+		_progressBar = (ProgressBar) this.findViewById(R.id.episode_load_progress);
+		_progressBar.setIndeterminate(true);
+		
+		TaskObserver progressObserver = new TaskObserver() {
+			@Override
+			void beginProgress() {
+				EpisodePagerActivity.this.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						_progressBar.setVisibility(View.VISIBLE);
+					}
+				});
+			}
+
+			void endProgress() {
+				EpisodePagerActivity.this.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						_progressBar.setVisibility(View.GONE);
+					}
+				});
+			}
+		};
+
 		int series = b.getInt("series");
 		String series_name = b.getString("series_name");
 		boolean nearest = b.getBoolean("nearest");
@@ -44,7 +66,9 @@ public class EpisodePagerActivity extends FragmentActivity {
         if(actionBar!=null)
 	    	actionBar.setDisplayHomeAsUpEnabled(true);
 	    
-		_episodePagerAdapter  = new EpisodeCollectionPagerAdapter(getSupportFragmentManager(),this,series,nearest);
+		_episodePagerAdapter  = new EpisodeCollectionPagerAdapter(getSupportFragmentManager(),
+				this,series,nearest,progressObserver);
+		
 		_viewPager = (ViewPager) findViewById(R.id.series_page_layout);
         _viewPager.setAdapter(_episodePagerAdapter);
         _viewPager.setCurrentItem(0);
@@ -54,17 +78,22 @@ public class EpisodePagerActivity extends FragmentActivity {
 		TableLayout tl = (TableLayout) this.findViewById(R.id.episode_pager_info_table);
 		LinearLayout ll = (LinearLayout) this.findViewById(R.id.episode_seasons_tree);
 		
-		_DrawerLayout = (DrawerLayout) findViewById(R.id.episodes_drawer_layout);
-	    _DrawerTable  = (TableLayout) findViewById(R.id.episodes_drawer_table);
-		_DrawerScrollView = (ScrollView) findViewById(R.id.episodes_drawer_scrollview);
+		// _DrawerLayout = (DrawerLayout) findViewById(R.id.episodes_drawer_layout);
+	    _drawerTable  = (TableLayout) findViewById(R.id.episodes_drawer_table);
+		_drawerScrollView = (ScrollView) findViewById(R.id.episodes_drawer_scrollview);
 		
+		SeasonsInfoThread sit = null;
 	    if(Environment.getColumns(this)==1) {
 			ll.setVisibility(View.GONE);
-			new SeasonsInfoThread(this,_DrawerTable,1,false,series,tv_seasons_count).start();
+			sit = new SeasonsInfoThread(this,_drawerTable,1,false,series,tv_seasons_count,progressObserver);
 		} else {
-			_DrawerScrollView.setVisibility(View.GONE);
-			new SeasonsInfoThread(this,tl,1,false,series,tv_seasons_count).start();
+			_drawerScrollView.setVisibility(View.GONE);
+			sit = new SeasonsInfoThread(this,tl,1,false,series,tv_seasons_count,progressObserver);
 		}
+	    
+	    sit.start();
+	    progressObserver.add(sit);
+	    
 	}
 	
 	@Override

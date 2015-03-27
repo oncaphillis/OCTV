@@ -20,15 +20,22 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 	
 	private List<? extends SeriesInfo.SeasonNode> _seasonList = new ArrayList<SeriesInfo.SeasonNode>();
 	private int _series;
+	private TaskObserver _threadObserver;
 	
 	public EpisodeCollectionPagerAdapter(FragmentManager fm, EpisodePagerActivity episodePagerActivity,
-			int series,boolean nearest) {
+			int series,boolean nearest, TaskObserver to) {
+		
 		super(fm);
+		
+		_threadObserver = to;
 		_series = series;
+		
 		final boolean near = nearest;
 		final FragmentStatePagerAdapter a = this;
 		final EpisodePagerActivity act =  episodePagerActivity;
-		new Thread(new Runnable() {
+		
+		
+		Thread t = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
@@ -49,12 +56,14 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 					}
 				});
 			}
-		}).start();
+		});
+		t.start();
+		_threadObserver.add(t);
 	}
 	
 	@Override
 	public Fragment getItem(int n) {
-		Fragment fragment = new EpisodeObjectFragment();
+		Fragment fragment = new EpisodeObjectFragment(_threadObserver);
         Bundle args       = new Bundle();
         synchronized( this ) {
         	if( _seasonList != null ) {

@@ -32,14 +32,14 @@ import android.widget.TextView;
 class SeasonsInfoThread extends Thread {
 
 
-	Activity _activity;
-	TvSeries _series = null;
-	TableLayout _table; 
-	int _maxcol = 1;
-	int _seriesN = -1;
-	TextView _count = null;
-	
-	boolean _withHeader = false;
+	private Activity _activity;
+	private TvSeries _series = null;
+	private TableLayout _table; 
+	private int _maxcol = 1;
+	private int _seriesN = -1;
+	private TextView _count = null;
+	private boolean _withHeader = false;
+	private TaskObserver _taskObserver = null;
 	
  	class InfoNode {
 		public TableRow row = null;
@@ -51,16 +51,17 @@ class SeasonsInfoThread extends Thread {
 		public ArrayList<TvSeason>    se  = new ArrayList<TvSeason>();
  	};
  	
- 	SeasonsInfoThread(Activity ac,TableLayout tl, int mc, boolean withHeader, TvSeries ts) {
+ 	SeasonsInfoThread(Activity ac,TableLayout tl, int mc, boolean withHeader, TvSeries ts,TaskObserver obs) {
  		super();
  		_activity = ac;
  		_maxcol = mc;
  		_series = ts;
  		_table = tl; 
  		_withHeader = withHeader;
+ 		_taskObserver = obs;
  	}
  	
- 	SeasonsInfoThread(Activity ac,TableLayout tl, int mc, boolean withHeader,int s0, TextView tv_seasons_count) {
+ 	SeasonsInfoThread(Activity ac,TableLayout tl, int mc, boolean withHeader,int s0, TextView tv_seasons_count,TaskObserver obs) {
  		super();
  		_activity = ac;
  		_maxcol = mc;
@@ -69,6 +70,7 @@ class SeasonsInfoThread extends Thread {
  		_seriesN = s0;
  		_withHeader = withHeader;
  		_count =  tv_seasons_count;
+ 		_taskObserver = obs;
  	}
 
  	@Override
@@ -198,7 +200,12 @@ class SeasonsInfoThread extends Thread {
 							if(n.img!=null) {
 								Iterator<ImageView> i2 = n.img.iterator();
 								for(int j = 0;j<n.img.size();j++) {
-									new BitmapDownloaderTask(n.img.get(j), _activity, n.pb.get(j), null,null).execute();
+									BitmapDownloaderTask b = new BitmapDownloaderTask(n.img.get(j), _activity, n.pb.get(j), null,null);
+									b.execute();
+									
+									if(_taskObserver != null)
+										_taskObserver.add(b);
+									
 									final TextView _t0 = n.date.get(j);
 									final TextView _t1 = n.name.get(j);
 									final int _si = _series.getId();

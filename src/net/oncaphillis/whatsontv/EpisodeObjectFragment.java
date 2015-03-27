@@ -24,13 +24,19 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 	private int _series;
 	private int _season;
 	private int _episode;
-	
+	private TaskObserver _threadObserver = null; 
+
     private static final String _prefix = "<html>"+
 			   " <body style='background-color: #000000; color: #ffffff'>";
 
     private static final String _postfix = "</body></html>";
 
 	
+	public EpisodeObjectFragment(TaskObserver to) {
+		_threadObserver = to;
+	}
+
+
 	@Override
     public View onCreateView(LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState) {
@@ -57,7 +63,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
         final String aired = getActivity().getResources().getString(R.string.aired);
 		final Fragment fragment = this;
         
-        new Thread(new Runnable() {
+		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				final TvSeries series = Tmdb.get().loadSeries(_series);
@@ -154,7 +160,12 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 					}
 				}
 			}
-        }).start();
+        });
+		
+		t.start();
+		_threadObserver.add(t);
+		
+		
         return _rootView;
     }
 }

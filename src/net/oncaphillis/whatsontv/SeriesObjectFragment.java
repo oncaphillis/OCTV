@@ -354,7 +354,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					// SEASONS
 					//
 					final TableLayout  seasons_info_table = ((TableLayout) rootView.findViewById(R.id.series_page_seasons_table));
-					new SeasonsInfoThread(getActivity(),seasons_info_table,_maxcol,true,series).start();
+					new SeasonsInfoThread(getActivity(),seasons_info_table,_maxcol,true,series,null).start();
 	        	}		
 			}
  		} ).start();

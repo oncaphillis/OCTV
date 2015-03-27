@@ -2,23 +2,12 @@ package net.oncaphillis.whatsontv;
 
 import net.oncaphillis.whatsontv.R;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.NavUtils;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.SearchView;
 import android.app.ActionBar;
-import android.app.SearchManager;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.AutoCompleteTextView;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 
 public class SeriesPagerActivity extends FragmentActivity {
 	private SeriesCollectionPagerAdapter _seriesCollectionPagerAdapter;
@@ -30,6 +19,9 @@ public class SeriesPagerActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_series_pager);
+
+		ProgressBar pb = (ProgressBar) this.findViewById(R.id.series_load_progress);
+		pb.setIndeterminate(true);
 
 		Bundle b = getIntent().getExtras();
         _seriesCollectionPagerAdapter =
