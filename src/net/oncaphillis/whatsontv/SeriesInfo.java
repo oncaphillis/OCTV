@@ -177,7 +177,7 @@ public class SeriesInfo {
 
 	public List<? extends SeasonNode> getSeasonsEpisodeList() {
 		if(_seasonsEpisodeList == null) {
-			_seasonsEpisodeList  = new ArrayList();
+			_seasonsEpisodeList  = new ArrayList<SeasonNode>();
 			
 			if(_tvs == null || _tvs.getSeasons() == null || _tvs.getSeasons().isEmpty() )
 				return _seasonsEpisodeList;
