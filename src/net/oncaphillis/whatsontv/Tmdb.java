@@ -492,15 +492,15 @@ public class Tmdb {
 	}
 
 	
-	public static CacheMap getSeriesCache() {
+	public static CacheMap<?, ?> getSeriesCache() {
 		return get()._series;
 	}
 	
-	public static CacheMap getSeasonsCache() {
+	public static CacheMap<?, ?> getSeasonsCache() {
 		return get()._seasons;
 	}
 	
-	public static CacheMap getEpisodeCache() {
+	public static CacheMap<?, ?> getEpisodeCache() {
 		return get()._episodes; 
 	}
 	
