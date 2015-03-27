@@ -30,7 +30,8 @@ public class SearchActivity extends Activity {
 	private ArrayAdapter<TvSeries> _listAdapter;
 	private Bitmap                 _defBitmap;
 	private List<TvSeries> _mainList = new ArrayList<TvSeries>();
-	private Menu                   _menu = null;
+
+
 	private SearchThread           _searchThread = null;
 	private String                 _query = "";
 	private ProgressBar _progressBar = null;
