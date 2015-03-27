@@ -32,10 +32,12 @@ public class EpisodePagerActivity extends FragmentActivity {
 		Bundle b = getIntent().getExtras();
 		
 		int series = b.getInt("series");
+		String series_name = b.getString("series_name");
 		boolean nearest = b.getBoolean("nearest");
-
-		String episodes = getResources().getString(R.string.episodes);
-		this.setTitle(episodes);
+		series_name = series_name == null ? "" : series_name;
+		
+		String episodes_for = getResources().getString(R.string.episodes_for);
+		this.setTitle(String.format(episodes_for,series_name));
 
         ActionBar actionBar = getActionBar();
 	    

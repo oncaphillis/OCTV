@@ -63,6 +63,7 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 					synchronized(_list) {
 						if(_list.get(pos)!=null) {
 							b.putSerializable("series", _list.get(pos).getId() );
+							b.putString("series_name", _list.get(pos).getName() );
 							b.putBoolean("nearest",true );
 							myIntent.putExtras(b);
 							_activity.startActivity(myIntent);

@@ -74,7 +74,6 @@ class SeasonsInfoThread extends Thread {
  	@Override
  	public void run() {
 
-
  		if(_series==null) {
 			_series = Tmdb.get().loadSeries(_seriesN);
 		}
@@ -84,7 +83,7 @@ class SeasonsInfoThread extends Thread {
 
 		final List<TvSeason> tsa = _series.getSeasons();
 
-		if(tsa!=null && tsa.size()!=0) {
+		if(tsa!=null) {
 			
 			_activity.runOnUiThread(new Runnable() {
 		    	@Override
@@ -97,6 +96,9 @@ class SeasonsInfoThread extends Thread {
 	    			if(_count!=null) {
 	    				_count.setText(String.format(seasons_count, tsa.size()));
 	    			}
+	    			
+	    			if(tsa.size()==0)
+	    				return;
 	    			
 	    			if(_withHeader) {
 		    			header = (LinearLayout) vi.inflate(R.layout.series_table_header,null);
