@@ -173,7 +173,7 @@ public class SearchActivity extends Activity {
 		
 	    // Inflate the menu items for use in the action bar
 	    
-		MenuInflater inflater = getMenuInflater();
+		/*MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.main, menu);
 	    
 	    SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -183,7 +183,7 @@ public class SearchActivity extends Activity {
 	    	searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 	    	searchView.setIconifiedByDefault(true);
 	    }
-	    
+	    */
 	    return super.onCreateOptionsMenu(menu);
 	}
 	

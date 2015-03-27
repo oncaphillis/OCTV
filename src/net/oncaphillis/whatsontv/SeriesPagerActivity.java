@@ -58,21 +58,6 @@ public class SeriesPagerActivity extends FragmentActivity {
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.main, menu);
-	    
-	    MenuItem mi = (MenuItem) menu.findItem(R.id.search);
-	    SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-	    SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-	    
-	    if(searchView!=null) {
-	    	MenuItemCompat.setShowAsAction(mi, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-	    	MenuItemCompat.setActionView(mi, searchView );
-	    	
-		    searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-		    searchView.setIconifiedByDefault(true);
-	    }
-
 	    return super.onCreateOptionsMenu(menu);
 	}
 	

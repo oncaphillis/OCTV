@@ -1,5 +1,6 @@
 package net.oncaphillis.whatsontv;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -36,6 +37,11 @@ public class EpisodePagerActivity extends FragmentActivity {
 		String episodes = getResources().getString(R.string.episodes);
 		this.setTitle(episodes);
 
+        ActionBar actionBar = getActionBar();
+	    
+        if(actionBar!=null)
+	    	actionBar.setDisplayHomeAsUpEnabled(true);
+	    
 		_episodePagerAdapter  = new EpisodeCollectionPagerAdapter(getSupportFragmentManager(),this,series,nearest);
 		_viewPager = (ViewPager) findViewById(R.id.series_page_layout);
         _viewPager.setAdapter(_episodePagerAdapter);
@@ -61,18 +67,20 @@ public class EpisodePagerActivity extends FragmentActivity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.episode_pager, menu);
-		return true;
+		// getMenuInflater().inflate(R.menu.episode_pager, menu);
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
+	    switch (item.getItemId()) {
+	    case android.R.id.home:
+	        finish();
+	    	return true;
+	    }
+	    return super.onOptionsItemSelected(item);
 	}
+
 	@Override
 	protected void	onPause() {
 		/*if(SearchThread!=null)
