@@ -19,6 +19,7 @@ public class SeriesInfo {
 	private TvSeries _tvs;
 	private String _nws = new String("");
 	private Date    _nearestAiring  = null;
+	private Date    _firstAiring  = null;
 	private String _nearestEpisodeTitle = new String("");
 	private boolean _hasClock = false;
 	private int _nearestEpisodeSeason = 0;
@@ -56,7 +57,14 @@ public class SeriesInfo {
 			}
 		}
 
-		_nearestAiring    = new Date();
+		if(s.getFirstAirDate()!=null) {
+			try {
+				_firstAiring = Environment.TmdbDateFormater.parse(s.getFirstAirDate());
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 		
 		if(s.getLastAirDate()!=null) {
 			
@@ -208,6 +216,9 @@ public class SeriesInfo {
 		}
 		
 		return null;
+	}
+	public Date getFirstAiring() {
+		return _firstAiring;
 	}
 	public Date getNearestAiring() {
 		return _nearestAiring;

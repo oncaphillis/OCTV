@@ -17,6 +17,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import net.oncaphillis.whatsontv.R;
+import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -196,7 +197,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 			        final TextView  tv_voting           = ((TextView) rootView.findViewById(R.id.series_page_vote));
 			        final TextView  tv_voting_count     = ((TextView) rootView.findViewById(R.id.series_page_vote_count));
 			        final String    overview = series.getOverview()==null || series.getOverview()=="" ? no_overview : series.getOverview();
-
+			        final SeriesInfo series_info = new SeriesInfo(series);
 			        
 					getActivity().runOnUiThread(new Runnable() {
 			        	@Override
@@ -215,11 +216,13 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 				        		tv_voting_count.setText("0");
 				        	}
 
-							String fa = series.getFirstAirDate();
+							Date first_aired = series_info.getFirstAiring();
 				        	
-							if(fa != null)
-				        		tv_first_aired.setText(fa);
-							
+							if(first_aired != null)
+				        		tv_first_aired.setText(Environment.DateFormater.format( first_aired ));
+							else
+				        		tv_first_aired.setText("...");
+									
 							// First load the overview without Bitmap 
 							overview_webview.loadData(_prefix+
 				    				StringEscapeUtils.escapeHtml4(overview) +  
@@ -261,36 +264,37 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 							 
 							final String nearest_title = series_info.getNearestEpisodeTitle();
 							final int nearest_season = series_info.getNearestEpisodeSeason();
-							final TvEpisode nearest_episode = series_info.getNearestEpisodeInfo().getTmdb(); 
-
 					    	final Date today = TimeTool.getToday();
 							final Date nearest = series_info.getNearestAiring();
 
-							final String nearest_still_path = nearest_episode.getStillPath();
-							
+							final EpisodeInfo episode_info =  series_info.getNearestEpisodeInfo();
+
 							getActivity().runOnUiThread(new Runnable() {
 
 								@Override
 								public void run() {
-									if(nearest_still_path != null) {
-										tv_nearest_still.setTag(nearest_still_path);
-										new BitmapDownloaderTask(tv_nearest_still,4, getActivity(), null,null,null).execute();
-									}
+
+									TvEpisode nearest_episode = null;
 									
-								
-									tv_nearest.setText(Integer.toString(nearest_season)+"x"+
-					        				Integer.toString(nearest_episode.getEpisodeNumber())+" "+nearest_title);
-	
-									if(nearest_episode != null) {
-										
+									if(episode_info!=null && (nearest_episode=episode_info.getTmdb())!=null) { 
+										String nearest_still_path = nearest_episode.getStillPath();
+
+										if(nearest_still_path != null) {
+											tv_nearest_still.setTag(nearest_still_path);
+											new BitmapDownloaderTask(tv_nearest_still,4, getActivity(), null,null,null).execute();
+										}
+
+										tv_nearest.setText(Integer.toString(nearest_season)+"x"+
+												Integer.toString(nearest_episode.getEpisodeNumber())+" "+nearest_title);
+
 										if(nearest_episode.getOverview()!=null) {
 											tv_nearest_summary.setText(	nearest_episode.getOverview() == null || nearest_episode.getOverview() == "" ? 
 													no_overview : nearest_episode.getOverview() );
 										} else {
-											tv_nearest_summary.setText(	"..." );
+											tv_nearest_summary.setText(	no_overview );
 										}
-									
-						        		if(!today.before(nearest)) {
+
+										if(!today.before(nearest)) {
 						        			tv_last_aired.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_white));
 						        			tv_next_last_tag.setText(lastText);
 						        		} else {
@@ -324,23 +328,25 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 						        		}
 						        		DateFormat df = series_info.hasClock() ? Environment.TimeFormater : Environment.DateFormater;
 						        		tv_last_aired.setText(df.format(nearest));
-									
-						        		// CAST OF NEAREST EPISODE
-										Credits c = null;
-										
-										if(nearest_episode != null && (c = nearest_episode.getCredits())!=null) {
-											
-											
-											String s[] = getActivity().getResources().getStringArray(R.array.cast_titles);
-											
-											String a[] = new String[] {s[Environment.CREW],s[Environment.GUEST]};
-
-											List<? extends Person>[]  cc = new List[] {c.getCrew(),c.getGuestStars()};	
-											
-											new CastInfoThread(getActivity(),episode_info_table,_maxcol,cc,a).start();
-										}
+									} else {
+										tv_last_aired.setText("...");
 									}
-								} 
+									
+					        		// CAST OF NEAREST EPISODE
+									Credits c = null;
+									
+									if(nearest_episode != null && (c = nearest_episode.getCredits())!=null) {
+										
+										
+										String s[] = getActivity().getResources().getStringArray(R.array.cast_titles);
+										
+										String a[] = new String[] {s[Environment.CREW],s[Environment.GUEST]};
+
+										List<? extends Person>[]  cc = new List[] {c.getCrew(),c.getGuestStars()};	
+										
+										new CastInfoThread(getActivity(),episode_info_table,_maxcol,cc,a).start();
+									}
+								}
 							});
 						}
 					}).start();
