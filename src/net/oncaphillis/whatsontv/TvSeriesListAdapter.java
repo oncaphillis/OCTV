@@ -101,7 +101,7 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	if(the_series.getFirstAirDate()!=null) {
 	    		Calendar c = Calendar.getInstance();
 	    		try {
-					c.setTime( Tmdb.DateFormater.parse(the_series.getFirstAirDate()) );
+					c.setTime( Environment.TmdbDateFormater.parse(the_series.getFirstAirDate()) );
 		    		fa = Integer.toString(c.get(Calendar.YEAR));
 				} catch (ParseException e) {
 				}

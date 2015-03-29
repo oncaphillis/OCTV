@@ -48,7 +48,12 @@ public class SeriesInfo {
 		}
 	}
 	
-	public SeriesInfo(TvSeries s) {
+	static SeriesInfo fromSeries(TvSeries s) {
+		if(s == null)
+			return null;
+		return new SeriesInfo(s);
+	}
+	private SeriesInfo(TvSeries s) {
 		_tvs = Tmdb.get().loadSeries(s.getId());
 
 		if(_tvs.getNetworks()!=null) {
@@ -61,15 +66,13 @@ public class SeriesInfo {
 			try {
 				_firstAiring = Environment.TmdbDateFormater.parse(s.getFirstAirDate());
 			} catch (ParseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
 			}
 		}
 		
 		if(s.getLastAirDate()!=null) {
 			
 			try {
-				_nearestAiring = Tmdb.DateFormater.parse( s.getLastAirDate());
+				_nearestAiring = Environment.TmdbDateFormater.parse( s.getLastAirDate());
 			} catch (ParseException e) {
 			}
 
@@ -208,7 +211,7 @@ public class SeriesInfo {
 			int delta = TimeZone.getDefault().getRawOffset() - TimeZone.getTimeZone("EST").getRawOffset();
 		
 			try {
-				Date date =  Tmdb.DateFormater.parse(e.getAirDate());
+				Date date =  Environment.TmdbDateFormater.parse(e.getAirDate());
 				date.setTime(date.getTime()+delta);
 				return date;
 			} catch (ParseException e1) {

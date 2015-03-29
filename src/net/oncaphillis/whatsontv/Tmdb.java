@@ -267,13 +267,8 @@ public class Tmdb {
 	
 	static Date getAirDate(TvEpisode te) {
 		if(te.getAirDate()!=null) {
-			DateFormat formater   = new SimpleDateFormat("yyyy-MM-dd") {
-				{
-					this.setTimeZone(TimeZone.getTimeZone("EST"));
-				}
-			};
 			try {
-				return formater.parse(te.getAirDate());
+				return Environment.TmdbDateFormater.parse(te.getAirDate());
 			} catch (ParseException e) {
 			}
 		}
@@ -358,12 +353,6 @@ public class Tmdb {
 		}
 	};
 	
-	static DateFormat DateFormater   = new SimpleDateFormat("yyyy-MM-dd") {
-		{
-			this.setTimeZone(TimeZone.getTimeZone("EST"));
-		}
-	};
-
 	private Tmdb() {
 		final Semaphore mutex = new Semaphore(0);
 		_key = TmdbKey.APIKEY;

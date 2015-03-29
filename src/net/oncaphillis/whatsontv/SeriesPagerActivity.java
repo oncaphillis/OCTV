@@ -4,15 +4,18 @@ import net.oncaphillis.whatsontv.R;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ProgressBar;
 
 public class SeriesPagerActivity extends FragmentActivity {
 	private SeriesCollectionPagerAdapter _seriesCollectionPagerAdapter;
     private ViewPager                    _viewPager;
-
+    private ProgressBar _progressBar;
+    private TaskObserver _progressObserver = null;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	
@@ -20,8 +23,31 @@ public class SeriesPagerActivity extends FragmentActivity {
 
 		setContentView(R.layout.activity_series_pager);
 
-		ProgressBar pb = (ProgressBar) this.findViewById(R.id.series_load_progress);
-		pb.setIndeterminate(true);
+		final Activity act = this;
+		_progressObserver = new TaskObserver() {
+
+			@Override
+			void beginProgress() {
+				act.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						_progressBar.setVisibility(View.VISIBLE);
+					}
+				});
+			}
+
+			@Override
+			void endProgress() {
+				act.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						_progressBar.setVisibility(View.GONE);
+					}
+				});
+			}
+		};
+		
+		_progressBar  = (ProgressBar) this.findViewById(R.id.series_load_progress);
 
 		Bundle b = getIntent().getExtras();
         _seriesCollectionPagerAdapter =
@@ -29,7 +55,8 @@ public class SeriesPagerActivity extends FragmentActivity {
                         getSupportFragmentManager(),
                         b.getInt(SeriesObjectFragment.ARG_IX),
                         b.getIntArray(SeriesObjectFragment.ARG_IDS),
-                        b.getStringArray(SeriesObjectFragment.ARG_NAMES));
+                        b.getStringArray(SeriesObjectFragment.ARG_NAMES),
+                        _progressObserver);
 		
         _viewPager = (ViewPager) findViewById(R.id.series_page_layout);
         _viewPager.setAdapter(_seriesCollectionPagerAdapter);

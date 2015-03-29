@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 import net.oncaphillis.whatsontv.R;
 import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -35,13 +36,17 @@ public class SeriesObjectFragment extends EntityInfoFragment {
     public static final String ARG_IX    = "ix";
     public static final String ARG_NAMES = "names";
     public static final String ARG_IDS   = "ids";
-    public static final String ARG_TITLE   = "actiontitle";
+    public static final String ARG_TITLE = "actiontitle";
     
     private static final String _prefix = "<html>"+
 										   " <body style='background-color: #000000; color: #ffffff'>";
 	private static final String _postfix = "</body></html>";
 	
 	private int _maxcol = 1;
+	private TaskObserver _progressObserver = null;  
+	public SeriesObjectFragment(TaskObserver progressObserver) {
+		_progressObserver = progressObserver;
+	}
 
 	@Override
     public View onCreateView(LayoutInflater inflater,
@@ -52,7 +57,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 
         final int seriesId   = args.getIntArray(ARG_IDS)[args.getInt(ARG_IX)];
         final String seriesName = args.getStringArray(ARG_NAMES)[args.getInt(ARG_IX)];
-        final String title;
+        String title;
         
         if( (title = args.getString(ARG_TITLE))!=null) {
         	this.getActivity().setTitle(title);
@@ -95,7 +100,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 
         final String nextText = getResources().getString(R.string.next);
         final String lastText = getResources().getString(R.string.last);
-		
+
         if(landscape) {
         	LinearLayout ll = ((LinearLayout)rootView.findViewById(R.id.series_page_episode_layout_portrait));
         	ll.setVisibility(View.GONE);
@@ -110,38 +115,32 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         
         overview_webview.loadData("","text/html; charset=utf-8;", "utf-8");
         tv_progress.setVisibility(View.INVISIBLE);
-         		
- 		
- 		new Thread(new Runnable() {
+        
+		final Activity activity = getActivity();
+        
+ 		Thread t = new Thread(new Runnable() {
 
  			private TvSeries series=null;
 
 			@Override
 			public void run() {
-				
-				if(Tmdb.get().api()==null) {
-					return;
-				}
 
 				String networks = "";
 				String gens = "";
 				
 				try {
 					series = Tmdb.get().loadSeries(seriesId);
-					
 					if(Environment.isDebug())
 		        		networks = "#"+Integer.toString(seriesId)+((series.getPosterPath()==null) ? " \u2205" : "\u753b")+" ";
 					else
 						networks = "";					
-					
-					
+
 				} catch (Exception ex) {
 					return;
 				}
 				
 				if(series==null)
 					return;
-
 				{
 					Iterator<Network> i = series.getNetworks().iterator();
 					int j= 0;
@@ -163,8 +162,8 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 				{
 					final TvSeries _series = series;
 					final TableLayout  series_info_table = ((TableLayout) rootView.findViewById(R.id.series_page_info_table));
-
-					new Thread(new Runnable() {
+					
+					Thread t = new Thread(new Runnable() {
 						@Override
 						public void run() {
 							Credits c;
@@ -174,62 +173,80 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 								return;
 							}
 
-							if(c!=null) {
+							if(activity!=null && c!=null) {
 								List<? extends Person>[] cc = new ArrayList[3];
-								String[] titles = getActivity().getResources().getStringArray(R.array.cast_titles);
+								String[] titles = activity.getResources().getStringArray(R.array.cast_titles);
 								cc[0] = c != null ? c.getCast() : null;
 								cc[1] = c != null ? c.getCrew() : null;
 								cc[2] = series.getCreatedBy();
-								new CastInfoThread(getActivity(),series_info_table,_maxcol,cc,titles).start();
+								new CastInfoThread(activity,series_info_table,_maxcol,cc,titles).start();
 							}
 						}
-					}).start();
+					});
+					t.start();
+					_progressObserver.add(t);
 				}
+			
+				if(activity!=null){
+					// SEASONS
+					//
+					final TableLayout  seasons_info_table = ((TableLayout) rootView.findViewById(R.id.series_page_seasons_table));
+					SeasonsInfoThread si = new SeasonsInfoThread(activity,seasons_info_table,_maxcol,true,series,null);
+					si.start();
+					_progressObserver.add(si);
+				}
+			
+			
+				{
+					// OVEREVIEW
+					// without image
 
-				// Set HTML code and everything already associated with the
-				// series object. Load load main bitmap and rewrite the HTML
-				// when finished.
-
-				if(getActivity()!=null) {
-
+					// Set HTML code and everything already associated with the
+					// series object. Load load main bitmap and rewrite the HTML
+					// when finished.
+	
 					final String    _gens = gens;
 					final String    _networks = networks;
 			        final TextView  tv_voting           = ((TextView) rootView.findViewById(R.id.series_page_vote));
 			        final TextView  tv_voting_count     = ((TextView) rootView.findViewById(R.id.series_page_vote_count));
 			        final String    overview = series.getOverview()==null || series.getOverview()=="" ? no_overview : series.getOverview();
-			        final SeriesInfo series_info = new SeriesInfo(series);
-			        
-					getActivity().runOnUiThread(new Runnable() {
-			        	@Override
-						public void run() {
-							tv_network.setText(_networks);
-							tv_genres.setText(_gens);
-							tv_header.setText(series.getName() + 
-									(series.getOriginalName()!=null && !series.getOriginalName().equals("") && !series.getOriginalName().equals(series.getName()) 
-										? " ("+series.getOriginalName()+")" : ""));
-
-							if(series.getVoteCount()!=0) {
-						    	tv_voting.setText(String.format("%.1f",series.getVoteAverage())+"/"+Integer.toString(10) );
-						        tv_voting_count.setText(Integer.toString(series.getVoteCount()));
-				        	} else {
-				        		tv_voting.setText("-/-");
-				        		tv_voting_count.setText("0");
+			        final SeriesInfo series_info = SeriesInfo.fromSeries(series);
+			        // First without IMAGE
+			        if(activity!=null && series_info!=null)  {
+			        	activity.runOnUiThread(new Runnable() {
+				        	@Override
+							public void run() {
+								tv_network.setText(_networks);
+								tv_genres.setText(_gens);
+								tv_header.setText(series.getName() + 
+										(series.getOriginalName()!=null && !series.getOriginalName().equals("") && !series.getOriginalName().equals(series.getName()) 
+											? " ("+series.getOriginalName()+")" : ""));
+	
+								if(series.getVoteCount()!=0) {
+							    	tv_voting.setText(String.format("%.1f",series.getVoteAverage())+"/"+Integer.toString(10) );
+							        tv_voting_count.setText(Integer.toString(series.getVoteCount()));
+					        	} else {
+					        		tv_voting.setText("-/-");
+					        		tv_voting_count.setText("0");
+					        	}
+	
+								Date first_aired = series_info.getFirstAiring();
+					        	
+								if(first_aired != null)
+					        		tv_first_aired.setText(Environment.TmdbDateFormater.format( first_aired ));
+								else
+					        		tv_first_aired.setText("...");
+										
+								// First load the overview without Bitmap 
+								overview_webview.loadData(_prefix+
+					    				StringEscapeUtils.escapeHtml4(overview) +  
+					        			_postfix, "text/html; charset=utf-8;", "UTF-8");
 				        	}
+			        	});
 
-							Date first_aired = series_info.getFirstAiring();
-				        	
-							if(first_aired != null)
-				        		tv_first_aired.setText(Environment.DateFormater.format( first_aired ));
-							else
-				        		tv_first_aired.setText("...");
-									
-							// First load the overview without Bitmap 
-							overview_webview.loadData(_prefix+
-				    				StringEscapeUtils.escapeHtml4(overview) +  
-				        			_postfix, "text/html; charset=utf-8;", "UTF-8");
-							
-							// Then initialize lazy load of Bitmap + text
-							new AsyncTask<String,Void,Bitmap>() {
+			        	// Then initialize lazy load of Bitmap + text
+						{
+							AsyncTask<String,Void,Bitmap> at = new AsyncTask<String,Void,Bitmap>() {
 								final String _path = series.getPosterPath();
 								final WebView _web = overview_webview;
 								
@@ -246,118 +263,124 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 						    				StringEscapeUtils.escapeHtml4(overview) +  
 						        			_postfix, "text/html; charset=utf-8;", "UTF-8");
 							    	_web.reload();
-							    
 							    }
-							}.execute();
-			        	}
-					});
-				}
+							};
+							at.execute();
+							_progressObserver.add(at);
+				        }
+			        }
+				}	
+			
+			
+			
+				{
+					// NEAREST EPISODE 
+					Thread t = new Thread(new Runnable() {
 
-				// Overview, Genre Network etc.
-				if(getActivity()!=null) {
+						final SeriesInfo series_info = SeriesInfo.fromSeries(series);
+						final String nearest_title = series_info.getNearestEpisodeTitle();
+						final int nearest_season = series_info.getNearestEpisodeSeason();
+				    	final Date today = TimeTool.getToday();
+						final Date nearest = series_info.getNearestAiring();
 
-					new Thread(new Runnable() {
+						final EpisodeInfo episode_info =  series_info.getNearestEpisodeInfo();
 
 						@Override
 						public void run() {
-							final SeriesInfo series_info = new SeriesInfo(series);
-							 
-							final String nearest_title = series_info.getNearestEpisodeTitle();
-							final int nearest_season = series_info.getNearestEpisodeSeason();
-					    	final Date today = TimeTool.getToday();
-							final Date nearest = series_info.getNearestAiring();
+							
+							if(activity!=null) {
+							
+								activity.runOnUiThread(new Runnable() {
 
-							final EpisodeInfo episode_info =  series_info.getNearestEpisodeInfo();
+									@Override
+									public void run() {
 
-							getActivity().runOnUiThread(new Runnable() {
+										TvEpisode nearest_episode = null;
+										
+										if(episode_info!=null && (nearest_episode=episode_info.getTmdb())!=null) { 
+											String nearest_still_path = nearest_episode.getStillPath();
 
-								@Override
-								public void run() {
+											if(nearest_still_path != null) {
+												tv_nearest_still.setTag(nearest_still_path);
+												new BitmapDownloaderTask(tv_nearest_still,4, getActivity(), null,null,null).execute();
+											}
 
-									TvEpisode nearest_episode = null;
-									
-									if(episode_info!=null && (nearest_episode=episode_info.getTmdb())!=null) { 
-										String nearest_still_path = nearest_episode.getStillPath();
+											tv_nearest.setText(Integer.toString(nearest_season)+"x"+
+													Integer.toString(nearest_episode.getEpisodeNumber())+" "+nearest_title);
 
-										if(nearest_still_path != null) {
-											tv_nearest_still.setTag(nearest_still_path);
-											new BitmapDownloaderTask(tv_nearest_still,4, getActivity(), null,null,null).execute();
-										}
+											if(nearest_episode.getOverview()!=null) {
+												tv_nearest_summary.setText(	nearest_episode.getOverview() == null || nearest_episode.getOverview() == "" ? 
+														no_overview : nearest_episode.getOverview() );
+											} else {
+												tv_nearest_summary.setText(	no_overview );
+											}
 
-										tv_nearest.setText(Integer.toString(nearest_season)+"x"+
-												Integer.toString(nearest_episode.getEpisodeNumber())+" "+nearest_title);
-
-										if(nearest_episode.getOverview()!=null) {
-											tv_nearest_summary.setText(	nearest_episode.getOverview() == null || nearest_episode.getOverview() == "" ? 
-													no_overview : nearest_episode.getOverview() );
-										} else {
-											tv_nearest_summary.setText(	no_overview );
-										}
-
-										if(!today.before(nearest)) {
-						        			tv_last_aired.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_white));
-						        			tv_next_last_tag.setText(lastText);
-						        		} else {
-											tv_last_aired.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_orange));
-						        			tv_next_last_tag.setText(nextText);
-	
-						        			if(!series_info.hasClock()) {
-	
-						        				Runnable r = new Runnable() {
-						        					final Runnable _me = this;
-						        					WeakReference<TextView> view = new WeakReference(tv_last_aired);
-						        					TvSeries  tvs = series_info.getTmdb();
-						        					@Override
-													public void run() {
-					        							SeriesInfo si = new SeriesInfo(tvs);
-					        							DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.TimeFormater;
-					        							final String s = df.format(si.getNearestAiring());
-					        							if(getActivity()!=null && view.get() != null && view.get().getTag() == _me) {
-					        								getActivity().runOnUiThread(new Runnable() {
-					        									@Override
-					        									public void run() {
-					        										tv_last_aired.setText(s);
-					        									}
-					        								});
+											if(!today.before(nearest)) {
+							        			tv_last_aired.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_white));
+							        			tv_next_last_tag.setText(lastText);
+							        		} else {
+												tv_last_aired.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_orange));
+							        			tv_next_last_tag.setText(nextText);
+		
+							        			if(!series_info.hasClock()) {
+		
+							        				Runnable r = new Runnable() {
+							        					final Runnable _me = this;
+							        					WeakReference<TextView> view = new WeakReference(tv_last_aired);
+							        					TvSeries  tvs = series_info.getTmdb();
+							        					@Override
+														public void run() {
+						        							SeriesInfo si = SeriesInfo.fromSeries(tvs);
+						        							DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.TimeFormater;
+						        							final String s = df.format(si.getNearestAiring());
+						        							if(getActivity()!=null && view.get() != null && view.get().getTag() == _me) {
+						        								getActivity().runOnUiThread(new Runnable() {
+						        									@Override
+						        									public void run() {
+						        										tv_last_aired.setText(s);
+						        									}
+						        								});
+															}
 														}
-													}
-						        				};
-							        			tv_last_aired.setTag(r);
-						        				Tmdb.get().trakt_reader().register(r);
-						        			}
-						        		}
-						        		DateFormat df = series_info.hasClock() ? Environment.TimeFormater : Environment.DateFormater;
-						        		tv_last_aired.setText(df.format(nearest));
-									} else {
-										tv_last_aired.setText("...");
-									}
-									
-					        		// CAST OF NEAREST EPISODE
-									Credits c = null;
-									
-									if(nearest_episode != null && (c = nearest_episode.getCredits())!=null) {
+							        				};
+								        			tv_last_aired.setTag(r);
+							        				Tmdb.get().trakt_reader().register(r);
+							        			}
+							        		}
+							        		DateFormat df = series_info.hasClock() ? Environment.TimeFormater : Environment.TmdbDateFormater;
+							        		tv_last_aired.setText(df.format(nearest));
+										} else {
+											tv_last_aired.setText("...");
+										}
 										
+						        		// CAST OF NEAREST EPISODE
+										Credits c = null;
 										
-										String s[] = getActivity().getResources().getStringArray(R.array.cast_titles);
-										
-										String a[] = new String[] {s[Environment.CREW],s[Environment.GUEST]};
+										if(nearest_episode != null && (c = nearest_episode.getCredits())!=null) {
+											
+											
+											String s[] = getActivity().getResources().getStringArray(R.array.cast_titles);
+											
+											String a[] = new String[] {s[Environment.CREW],s[Environment.GUEST]};
 
-										List<? extends Person>[]  cc = new List[] {c.getCrew(),c.getGuestStars()};	
-										
-										new CastInfoThread(getActivity(),episode_info_table,_maxcol,cc,a).start();
+											List<? extends Person>[]  cc = new List[] {c.getCrew(),c.getGuestStars()};	
+											
+											new CastInfoThread(getActivity(),episode_info_table,_maxcol,cc,a).start();
+										}
 									}
-								}
-							});
+								});
+							}
 						}
-					}).start();
-				
-					// SEASONS
-					//
-					final TableLayout  seasons_info_table = ((TableLayout) rootView.findViewById(R.id.series_page_seasons_table));
-					new SeasonsInfoThread(getActivity(),seasons_info_table,_maxcol,true,series,null).start();
-	        	}		
+					});
+					t.start();
+					_progressObserver.add(t);
+				}
 			}
- 		} ).start();
-        return rootView;
+ 		
+ 		});
+		t.start();
+		_progressObserver.add(t);
+
+		return rootView;
     }
 }

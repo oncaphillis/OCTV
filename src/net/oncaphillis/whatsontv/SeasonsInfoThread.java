@@ -249,7 +249,7 @@ class SeasonsInfoThread extends Thread {
     				if(s!=null) {
 	    				try {
 							Date d = Environment.TmdbDateFormater.parse(tv_season.getAirDate());
-							s=Environment.DateFormater.format(d);
+							s=Environment.TmdbDateFormater.format(d);
 	    				} catch (ParseException e) {
 						}
     				} else {

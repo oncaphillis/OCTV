@@ -9,16 +9,18 @@ public class SeriesCollectionPagerAdapter extends FragmentStatePagerAdapter {
 	private int[]    _ids;
 	private String[] _names;
 	private int      _ix;
-	public SeriesCollectionPagerAdapter(FragmentManager fm,int ix,int[] ids,String[] names) {
+	private TaskObserver _progressObserver = null;
+	public SeriesCollectionPagerAdapter(FragmentManager fm,int ix,int[] ids,String[] names, TaskObserver progressObserver) {
 	    super(fm);
 	    _ix    = ix;
 	    _ids   = ids;
 		_names = names;
+		_progressObserver = progressObserver;
     }
 
     @Override
     public Fragment getItem(int i) {
-        Fragment fragment = new SeriesObjectFragment();
+        Fragment fragment = new SeriesObjectFragment(_progressObserver);
         Bundle args       = new Bundle();
         args.putInt(SeriesObjectFragment.ARG_IX, i);
         args.putIntArray("ids", _ids);

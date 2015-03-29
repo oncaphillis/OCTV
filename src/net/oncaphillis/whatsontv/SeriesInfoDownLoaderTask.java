@@ -33,7 +33,7 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 		SeriesInfo si = null;
 		if(_networkText != null && _networkText.get() != null && _networkText.get().getTag()!=null && _networkText.get().getTag() instanceof Integer) {
 			TvSeries s = Tmdb.get().loadSeries((Integer)_networkText.get().getTag());
-			si = new SeriesInfo(s);
+			si = SeriesInfo.fromSeries(s);
 		}
 		return si;
 	}	
@@ -48,12 +48,12 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 				
 				if(si.getNearestAiring()!=null) {
 					
-					DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.DateFormater;
+					DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.TmdbDateFormater;
 					
-					Date td = TimeTool.getToday();
+					Date now = TimeTool.getNow();
 					_timeText.get().setText(df.format(si.getNearestAiring()) );					
 					
-					if(si.getNearestAiring().before(td)) {
+					if(si.getNearestAiring().before(now)) {
 						_timeText.get().setTextColor(_activity.getResources().getColor(R.color.actionbar_text_color));
 						if(_timeStateText.get()!=null)
 							_timeStateText.get().setText("last");
@@ -69,8 +69,8 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 									final Runnable _me = this;
 									@Override
 									public void run() {
-										SeriesInfo si = new SeriesInfo(tvs);
-										DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.DateFormater;
+										SeriesInfo si = SeriesInfo.fromSeries(tvs);
+										DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.TmdbDateFormater;
 										final String t = df.format(si.getNearestAiring());
 										_activity.runOnUiThread(new Runnable() {
 											@Override

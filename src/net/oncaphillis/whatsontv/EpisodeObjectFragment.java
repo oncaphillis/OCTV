@@ -141,7 +141,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 								tv_rating_count.setText(String.format("%d", _voteCount));
 								if(fragment.getActivity()!=null)  {
 									if(_date!=null) {
-										tv_date.setText(withTime ? Environment.TimeFormater.format(_date) :  Environment.DateFormater.format(_date));
+										tv_date.setText(withTime ? Environment.TimeFormater.format(_date) :  Environment.TmdbDateFormater.format(_date));
 										if(!today.before(_date)) {
 											tv_date_tag.setText(aired);
 											tv_date.setTextColor(fragment.getActivity().getResources().getColor(R.color.oncaphillis_white));
