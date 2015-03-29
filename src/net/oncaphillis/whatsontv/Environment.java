@@ -3,7 +3,11 @@ package net.oncaphillis.whatsontv;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +40,47 @@ public class Environment {
 	} 
 	
 	
-	static DateFormat TmdbDateFormater   = new SimpleDateFormat("yyyy-MM-dd") {
+	static DateFormat TmdbDateFormater = new SimpleDateFormat("yyyy-MM-dd") {
+		DateFormat _outFormat = new SimpleDateFormat("EEE, dd.MM.yyyy@HH:mm"); 
 		{
-			this.setTimeZone(TimeZone.getTimeZone("UTC"));
+			this.setTimeZone(TimeZone.getTimeZone("EST"));
+		}
+
+		@Override
+		public Date parse(String s) throws ParseException {
+			Date d = super.parse(s);
+			Calendar c = Calendar.getInstance();
+			c.setTimeZone(TimeZone.getTimeZone("EST"));
+			c.setTime(d);
+			
+			c.set(Calendar.HOUR_OF_DAY,23);
+			c.set(Calendar.MINUTE,59);
+			c.set(Calendar.SECOND,59);
+			
+			return c.getTime();
+		}
+		
+		
+		@Override
+		public StringBuffer format(Date d, StringBuffer toAppendTo,
+                FieldPosition fieldPosition) {
+			Calendar c = Calendar.getInstance();
+			c.setTimeZone(TimeZone.getTimeZone("EST"));
+			c.setTime(d);
+			
+			c.set(c.HOUR_OF_DAY,0);
+			c.set(c.MINUTE,0);
+			c.set(c.SECOND,0);
+			
+			return _outFormat.format(c.getTime(),toAppendTo,fieldPosition);
 		}
 	};
+
+	/*static DateFormat DateFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy@HH:mm") {
+		{
+			this.setTimeZone(TimeZone.getDefault());
+		}
+	};*/
 
 	static DateFormat TimeFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm") {
 		{
@@ -48,11 +88,6 @@ public class Environment {
 		}
 	};
 	
-	static DateFormat DateFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy") {
-		{
-			this.setTimeZone(TimeZone.getDefault());
-		}
-	};
 	
 	public static int getColumns(Activity activity) {
         
