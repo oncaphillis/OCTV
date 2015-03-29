@@ -41,7 +41,7 @@ public class Environment {
 	
 	
 	static DateFormat TmdbDateFormater = new SimpleDateFormat("yyyy-MM-dd") {
-		DateFormat _outFormat = new SimpleDateFormat("EEE, dd.MM.yyyy@HH:mm"); 
+		DateFormat _outFormat = new SimpleDateFormat("EEE, dd.MM.yyyy"); 
 		{
 			this.setTimeZone(TimeZone.getTimeZone("EST"));
 		}
@@ -75,12 +75,6 @@ public class Environment {
 			return _outFormat.format(c.getTime(),toAppendTo,fieldPosition);
 		}
 	};
-
-	/*static DateFormat DateFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy@HH:mm") {
-		{
-			this.setTimeZone(TimeZone.getDefault());
-		}
-	};*/
 
 	static DateFormat TimeFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm") {
 		{
