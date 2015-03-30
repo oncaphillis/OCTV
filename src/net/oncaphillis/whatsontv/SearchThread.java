@@ -63,9 +63,10 @@ public class SearchThread extends Thread {
 
 	@Override
 	public void run() {
+		
 		synchronized(this) {
-			_list  = 0;
-			_count = 0;
+			_list  =  0;
+			_count =  0;
 			_total = -1;
 		}
 		
@@ -87,48 +88,46 @@ public class SearchThread extends Thread {
 			try {
 			    mutex.acquire();
 			} catch (InterruptedException e) {
-			    e.printStackTrace();
 			}
-			
-			
+
 			int page = 1;
-			int n = 0;
-			int s = 0;
-			
-			if(Tmdb.get().api()==null) {
-				return;
-			}
-	
+			int n    = 0;
+			int s    = 0;
+
 			List<TvSeries> li_page= new ArrayList<TvSeries>();
 			
 			_pagers[_list].start();
 			
 			int cc;
 			while( (cc=_listAdapters[_list].getCount()) < MAX_SEARCH) {
-				
-				lock();
-				
+
 				li_page=_pagers[_list].getPage(page++);
 				final TextView tv = _tv;
-				final List<TvSeries> li = li_page;
-				_activity.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						_listAdapters[fj].addAll(li);	
-						_listAdapters[fj].notifyDataSetChanged();
-						if( tv != null ) {
-							tv.setText(Integer.toString(_listAdapters[fj].getCount()));
-						}
-					}
-				});
-				
-				synchronized(this) {
-					_count = _listAdapters[fj].getCount();
-					_total = _pagers[_list].getTotal();
-				}
-				release();
 
-				if(li_page.size() == 0)
+				if(li_page != null) {
+
+					lock();
+					
+					final List<TvSeries> li = li_page;
+					_activity.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							_listAdapters[fj].addAll(li);	
+							_listAdapters[fj].notifyDataSetChanged();
+							if( tv != null ) {
+								tv.setText(Integer.toString(_listAdapters[fj].getCount()));
+							}
+						}
+					});
+					
+					synchronized(this) {
+						_count = _listAdapters[fj].getCount();
+						_total = _pagers[_list].getTotal();
+					}
+					release();
+				}
+				
+				if(li_page == null || li_page.size() == 0)
 					break;
 			} 
 			
