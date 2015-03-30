@@ -83,7 +83,7 @@ public class MainActivity extends FragmentActivity {
 
 		public List<TvSeries> getPage(int page) {
 
-			List<TvSeries> series_list;
+			List<TvSeries> series_list = new ArrayList<TvSeries>();
 				
 			synchronized( _storage  )  {					
 				if( ( series_list = _storage.get(page))!=null)
@@ -93,6 +93,11 @@ public class MainActivity extends FragmentActivity {
 			while(true) {
 				try {
 					TvResultsPage r =  request(page);
+					
+					if(r==null) {
+						return series_list;
+					}
+
 					series_list = r.getResults();
 					_totalCount = r.getTotalResults();
 					
@@ -101,7 +106,8 @@ public class MainActivity extends FragmentActivity {
 							_storage.put(page, series_list);
 							return series_list;
 						}
-					}	
+					}
+					
 				} catch(Exception ex0) {
 					try {
 						Thread.sleep(1000);
@@ -141,18 +147,12 @@ public class MainActivity extends FragmentActivity {
 
 			setContentView(R.layout.activity_main_pager);
 
-			boolean b = NetWatchdog.isOnline(this);
-			if(b)
-				throw new Exception("B");
-
 			Preferences = getPreferences(MODE_PRIVATE);
 			
 			initNavbar();
 
 			_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image);
-
 			_mainPagerAdapter = new MainPagerAdapter(getSupportFragmentManager(),this);
-			
 			_viewPager = (ViewPager) findViewById(R.id.main_pager_layout);
 	        _viewPager.setAdapter(_mainPagerAdapter);
 	        _viewPager.setCurrentItem(0);
@@ -176,16 +176,16 @@ public class MainActivity extends FragmentActivity {
 						public TvResultsPage request(int page) throws Exception {
 			        		switch(idx) {
 			        		case Environment.AIRING_TODAY:
-		        				return api().getTvSeries().getAiringToday(Tmdb.getLanguage(), page,Tmdb.getTimezone());
+		        				return api() == null ? null : api().getTvSeries().getAiringToday(Tmdb.getLanguage(), page,Tmdb.getTimezone());
 
 			        		case Environment.ON_THE_AIR:
-			        			return api().getTvSeries().getOnTheAir(Tmdb.getLanguage(),page);
+			        			return api() == null ? null : api().getTvSeries().getOnTheAir(Tmdb.getLanguage(),page);
 			        			
 			        		case Environment.HI_VOTED:	
-		        				return api().getTvSeries().getTopRated(Tmdb.getLanguage(),page);
+			        			return api() == null ? null : api().getTvSeries().getTopRated(Tmdb.getLanguage(),page);
 
 			        		case Environment.POPULAR:	
-		        				return api().getTvSeries().getPopular(Tmdb.getLanguage(), page);
+			        			return api() == null ? null : api().getTvSeries().getPopular(Tmdb.getLanguage(), page);
 
 			        		default:
 			        			return null;
@@ -195,33 +195,41 @@ public class MainActivity extends FragmentActivity {
 	        	}
 	        }
 
-	        SearchThread = new SearchThread(this,Environment.ListAdapters,ThePager,null,null);
-		        
+
+        	SearchThread = new SearchThread(this,Environment.ListAdapters,ThePager,null,null);
 		    final FragmentActivity a = this; 
-		        
-	        Thread.UncaughtExceptionHandler searchThreadExceptionHandler = new Thread.UncaughtExceptionHandler() {
+
+		    Thread.UncaughtExceptionHandler searchThreadExceptionHandler = new Thread.UncaughtExceptionHandler() {
 	            public void uncaughtException(Thread th, Throwable ex) {
+            		final Throwable _ex = ex;
 	            	
-	            	Bundle b        = new Bundle();
-	            	
-	            	if(ex.getMessage()!=null)
-	            		b.putString("txt1", ex.getMessage());
-	            	else
-	            		b.putString("txr1", " ? ? ? ");
-	            	
-	            	if(ex.getCause()!=null && ex.getCause().getMessage()!=null)
-	            		b.putString("txt2", ex.getCause().getMessage());
-	            	else
-	            		b.putString("txt2", "...");
-	            		
-	    			Intent myIntent = new Intent(a, ErrorActivity.class);
-	    			myIntent.putExtras(b);
-	    			startActivity(myIntent);
-	    			finish();
+	            	a.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+			            	Bundle b        = new Bundle();
+			            	
+			            	if(_ex.getMessage()!=null)
+			            		b.putString("txt1", _ex.getMessage());
+			            	else
+			            		b.putString("txr1", " ? ? ? ");
+			            	
+			            	if(_ex.getCause()!=null && _ex.getCause().getMessage()!=null)
+			            		b.putString("txt2", _ex.getCause().getMessage());
+			            	else
+			            		b.putString("txt2", "...");
+			            		
+			    			Intent myIntent = new Intent(a, ErrorActivity.class);
+			    			myIntent.putExtras(b);
+			    			a.startActivity(myIntent);
+			    			finish();
+						}
+	            	});
 	            }
 	        };
+
 	        SearchThread.setUncaughtExceptionHandler(searchThreadExceptionHandler);
 	        SearchThread.start();
+	        
 		} catch(Exception ex) {
 			Intent myIntent = new Intent(this, ErrorActivity.class);
 			Bundle b        = new Bundle();
