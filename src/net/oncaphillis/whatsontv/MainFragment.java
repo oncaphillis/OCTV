@@ -82,19 +82,19 @@ public class MainFragment extends Fragment {
 			
 			if(_activity!=null && _activity instanceof MainActivity) {
 				
-				final MainActivity a = (MainActivity)_activity;
+				final MainActivity act = (MainActivity)_activity;
 				final MainFragment f = this;
 				
 				new Thread(new Runnable() {
 					
 					@Override
 					public void run() {
-						while(a.SearchThread.getState()!=Thread.State.TERMINATED) {
-							a.runOnUiThread(new Runnable(){
+						while(act!=null && act.SearchThread!=null && act.SearchThread.getState()!=Thread.State.TERMINATED) {
+							act.runOnUiThread(new Runnable(){
 								@Override
 								public void run() {
-									Current ci = a.SearchThread.getCurrent();
-									synchronized(a) {
+									Current ci = act.SearchThread.getCurrent();
+									synchronized(act) {
 										if( f.getIdx() < ci.list) {
 											f.setProgressBarVisibility(false);							
 										} else if(f.getIdx()==ci.list && ci.count>0) {
@@ -115,7 +115,7 @@ public class MainFragment extends Fragment {
 							}
 						}
 						
-						a.runOnUiThread(new Runnable(){
+						act.runOnUiThread(new Runnable(){
 							@Override
 							public void run() {
 								f.setProgressBarIndeterminate(false);
