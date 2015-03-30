@@ -458,8 +458,10 @@ public class Tmdb {
 	 * @return
 	 */
 	
-	TmdbApi api() {
-		return _api;
+	static TmdbApi api() {
+		if(get()==null)
+			return null;
+		return get()._api;
 	}
 	
 	public TraktReaderThread trakt_reader() {
@@ -471,7 +473,11 @@ public class Tmdb {
 	
 	static Tmdb get() {
 		if( _one == null ) {
-			_one=new Tmdb();
+			try {
+				_one=new Tmdb();
+			} catch(Throwable t) {
+				return null;
+			}
 		}
 		return _one;  
 	}
