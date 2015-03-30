@@ -20,14 +20,10 @@ public class NetWatchdog extends Thread {
 			final Activity act =Environment.getCurrentActivity();
 			
 			if(act!=null && !isOnline(act)) {
-				
 				act.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						Intent myIntent = new Intent( act, ErrorActivity.class);
-						Bundle b        = new Bundle();
-						b.putString("txt1", "NO NET");
-						myIntent.putExtras(b);
+						Intent myIntent = new Intent( act, NonetActivity.class);
 						act.startActivity(myIntent);
 					}
 				});
@@ -40,5 +36,10 @@ public class NetWatchdog extends Thread {
 	        (ConnectivityManager) act.getSystemService(Context.CONNECTIVITY_SERVICE);
 	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
 	    return netInfo != null && netInfo.isConnectedOrConnecting();
+	}
+
+	public static boolean isOnline() {
+		Activity act = Environment.getCurrentActivity();
+		return act == null ? false : isOnline(act);
 	}
 }
