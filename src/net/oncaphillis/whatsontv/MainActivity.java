@@ -75,7 +75,7 @@ public class MainActivity extends FragmentActivity {
 		private Map<Integer,List<TvSeries>> _storage;
 		private int _totalCount = -1;
 		
-		abstract public TvResultsPage request(int page);
+		abstract public TvResultsPage request(int page) throws Exception;
 		
 		public CachingPager(Map<Integer,List<TvSeries>> storage) {
 			_storage = storage;
@@ -91,14 +91,6 @@ public class MainActivity extends FragmentActivity {
 			}	
 			
 			while(true) {
-				if(!isOnline()) {
-					try {
-						Thread.sleep(1000);
-					} catch(Exception ex1) {
-					}
-					continue;
-				}
-				
 				try {
 					TvResultsPage r =  request(page);
 					series_list = r.getResults();
@@ -131,44 +123,32 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
-	private void checkOnline() { 
-		
-
-		if(ThePager==null)
-			ThePager = new Pager[Environment.Titles.length];
-
-		if(!isOnline()) {
-			final MainActivity a=this;
-			new AlertDialog.Builder(this)
-			.setTitle("Alert")
-			.setMessage("We are not online")
-			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) { 
-					a.checkOnline();
-				}
-			})
-			.setIcon(android.R.drawable.ic_dialog_alert).show();
-		}
-
-	}
-	
 	/** main activity after startup
 	 */
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		Environment.init(this);
 		
-		setContentView(R.layout.activity_main_pager);
-
-		Preferences = getPreferences(MODE_PRIVATE);
-		
-		initNavbar();
-		final Activity act = this; 
+		new NetWatchdog().start();
 
 		try {			
+					
+			Environment.init(this);
+
+			if(ThePager==null)
+				ThePager = new Pager[Environment.Titles.length];
+
+			setContentView(R.layout.activity_main_pager);
+
+			boolean b = NetWatchdog.isOnline(this);
+			if(b)
+				throw new Exception("B");
+
+			Preferences = getPreferences(MODE_PRIVATE);
+			
+			initNavbar();
+
 			_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image);
 
 			_mainPagerAdapter = new MainPagerAdapter(getSupportFragmentManager(),this);
@@ -176,9 +156,7 @@ public class MainActivity extends FragmentActivity {
 			_viewPager = (ViewPager) findViewById(R.id.main_pager_layout);
 	        _viewPager.setAdapter(_mainPagerAdapter);
 	        _viewPager.setCurrentItem(0);
-	        
-	        checkOnline();
-	        
+
 	        for(int i=0;i< Environment.Titles.length ;i++) {
 				final int j = i;
 	        	if(Environment.StoredResults[i]==null)
@@ -192,24 +170,27 @@ public class MainActivity extends FragmentActivity {
 						android.R.layout.simple_list_item_1,Environment.MainList[i],_defBitmap,this);
 	        	
 	        	final int idx = i;
+	        	
 	        	if(ThePager[i]==null) {
 	        		ThePager[i] = new CachingPager(Environment.StoredResults[i]) {
-						public TvResultsPage request(int page) {
+						public TvResultsPage request(int page) throws Exception {
 			        		switch(idx) {
-			        		case 0:
+			        		case Environment.AIRING_TODAY:
 		        				return api().getTvSeries().getAiringToday(Tmdb.getLanguage(), page,Tmdb.getTimezone());
 
-			        		case 1:
-		        				return api().getTvSeries().getOnTheAir(Tmdb.getLanguage(),page);
-
-			        		case 2:	
+			        		case Environment.ON_THE_AIR:
+			        			return api().getTvSeries().getOnTheAir(Tmdb.getLanguage(),page);
+			        			
+			        		case Environment.HI_VOTED:	
 		        				return api().getTvSeries().getTopRated(Tmdb.getLanguage(),page);
 
-			        		default:
+			        		case Environment.POPULAR:	
 		        				return api().getTvSeries().getPopular(Tmdb.getLanguage(), page);
+
+			        		default:
+			        			return null;
 			        		}
 						}
-
 					};
 	        	}
 	        }
@@ -218,7 +199,7 @@ public class MainActivity extends FragmentActivity {
 		        
 		    final FragmentActivity a = this; 
 		        
-	        Thread.UncaughtExceptionHandler h = new Thread.UncaughtExceptionHandler() {
+	        Thread.UncaughtExceptionHandler searchThreadExceptionHandler = new Thread.UncaughtExceptionHandler() {
 	            public void uncaughtException(Thread th, Throwable ex) {
 	            	
 	            	Bundle b        = new Bundle();
@@ -239,20 +220,18 @@ public class MainActivity extends FragmentActivity {
 	    			finish();
 	            }
 	        };
-	        
-	        SearchThread.setUncaughtExceptionHandler(h);
+	        SearchThread.setUncaughtExceptionHandler(searchThreadExceptionHandler);
 	        SearchThread.start();
-	        
 		} catch(Exception ex) {
 			Intent myIntent = new Intent(this, ErrorActivity.class);
 			Bundle b        = new Bundle();
-			b.putString("txt", ex.getMessage()+" "+ex.getCause());
+			b.putString("txt1", ex.getMessage()+" "+ex.getCause());
 			myIntent.putExtras(b);
 			startActivity(myIntent);
 		} catch(Throwable ta) {
 			Intent myIntent = new Intent(this,ErrorActivity.class);
 			Bundle b = new Bundle();
-			b.putString("txt", ta.getMessage()+" "+ta.getCause());
+			b.putString("txt1", ta.getMessage()+" "+ta.getCause());
 			myIntent.putExtras(b);
 			startActivity(myIntent);
 		}
@@ -346,7 +325,9 @@ public class MainActivity extends FragmentActivity {
 	    _DrawerLayout.setDrawerListener(_DrawerToggle);
 	}
 
+	@Override
 	protected void onDestroy() {
+		clearReferences();
 		super.onDestroy();
 	}
 	
@@ -357,6 +338,7 @@ public class MainActivity extends FragmentActivity {
 	}
 	@Override
 	protected void	onPause() {
+		clearReferences();
 		if(SearchThread!=null)
 			SearchThread.lock();
 		super.onPause();
@@ -367,6 +349,7 @@ public class MainActivity extends FragmentActivity {
 		if(SearchThread!=null)
 			SearchThread.release();
 		super.onResume();
+	    Environment.setCurrentActivity(this);
 	}
 	
 	@Override
@@ -383,20 +366,23 @@ public class MainActivity extends FragmentActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
-        _DrawerToggle.syncState();
+        if(_DrawerToggle!=null)
+        	_DrawerToggle.syncState();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        _DrawerToggle.onConfigurationChanged(newConfig);
+        if(_DrawerToggle!=null)
+        	_DrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
-        if (_DrawerToggle.onOptionsItemSelected(item)) {
+        
+    	if (_DrawerToggle!=null && _DrawerToggle.onOptionsItemSelected(item)) {
           return true;
         }
         // Handle your other action bar items...
@@ -426,11 +412,9 @@ public class MainActivity extends FragmentActivity {
 
 	    return super.onCreateOptionsMenu(menu);
 	}
-
-	public boolean isOnline() {
-	    ConnectivityManager cm =
-	        (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
-	    return netInfo != null && netInfo.isConnectedOrConnecting();
+	private void clearReferences(){
+      Activity currActivity = Environment.getCurrentActivity();
+      if (currActivity.equals(this))
+            Environment.setCurrentActivity(null);
 	}
 }

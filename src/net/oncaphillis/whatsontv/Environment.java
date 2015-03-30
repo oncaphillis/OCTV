@@ -26,6 +26,11 @@ public class Environment {
 	protected static final int CREATOR = 2;
 	protected static final int GUEST   = 3;
 	
+	final static public int AIRING_TODAY = 0;
+	final static public int ON_THE_AIR   = 1;
+	final static public int HI_VOTED     = 2;
+	final static public int POPULAR      = 3;
+
 	public static String VERSION   ="1.0";
 	public static String NAME ="";
 	public static String COPYRIGHT ="&copy; 2015 Sebastian Kloska (<a href='http://www.oncaphillis.net/'>www.oncaphillis.net</a>; <a href='mailto:sebastian.kloska@snafu.de'>sebastian.kloska@snafu.de</a>)";
@@ -35,6 +40,8 @@ public class Environment {
 	static public Map<Integer,List<TvSeries>>[] StoredResults = null;
 	static public List<TvSeries>[] MainList = null;
 
+	static private Activity _theActivity = null;
+	
 	public static boolean isDebug() {
 		return true;
 	} 
@@ -111,7 +118,6 @@ public class Environment {
 		try {
 			VERSION = a.getPackageManager().getPackageInfo(a.getPackageName(), 0).versionName;
 			NAME = a.getResources().getString(R.string.app_name);
-			
 		} catch (NameNotFoundException e) {
 		}
 		
@@ -132,5 +138,13 @@ public class Environment {
 		
 		if(MainList==null)
 			MainList = new List[Titles.length];
+	}
+
+	public static Activity getCurrentActivity() {
+		return _theActivity;
+	}
+
+	public static void setCurrentActivity(Activity a) {
+		_theActivity = a;
 	}
 }
