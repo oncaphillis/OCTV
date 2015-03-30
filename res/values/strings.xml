@@ -3,6 +3,7 @@
     
     <string name="action_search_string">search</string>
     <string name="action_settings">Settings</string>
+
     <string name="app_name">OCTV</string>
     <string name="aired">aired</string>
     <string name="aires">aires</string>
@@ -21,28 +22,30 @@
     <string name="nav_bar_close">Close Navbar</string>
     <string name="nav_bar_open">Open Navigator</string>
     <string name="next">next</string>
-	<string name="no_overview_available">No Overview available</string>
-    
+	
+	<string name="no_network_available">No Network available</string>
+    <string name="no_overview_available">No Overview available</string>
+	
     <string name="on_the_air">Currently Airing</string>
 	
     <string name="popular">Popular</string>
 		
+    <string name="retry">Retry</string>
     <string name="run_button_text">running</string>
-	
+    	
 	<string name="seasons_count">%d Seasons</string>
     <string name="search_hint">Search&#8230;</string>
     
-    <string name="title_activity_series">SeriesActivity</string>
-    <string name="title_activity_serial_overview">Serial Overview</string>
-    <string name="title_activity_search">SearchActivity</string>
-    <string name="title_activity_series_pager">Series</string>
     <string name="title_activity_about">About OCTV&#8230;</string>
+    <string name="title_activity_episode_pager">Episodes</string> 
     <string name="title_activity_error">Error</string>
-    
-    
     <string name="title_activity_login">Login&#8230;</string>
+    <string name="title_activity_nonet">No Network&#8230;</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_serial_overview">Serial Overview</string>
+    <string name="title_activity_series">SeriesActivity</string>
+    <string name="title_activity_series_pager">Series</string>
     <string name="title_activity_setup">Setup</string>
-    <string name="title_activity_episode_pager">Episodes</string>
     
     <string name="today">Today</string>
     	

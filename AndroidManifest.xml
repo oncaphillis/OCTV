@@ -53,6 +53,12 @@
             android:theme="@style/OncaphillisTheme" >
         </activity>
         <activity
+            android:name=".NonetActivity"
+            android:label="@string/title_activity_nonet"
+            android:launchMode="singleTop"
+            android:theme="@style/OncaphillisTheme" >
+        </activity>
+        <activity
             android:name=".SearchActivity"
             android:label="@string/title_activity_search"
             android:launchMode="singleTop"
