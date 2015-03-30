@@ -157,9 +157,14 @@ public class SearchActivity extends Activity {
 			private int _Total = -1;
 			@Override
 			public List<TvSeries> getPage(int page) {
-				TvResultsPage r = api().getSearch().searchTv(query, null, page);
-				_Total = r.getTotalResults();
-				return r.getResults();
+				try {
+					TvResultsPage r = api().getSearch().searchTv(query, null, page);
+					_Total = r.getTotalResults();
+					return r.getResults();
+				} catch(Throwable t) {
+					_Total = 0;
+					return new ArrayList<TvSeries>();
+				}
 			}
 
 			@Override
