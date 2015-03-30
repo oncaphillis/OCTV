@@ -422,7 +422,7 @@ public class MainActivity extends FragmentActivity {
 	}
 	private void clearReferences(){
       Activity currActivity = Environment.getCurrentActivity();
-      if (currActivity.equals(this))
+      if (currActivity!=null && currActivity.equals(this))
             Environment.setCurrentActivity(null);
 	}
 }
