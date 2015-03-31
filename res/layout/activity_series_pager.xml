@@ -4,14 +4,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <ProgressBar
-        android:id="@+id/series_load_progress"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:visibility="gone" />
-
  <RelativeLayout 
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >

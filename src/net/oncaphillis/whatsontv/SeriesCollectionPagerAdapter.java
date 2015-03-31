@@ -9,13 +9,12 @@ public class SeriesCollectionPagerAdapter extends FragmentStatePagerAdapter {
 	private int[]    _ids;
 	private String[] _names;
 	private int      _ix;
-	private TaskObserver _progressObserver = null;
-	public SeriesCollectionPagerAdapter(FragmentManager fm,int ix,int[] ids,String[] names, TaskObserver progressObserver) {
+
+	public SeriesCollectionPagerAdapter(FragmentManager fm,int ix,int[] ids,String[] names) {
 	    super(fm);
 	    _ix    = ix;
 	    _ids   = ids;
 		_names = names;
-		_progressObserver = progressObserver;
     }
 
     @Override

@@ -14,9 +14,8 @@ import android.widget.ProgressBar;
 public class SeriesPagerActivity extends FragmentActivity {
 	private SeriesCollectionPagerAdapter _seriesCollectionPagerAdapter;
     private ViewPager                    _viewPager;
-    private ProgressBar _progressBar;
-    private TaskObserver _progressObserver = null;
-	@Override
+    
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 	
 		super.onCreate(savedInstanceState);
@@ -24,30 +23,6 @@ public class SeriesPagerActivity extends FragmentActivity {
 		setContentView(R.layout.activity_series_pager);
 
 		final Activity act = this;
-		_progressObserver = new TaskObserver() {
-
-			@Override
-			void beginProgress() {
-				act.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						_progressBar.setVisibility(View.VISIBLE);
-					}
-				});
-			}
-
-			@Override
-			void endProgress() {
-				act.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						_progressBar.setVisibility(View.GONE);
-					}
-				});
-			}
-		};
-		
-		_progressBar  = (ProgressBar) this.findViewById(R.id.series_load_progress);
 
 		Bundle b = getIntent().getExtras();
         _seriesCollectionPagerAdapter =
@@ -55,8 +30,7 @@ public class SeriesPagerActivity extends FragmentActivity {
                         getSupportFragmentManager(),
                         b.getInt(SeriesObjectFragment.ARG_IX),
                         b.getIntArray(SeriesObjectFragment.ARG_IDS),
-                        b.getStringArray(SeriesObjectFragment.ARG_NAMES),
-                        _progressObserver);
+                        b.getStringArray(SeriesObjectFragment.ARG_NAMES));
 		
         _viewPager = (ViewPager) findViewById(R.id.series_page_layout);
         _viewPager.setAdapter(_seriesCollectionPagerAdapter);

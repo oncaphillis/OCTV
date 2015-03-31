@@ -44,16 +44,41 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 	
 	private int _maxcol = 1;
 	private TaskObserver _progressObserver = null;  
-
-	public SeriesObjectFragment() {
-	}
-
+	private ProgressBar  _progressBar = null;
+	
 	@Override
     public View onCreateView(LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState) {
 
     	final View rootView   = inflater.inflate(R.layout.series_fragment, container, false);
-        Bundle args = getArguments();
+        
+    	final Activity _activity = getActivity();
+        
+    	Bundle args = getArguments();
+
+        _progressObserver = new TaskObserver() {
+			@Override
+			void beginProgress() {
+				if(_activity != null)
+					_activity.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+					        _progressBar.setVisibility(View.VISIBLE);
+						}
+					});
+			}
+
+			@Override
+			void endProgress() {
+				if(_activity != null)
+					_activity.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+					        _progressBar.setVisibility(View.INVISIBLE);
+						}
+					});
+			}
+        };
 
         final int seriesId   = args.getIntArray(ARG_IDS)[args.getInt(ARG_IX)];
         final String seriesName = args.getStringArray(ARG_NAMES)[args.getInt(ARG_IX)];
@@ -63,11 +88,12 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         	this.getActivity().setTitle(title);
         }
 
+        _progressBar      = ((ProgressBar) rootView.findViewById(R.id.series_fragment_progress));
+
         final WebView  overview_webview    = ((WebView) rootView.findViewById(R.id.series_fragment_overview));
         final TextView tv_header           = ((TextView) rootView.findViewById(R.id.series_header));
         final TextView tv_network     = ((TextView) rootView.findViewById(R.id.series_page_network));
         final TextView tv_genres     = ((TextView) rootView.findViewById(R.id.series_page_genres));
-        final ProgressBar tv_progress      = ((ProgressBar) rootView.findViewById(R.id.series_fragment_progress));
         final String no_overview = getResources().getString(R.string.no_overview_available);
         
         boolean landscape = true;
@@ -113,7 +139,6 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         	tv_network.setText("#"+Integer.toString(seriesId));
         
         overview_webview.loadData("","text/html; charset=utf-8;", "utf-8");
-        tv_progress.setVisibility(View.INVISIBLE);
         
 		final Activity activity = getActivity();
         
@@ -266,6 +291,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 						    				StringEscapeUtils.escapeHtml4(overview) +  
 						        			_postfix, "text/html; charset=utf-8;", "UTF-8");
 							    	_web.reload();
+							    	_web.invalidate();
 							    }
 							};
 							at.execute();
