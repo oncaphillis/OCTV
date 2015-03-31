@@ -114,6 +114,10 @@ public class SetupActivity extends Activity {
 				
 		final Activity  act = this; 
 		final TzCollection tc  = new TzCollection(Tmdb.get().getTimezones());
+		
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+        
 		Locale[] loclist = Locale.getAvailableLocales();
 
 		final CityAdapter ca =new CityAdapter(this,tc);
@@ -135,14 +139,20 @@ public class SetupActivity extends Activity {
 	}
 
 	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    case android.R.id.home:
+	        finish();
+	    	return true;
+	    }
+	    return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		return super.onOptionsItemSelected(item);
-	}
 }
