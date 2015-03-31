@@ -63,7 +63,6 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         	this.getActivity().setTitle(title);
         }
 
-
         final WebView  overview_webview    = ((WebView) rootView.findViewById(R.id.series_fragment_overview));
         final TextView tv_header           = ((TextView) rootView.findViewById(R.id.series_header));
         final TextView tv_network     = ((TextView) rootView.findViewById(R.id.series_page_network));
@@ -195,7 +194,9 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					final TableLayout  seasons_info_table = ((TableLayout) rootView.findViewById(R.id.series_page_seasons_table));
 					SeasonsInfoThread si = new SeasonsInfoThread(activity,seasons_info_table,_maxcol,true,series,null);
 					si.start();
-					_progressObserver.add(si);
+					
+					if(_progressObserver!=null)
+						_progressObserver.add(si);
 				}
 			
 			
@@ -268,7 +269,9 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 							    }
 							};
 							at.execute();
-							_progressObserver.add(at);
+							
+							if(_progressObserver!=null)
+								_progressObserver.add(at);
 				        }
 			        }
 				}	
@@ -375,13 +378,16 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 						}
 					});
 					t.start();
-					_progressObserver.add(t);
+					if(_progressObserver!=null)
+						_progressObserver.add(t);
 				}
 			}
  		
  		});
 		t.start();
-		_progressObserver.add(t);
+		
+		if(_progressObserver!=null)
+			_progressObserver.add(t);
 
 		return rootView;
     }
