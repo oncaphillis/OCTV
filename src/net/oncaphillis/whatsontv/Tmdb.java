@@ -354,6 +354,7 @@ public class Tmdb {
 	};
 	
 	private Tmdb() {
+		
 		final Semaphore mutex = new Semaphore(0);
 		_key = TmdbKey.APIKEY;
 
@@ -364,13 +365,19 @@ public class Tmdb {
 		if(_api == null) {
 			
 			new Thread(new Runnable() {
+				String _e = null;
 				@Override
 				public void run() {
-					_trakt = new TraktV2();
-					_trakt.setApiKey(TmdbKey.TRAKTID);
-					_api = new TmdbApi(_key);
-					_timezones = _api.getTimezones();
-					mutex.release();
+					try {
+						_trakt = new TraktV2();
+						_trakt.setApiKey(TmdbKey.TRAKTID);
+						_api = new TmdbApi(_key);
+						_timezones = _api.getTimezones();
+					} catch(Exception ex) {
+						_e = ex.getMessage();
+					} finally {
+						mutex.release();
+					}
 				}
 			}).start();
 
