@@ -44,8 +44,8 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 	
 	private int _maxcol = 1;
 	private TaskObserver _progressObserver = null;  
-	public SeriesObjectFragment(TaskObserver progressObserver) {
-		_progressObserver = progressObserver;
+
+	public SeriesObjectFragment() {
 	}
 
 	@Override
@@ -184,7 +184,9 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 						}
 					});
 					t.start();
-					_progressObserver.add(t);
+					
+					if(_progressObserver!=null)
+						_progressObserver.add(t);
 				}
 			
 				if(activity!=null){

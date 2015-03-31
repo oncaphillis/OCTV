@@ -20,7 +20,7 @@ public class SeriesCollectionPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int i) {
-        Fragment fragment = new SeriesObjectFragment(_progressObserver);
+        Fragment fragment = new SeriesObjectFragment();
         Bundle args       = new Bundle();
         args.putInt(SeriesObjectFragment.ARG_IX, i);
         args.putIntArray("ids", _ids);

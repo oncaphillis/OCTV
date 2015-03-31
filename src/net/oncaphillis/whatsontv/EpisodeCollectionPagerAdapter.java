@@ -63,7 +63,7 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 	
 	@Override
 	public Fragment getItem(int n) {
-		Fragment fragment = new EpisodeObjectFragment(_threadObserver);
+		Fragment fragment = new EpisodeObjectFragment();
         Bundle args       = new Bundle();
         synchronized( this ) {
         	if( _seasonList != null ) {

@@ -32,8 +32,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
     private static final String _postfix = "</body></html>";
 
 	
-	public EpisodeObjectFragment(TaskObserver to) {
-		_threadObserver = to;
+	public EpisodeObjectFragment() {
 	}
 
 
@@ -163,7 +162,9 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
         });
 		
 		t.start();
-		_threadObserver.add(t);
+		
+		if(_threadObserver!=null)
+			_threadObserver.add(t);
 		
 		
         return _rootView;
