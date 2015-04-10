@@ -3,7 +3,11 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
-    
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -19,17 +23,37 @@
                 android:max="10000"
                 android:visibility="invisible" />
 
-        <GridView
-            android:id="@+id/main_list"
-            style="@style/AppBaseTheme"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:focusable="false"
-            android:numColumns="3" >
+            <GridView
+                android:id="@+id/main_list"
+                style="@style/AppBaseTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:focusable="false"
+                android:numColumns="3" >
+            </GridView>
+        </LinearLayout>
 
-        </GridView>
+        <LinearLayout
+            android:id="@+id/nothing_found_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/nothing_found"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/oncaphillis_orange"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
     
 </RelativeLayout>
