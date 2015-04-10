@@ -132,10 +132,18 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 								if(_overview == null || _overview == "")
 									_overview = no_overview;
 								
-								tv_header.setText(episode.getTmdb().getName());
+								if(episode.getTmdb().getName() == null || episode.getTmdb().getName().equals(""))  {
+									tv_header.setTextColor(act.getResources().getColor(R.color.oncaphillis_light_grey));
+									tv_header.setText(act.getResources().getString(R.string.no_title_available));
+								} else {
+									tv_header.setTextColor(act.getResources().getColor(R.color.oncaphillis_white));
+									tv_header.setText(episode.getTmdb().getName());
+								}
+								
 								overview_webview.loadData(_prefix+
 							    				StringEscapeUtils.escapeHtml4(_overview) +  
 							        			_postfix, "text/html; charset=utf-8;", "UTF-8");
+	
 								tv_rating.setText(_voteCount==0 ? "-/-" : String.format("%.1f/10", _voteAverage));
 								tv_rating_count.setText(String.format("%d", _voteCount));
 								if(fragment.getActivity()!=null)  {
