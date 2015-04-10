@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 public class SearchActivity extends Activity {
@@ -37,6 +38,7 @@ public class SearchActivity extends Activity {
 	private ProgressBar _progressBar = null;
 
 	private TaskObserver _progressObserver = null;
+	private LinearLayout _nothingFoundLayout = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,10 @@ public class SearchActivity extends Activity {
 	    
 		_gridView    = (GridView)    findViewById(R.id.search_table);
 		_progressBar = ( ProgressBar ) findViewById( R.id.search_progress);
+		
+		_nothingFoundLayout = (LinearLayout) findViewById( R.id.no_search_found_layout);
+		_nothingFoundLayout.setVisibility(View.GONE);
+		
 		_progressBar.setIndeterminate(true);
 		
 		_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image); 
@@ -58,12 +64,10 @@ public class SearchActivity extends Activity {
 			void beginProgress() {
 				if(_progressBar!=null)
 					act.runOnUiThread(new Runnable() {
-
 						@Override
 						public void run() {
 							_progressBar.setVisibility(View.VISIBLE);
 						}
-						
 					});
 			}
 
@@ -74,6 +78,10 @@ public class SearchActivity extends Activity {
 
 						@Override
 						public void run() {
+							
+							if(_searchThread.getCount()==0)
+								_nothingFoundLayout.setVisibility(View.VISIBLE);
+							
 							_progressBar.setVisibility(View.GONE);
 												}
 					});

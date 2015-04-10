@@ -152,6 +152,20 @@ public class SearchThread extends Thread {
 			}
 		}
 	}
+	
+	// Return the current count if results
+	public int getCount() {
+		synchronized(this) {
+			return _count;
+		}
+	}
+	
+	// Get the total amount to expect. -1 if not (yet) known
+	public int getTotal() {
+		synchronized(this) {
+			return _total;
+		}
+	}
 
 	/** Holds the read Thread by acquireing the 
 	 * associated semaphore.
@@ -163,10 +177,6 @@ public class SearchThread extends Thread {
 		} catch (Exception ex) {
 		}
 	}
-	
-	/** 
-	 * 
-	 */
 	
 	public void release() {
 		_lock.release();
