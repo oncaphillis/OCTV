@@ -25,7 +25,8 @@
 	
 	<string name="no_network_available">No Network available</string>
     <string name="no_overview_available">No Overview available</string>
-	
+	<string name="nothing_found">Nothing found</string>
+    	
     <string name="on_the_air">Currently Airing</string>
 	
     <string name="popular">Popular</string>
