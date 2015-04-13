@@ -41,10 +41,10 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:orientation="vertical"
-            android:visibility="gone" >
+            android:visibility="visible" >
 
             <TextView
-                android:id="@+id/textView1"
+                android:id="@+id/no_list_found_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/nothing_found"
@@ -52,6 +52,13 @@
                 android:textColor="@color/oncaphillis_orange"
                 android:textSize="32sp"
                 android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/no_list_found_refresh"
+                android:layout_width="match_parent"
+                android:layout_height="116dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_refresh" />
 
         </LinearLayout>
 
