@@ -160,6 +160,11 @@ public class SearchThread extends Thread {
 		}
 	}
 	
+	public int getCount(int list) {
+		synchronized(this) {
+			return list>=0 && list<_listAdapters.length ? _listAdapters[list].getCount() : -1;
+		}
+	}
 	// Get the total amount to expect. -1 if not (yet) known
 	public int getTotal() {
 		synchronized(this) {
