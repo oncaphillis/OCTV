@@ -354,15 +354,16 @@ public class Tmdb {
 	};
 	
 	private Tmdb() {
-		
-		final Semaphore mutex = new Semaphore(0);
-		_key = TmdbKey.APIKEY;
-
 		_trakt_reader.start();
-		
-		// This may trigger net access. Therefor we place it
-		// into its own thread. 
-		if(_api == null) {
+	}
+
+	private TmdbApi getApi() {
+		if(_api == null || _api.getConfiguration() == null) {
+			
+			final Semaphore mutex = new Semaphore(0);
+
+			// This may trigger net access. Therefor we place it
+			// into its own thread. 
 			
 			new Thread(new Runnable() {
 				String _e = null;
@@ -371,7 +372,7 @@ public class Tmdb {
 					try {
 						_trakt = new TraktV2();
 						_trakt.setApiKey(TmdbKey.TRAKTID);
-						_api = new TmdbApi(_key);
+						_api = new TmdbApi(TmdbKey.APIKEY);
 						_timezones = _api.getTimezones();
 					} catch(Exception ex) {
 						_e = ex.getMessage();
@@ -387,6 +388,7 @@ public class Tmdb {
 				e.printStackTrace();
 			}
 		}
+		return _api;
 	}
 	
 	public Bitmap loadPoster(int size,String path,Activity act,ProgressBar pb) {
@@ -468,7 +470,7 @@ public class Tmdb {
 	static TmdbApi api() {
 		if(get()==null)
 			return null;
-		return get()._api;
+		return get().getApi();
 	}
 	
 	public TraktReaderThread trakt_reader() {
