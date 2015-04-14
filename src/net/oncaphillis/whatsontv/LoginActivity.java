@@ -12,12 +12,14 @@ import info.movito.themoviedbapi.model.config.Account;
 import info.movito.themoviedbapi.model.config.Timezone;
 import info.movito.themoviedbapi.model.config.TokenSession;
 import info.movito.themoviedbapi.model.core.SessionToken;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -48,6 +50,9 @@ public class LoginActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 
+		ActionBar actionBar = getActionBar();
+	    actionBar.setDisplayHomeAsUpEnabled(true);
+	    
 		_userName = (EditText) findViewById(R.id.user_input);
 		_password = (EditText) findViewById(R.id.password_input);
 		_loginProgress = (ProgressBar) findViewById(R.id.login_progress);
@@ -107,4 +112,15 @@ public class LoginActivity extends Activity {
 			}
 		});
 	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    case android.R.id.home:
+	        finish();
+	    	return true;
+	    }
+	    return super.onOptionsItemSelected(item);
+	}
+
 }
