@@ -34,11 +34,13 @@
     <string name="popular">Popular</string>
 		
     <string name="retry">Retry</string>
+    <string name="refresh">refresh</string>
     <string name="run_button_text">running</string>
     	
 	<string name="seasons_count">%d Seasons</string>
+    <string name="search">search</string>
     <string name="search_hint">Search&#8230;</string>
-    
+	
     <string name="title_activity_about">About OCTV&#8230;</string>
     <string name="title_activity_episode_pager">Episodes</string> 
     <string name="title_activity_error">Error</string>
