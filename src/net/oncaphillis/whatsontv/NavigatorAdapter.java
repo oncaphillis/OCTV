@@ -3,6 +3,7 @@ package net.oncaphillis.whatsontv;
 import java.util.ArrayList;
 
 import info.movito.themoviedbapi.model.tv.TvSeries;
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,18 +17,20 @@ import android.widget.TextView;
 
 public class NavigatorAdapter extends BaseExpandableListAdapter {
 	
-	private ArrayList<String>_Array;
+	// private ArrayList<String>_Array;
 	
-	static final int LOGIN = 0;
-	static final int LISTS = 1;
-	static final int SETUP = 2;
-	static final int ABOUT = 3;
+	private Activity _Activity = null;
+
+	static final int LOGIN   = 0;
+	static final int REFRESH = 1;
+	static final int LISTS   = 2;
+	static final int SETUP   = 3;
+	static final int ABOUT   = 4;
 	
-	private String[] _Groups = new String[] {
-			"Login","Lists","Setup","About"
-	};
+	private String[] _Groups = null;
 	
 	private String[][] _Children = new String[][] {
+			{},
 			{},
 			{"Today","On Air","Hi Vote","Popular"},
 			{},
@@ -36,8 +39,9 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 	
 	private int[] _GroupImageId = new int[] {
 			R.drawable.ic_action_person,
+			R.drawable.refresh,
 			R.drawable.ic_action_view_as_list,
-			R.drawable.ic_action_view_as_list,
+			R.drawable.preferences,
 			R.drawable.ic_action_about
 	};
 	
@@ -47,44 +51,51 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 		_Context = c;
 	}
 
+	private String[] getGroups() {
+		if(_Groups == null) {
+			_Groups = new String[] {
+				_Context.getResources().getString(R.string.login),
+				_Context.getResources().getString(R.string.refresh),
+				_Context.getResources().getString(R.string.lists),
+				_Context.getResources().getString(R.string.setup),
+				_Context.getResources().getString(R.string.about)
+			};
+		}
+		return _Groups;
+	}
+	
 	@Override
 	public int getGroupCount() {
-		return _Groups.length;
+		return getGroups().length;
 	}
 
 	@Override
 	public int getChildrenCount(int idx) {
-		// TODO Auto-generated method stub
 		return _Children[idx].length;
 	}
 
 	@Override
 	public Object getGroup(int groupPosition) {
-		// TODO Auto-generated method stub
 		return _Groups[groupPosition];
 	}
 
 	@Override
 	public Object getChild(int idxp, int idxc) {
-		// TODO Auto-generated method stub
 		return _Children[idxp][idxc];
 	}
 
 	@Override
 	public long getGroupId(int groupPosition) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public long getChildId(int groupPosition, int childPosition) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public boolean hasStableIds() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -153,7 +164,6 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public boolean isChildSelectable(int groupPosition, int childPosition) {
-		// TODO Auto-generated method stub
 		return true;
 	}
 }
