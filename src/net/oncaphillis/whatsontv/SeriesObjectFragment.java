@@ -105,7 +105,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
         else
         	_maxcol/=2;
         
-        int first_aired = landscape ? R.id.series_page_first_aired : R.id.series_page_first_aired_portrait;
+        int first_aired = landscape ? R.id.series_page_first_aired : R.id.series_page_first_aired;
         int last_aired = landscape ? R.id.series_page_last_aired : R.id.series_page_last_aired_portrait;
         int nearest_title = landscape ? R.id.series_page_nearest_title : R.id.series_page_nearest_title_portrait;
         int nearest_still = landscape ? R.id.series_page_nearest_still : R.id.series_page_nearest_still_portrait;

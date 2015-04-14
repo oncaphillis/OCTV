@@ -49,6 +49,33 @@
                         android:layout_weight="1"
                         android:textColor="@color/oncaphillis_orange"
                         android:textStyle="bold" />
+
+                    <TableLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" >
+
+                        <TableRow
+                            android:id="@+id/tableRow1_portrait"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
+
+                            <TextView
+                                android:id="@+id/series_page_first_tag"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="4dp"
+                                android:layout_marginRight="4dp"
+                                android:text="@string/first" />
+
+                            <TextView
+                                android:id="@+id/series_page_first_aired"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceMedium" />
+                        </TableRow>
+
+                    </TableLayout>
  
                    <WebView
                     android:id="@+id/series_fragment_overview"
@@ -153,26 +180,6 @@
                             <TableLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content" >
-
-                                <TableRow
-                                    android:id="@+id/tableRow1"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content" >
-
-                                    <TextView
-                                        android:id="@+id/series_page_first_tag_portrait"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginLeft="4dp"
-                                        android:layout_marginRight="4dp"
-                                        android:text="@string/first" />
-
-                                    <TextView
-                                        android:id="@+id/series_page_first_aired_portrait"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:textAppearance="?android:attr/textAppearanceMedium" />
-                                </TableRow>
 
                                 <TableRow
                                     android:id="@+id/tableRow2"
@@ -285,26 +292,6 @@
                             <TableLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content" >
-
-                                <TableRow
-                                    android:id="@+id/tableRow1_portrait"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content" >
-
-                                    <TextView
-                                        android:id="@+id/series_page_first_tag"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginLeft="4dp"
-                                        android:layout_marginRight="4dp"
-                                        android:text="@string/first" />
-
-                                    <TextView
-                                        android:id="@+id/series_page_first_aired"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:textAppearance="?android:attr/textAppearanceMedium" />
-                                </TableRow>
 
                                 <TableRow
                                     android:id="@+id/tableRow2_portrait"
