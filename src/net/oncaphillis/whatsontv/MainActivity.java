@@ -127,6 +127,13 @@ public class MainActivity extends FragmentActivity {
 		public int getTotal() {
 			return _totalCount;
 		}
+		
+		public void reset() {
+			synchronized(_storage) {
+				_storage.clear();
+				_totalCount = -1;
+			}
+		}
 	}
 
 	/** main activity after startup
@@ -195,40 +202,7 @@ public class MainActivity extends FragmentActivity {
 	        	}
 	        }
 
-
-        	SearchThread = new SearchThread(this,Environment.ListAdapters,ThePager,null,null);
-		    final FragmentActivity a = this; 
-
-		    Thread.UncaughtExceptionHandler searchThreadExceptionHandler = new Thread.UncaughtExceptionHandler() {
-	            public void uncaughtException(Thread th, Throwable ex) {
-            		final Throwable _ex = ex;
-	            	
-	            	a.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-			            	Bundle b        = new Bundle();
-			            	
-			            	if(_ex.getMessage()!=null)
-			            		b.putString("txt1", _ex.getMessage());
-			            	else
-			            		b.putString("txr1", " ? ? ? ");
-			            	
-			            	if(_ex.getCause()!=null && _ex.getCause().getMessage()!=null)
-			            		b.putString("txt2", _ex.getCause().getMessage());
-			            	else
-			            		b.putString("txt2", "...");
-			            		
-			    			Intent myIntent = new Intent(a, ErrorActivity.class);
-			    			myIntent.putExtras(b);
-			    			a.startActivity(myIntent);
-			    			finish();
-						}
-	            	});
-	            }
-	        };
-
-	        SearchThread.setUncaughtExceptionHandler(searchThreadExceptionHandler);
-	        SearchThread.start();
+	        refresh();
 	        
 		} catch(Exception ex) {
 			Intent myIntent = new Intent(this, ErrorActivity.class);
@@ -250,6 +224,51 @@ public class MainActivity extends FragmentActivity {
 		super.onAttachFragment(fragment);
 	}
 	  
+	private void refresh() {
+
+		for(ArrayAdapter<TvSeries> a : Environment.ListAdapters) {
+			a.clear();
+			a.notifyDataSetChanged();
+		}
+
+		for(Pager p : this.ThePager) {
+			p.reset();
+		}
+
+		SearchThread = new SearchThread(this,Environment.ListAdapters,ThePager,null,null);
+	    final FragmentActivity a = this; 
+
+	    Thread.UncaughtExceptionHandler searchThreadExceptionHandler = new Thread.UncaughtExceptionHandler() {
+            public void uncaughtException(Thread th, Throwable ex) {
+        		final Throwable _ex = ex;
+            	
+            	a.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+		            	Bundle b        = new Bundle();
+		            	
+		            	if(_ex.getMessage()!=null)
+		            		b.putString("txt1", _ex.getMessage());
+		            	else
+		            		b.putString("txr1", " ? ? ? ");
+		            	
+		            	if(_ex.getCause()!=null && _ex.getCause().getMessage()!=null)
+		            		b.putString("txt2", _ex.getCause().getMessage());
+		            	else
+		            		b.putString("txt2", "...");
+		            		
+		    			Intent myIntent = new Intent(a, ErrorActivity.class);
+		    			myIntent.putExtras(b);
+		    			a.startActivity(myIntent);
+		    			finish();
+					}
+            	});
+            }
+        };
+        SearchThread.setUncaughtExceptionHandler(searchThreadExceptionHandler);
+        SearchThread.start();
+	}
+	
 	private void initNavbar() {
         _DrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         _DrawerList  = (ExpandableListView) findViewById(R.id.left_drawer);
@@ -276,6 +295,11 @@ public class MainActivity extends FragmentActivity {
 			        _DrawerLayout.closeDrawers();
 					startActivity(myIntent);
 					return true;
+				} else if(groupPosition==NavigatorAdapter.REFRESH) {
+			        _DrawerLayout.closeDrawers();
+			        activity.refresh();
+			        SearchThread.release();
+			        return true;
 				} else if(groupPosition==NavigatorAdapter.LOGIN) {
 					Intent myIntent = new Intent( activity, LoginActivity.class);
 					Bundle b        = new Bundle();

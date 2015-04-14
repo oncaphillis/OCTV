@@ -16,4 +16,5 @@ public abstract class Pager {
 	abstract void start();
 	abstract void end();
 	abstract int getTotal();  
+	abstract void reset();
 }

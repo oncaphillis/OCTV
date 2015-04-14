@@ -187,6 +187,10 @@ public class SearchActivity extends Activity {
 			int getTotal() {
 				return _Total;
 			}			
+			
+			void reset() {
+				
+			}
 		},null,null);
 		
 		_searchThread.start();
