@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
@@ -84,6 +85,9 @@ public class MainFragment extends Fragment {
 				
 				final MainActivity act = (MainActivity)_activity;
 				final MainFragment f = this;
+				final LinearLayout ll = (LinearLayout)_theView.findViewById(R.id.no_list_found_layout);
+				
+				ll.setVisibility(View.GONE);
 				
 				new Thread(new Runnable() {
 					
@@ -97,6 +101,8 @@ public class MainFragment extends Fragment {
 									synchronized(act) {
 										if( f.getIdx() < ci.list) {
 											f.setProgressBarVisibility(false);							
+											if(act.SearchThread.getCount(f.getIdx()) == 0)
+												ll.setVisibility(View.VISIBLE);
 										} else if(f.getIdx()==ci.list && ci.count>0) {
 											f.setProgressBarVisibility(true);
 											f.setProgressBarIndeterminate(false);
@@ -118,6 +124,8 @@ public class MainFragment extends Fragment {
 						act.runOnUiThread(new Runnable(){
 							@Override
 							public void run() {
+								if(act.SearchThread.getCount(f.getIdx()) == 0)
+									ll.setVisibility(View.VISIBLE);
 								f.setProgressBarIndeterminate(false);
 								f.setProgressBarVisibility(false);
 							}
