@@ -68,7 +68,8 @@ public class CastInfoThread extends Thread {
 				        tr.addView(header);
 				        
 				        TableRow.LayoutParams params = (TableRow.LayoutParams)header.getLayoutParams();
-				        params.span = _maxcol;
+				        params.span   = _maxcol;
+				        params.width  = TableRow.LayoutParams.MATCH_PARENT;
 				        header.setLayoutParams(params);
 				        
 				        if(_titles != null && person_group < _titles.length) {
@@ -77,7 +78,7 @@ public class CastInfoThread extends Thread {
 				        } else {
 				        	txt.setText(Integer.toString(_credits[person_group].size()));
 				        }
-				        	_table.addView(tr);
+				        _table.addView(tr);
 				        
 				        List<InfoNode> trl = new ArrayList<InfoNode>();
 				        
@@ -109,8 +110,16 @@ public class CastInfoThread extends Thread {
 								rr = null;
 							} 
 							
-							View v = (View)vi.inflate(R.layout.series_info_grid_entry,null);
-				        	
+							LinearLayout v = (LinearLayout)vi.inflate(R.layout.series_info_grid_entry,null);
+							
+							{
+								TableRow.LayoutParams p1= (TableRow.LayoutParams)header.getLayoutParams();
+								p1.weight  = 1.0f;
+								p1.width   = TableRow.LayoutParams.MATCH_PARENT;
+								p1.span    = 1;
+								tr.setLayoutParams(p1);
+							}
+							
 					        TextView       tt0 = (TextView)     v.findViewById(R.id.creator_name);
 					        TextView       tt1 = (TextView)     v.findViewById(R.id.person_role);
 						    ImageView       ii = (ImageView)    v.findViewById(R.id.creator_image);
@@ -123,6 +132,8 @@ public class CastInfoThread extends Thread {
 						    
 						    trl.get(trl.size()-1).img.add(ii);
 						    trl.get(trl.size()-1).pb.add(pb);
+						    
+						    tt1.setText("AAAAAAA AAAA AAAAA AAAAAA AAAA AAA AAA A AA AAAAA AAAAAAAA AAAAAA AAAA AAAAAA AAAA AAAA AA AAAA");
 						    
 						    tr.addView(v);
 						    cc++;
