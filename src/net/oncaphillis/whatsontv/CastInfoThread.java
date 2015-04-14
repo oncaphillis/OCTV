@@ -132,9 +132,6 @@ public class CastInfoThread extends Thread {
 						    
 						    trl.get(trl.size()-1).img.add(ii);
 						    trl.get(trl.size()-1).pb.add(pb);
-						    
-						    tt1.setText("AAAAAAA AAAA AAAAA AAAAAA AAAA AAA AAA A AA AAAAA AAAAAAAA AAAAAA AAAA AAAAAA AAAA AAAA AA AAAA");
-						    
 						    tr.addView(v);
 						    cc++;
 						}
