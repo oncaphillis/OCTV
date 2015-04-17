@@ -202,7 +202,7 @@ public class MainActivity extends FragmentActivity {
 	        	}
 	        }
 
-	        refresh();
+	        refresh(false);
 	        
 		} catch(Exception ex) {
 			Intent myIntent = new Intent(this, ErrorActivity.class);
@@ -224,17 +224,19 @@ public class MainActivity extends FragmentActivity {
 		super.onAttachFragment(fragment);
 	}
 	  
-	private void refresh() {
+	private void refresh(boolean clearCash) {
 
-		for(ArrayAdapter<TvSeries> a : Environment.ListAdapters) {
-			a.clear();
-			a.notifyDataSetChanged();
+		if(clearCash) {
+			for(ArrayAdapter<TvSeries> a : Environment.ListAdapters) {
+				a.clear();
+				a.notifyDataSetChanged();
+			}
+	
+			for(Pager p : ThePager) {
+				p.reset();
+			}
 		}
-
-		for(Pager p : this.ThePager) {
-			p.reset();
-		}
-
+		
 		SearchThread = new SearchThread(this,Environment.ListAdapters,ThePager,null,null);
 	    final FragmentActivity a = this; 
 
@@ -297,7 +299,7 @@ public class MainActivity extends FragmentActivity {
 					return true;
 				} else if(groupPosition==NavigatorAdapter.REFRESH) {
 			        _DrawerLayout.closeDrawers();
-			        activity.refresh();
+			        activity.refresh(true);
 			        SearchThread.release();
 			        return true;
 				} else if(groupPosition==NavigatorAdapter.LOGIN) {
