@@ -19,7 +19,7 @@ public class NetWatchdog extends Thread {
 			
 			final Activity act =Environment.getCurrentActivity();
 			
-			if(act!=null && !isOnline(act)) {
+			if(act!=null && !(act instanceof NonetActivity) && !isOnline(act)) {
 				act.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {

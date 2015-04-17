@@ -45,7 +45,7 @@ public class MainActivity extends FragmentActivity {
 	private MainPagerAdapter _mainPagerAdapter = null;
 	
 	static private Pager[] ThePager = null;
-	
+	static private NetWatchdog _watchDog = null;
 	static private Bitmap _defBitmap = null;
 
 	public  SearchThread SearchThread = null;
@@ -143,8 +143,10 @@ public class MainActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		new NetWatchdog().start();
-
+		if(_watchDog == null || _watchDog.getState() == Thread.State.TERMINATED) {
+			(_watchDog = new NetWatchdog()).start();
+		}
+		
 		try {			
 					
 			Environment.init(this);

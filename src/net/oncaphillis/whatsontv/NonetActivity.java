@@ -18,6 +18,50 @@ public class NonetActivity extends Activity {
 			public void onClick(View v) {
 				finish();
 			}
-		});;
+		});
+		final Activity act = this;
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while(!NetWatchdog.isOnline()) {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+					}
+				}
+				act.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						act.finish();
+					}
+				});
+			}
+		});
+		t.start();
+	}
+		
+	@Override
+	protected void	onResume() {
+		super.onResume();
+	    Environment.setCurrentActivity(this);
+	}
+	
+	@Override
+	protected void	onPause() {
+		clearReferences();
+		super.onPause();
+	}
+
+	@Override
+	protected void onDestroy() {
+		clearReferences();
+		super.onDestroy();
+	}
+	
+	private void clearReferences(){
+      Activity currActivity = Environment.getCurrentActivity();
+      if (currActivity!=null && currActivity.equals(this))
+            Environment.setCurrentActivity(null);
 	}
 }
