@@ -347,10 +347,10 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 											}
 
 											if(!today.before(nearest)) {
-							        			tv_last_aired.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_white));
+							        			tv_last_aired.setTextColor(activity.getResources().getColor(R.color.oncaphillis_white));
 							        			tv_next_last_tag.setText(lastText);
 							        		} else {
-												tv_last_aired.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_orange));
+												tv_last_aired.setTextColor(activity.getResources().getColor(R.color.oncaphillis_orange));
 							        			tv_next_last_tag.setText(nextText);
 		
 							        			if(!series_info.hasClock()) {
@@ -390,13 +390,13 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 										if(nearest_episode != null && (c = nearest_episode.getCredits())!=null) {
 											
 											
-											String s[] = getActivity().getResources().getStringArray(R.array.cast_titles);
+											String s[] = activity.getResources().getStringArray(R.array.cast_titles);
 											
 											String a[] = new String[] {s[Environment.CREW],s[Environment.GUEST]};
 
 											List<? extends Person>[]  cc = new List[] {c.getCrew(),c.getGuestStars()};	
 											
-											new CastInfoThread(getActivity(),episode_info_table,_maxcol,cc,a).start();
+											new CastInfoThread(activity,episode_info_table,_maxcol,cc,a).start();
 										}
 									}
 								});
