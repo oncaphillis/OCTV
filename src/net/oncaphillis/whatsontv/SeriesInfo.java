@@ -53,8 +53,8 @@ public class SeriesInfo {
 			return null;
 		return new SeriesInfo(s);
 	}
-	private SeriesInfo(TvSeries s) {
-		_tvs = Tmdb.get().loadSeries(s.getId());
+	private SeriesInfo(TvSeries tvs) {
+		_tvs = Tmdb.get().loadSeries(tvs.getId());
 
 		if(_tvs.getNetworks()!=null) {
 			for(Network nw : _tvs.getNetworks() )  {
@@ -62,17 +62,17 @@ public class SeriesInfo {
 			}
 		}
 
-		if(s.getFirstAirDate()!=null) {
+		if(tvs.getFirstAirDate()!=null) {
 			try {
-				_firstAiring = Environment.TmdbDateFormater.parse(s.getFirstAirDate());
+				_firstAiring = Environment.TmdbDateFormater.parse(tvs.getFirstAirDate());
 			} catch (ParseException e1) {
 			}
 		}
 		
-		if(s.getLastAirDate()!=null) {
+		if(tvs.getLastAirDate()!=null) {
 			
 			try {
-				_nearestAiring = Environment.TmdbDateFormater.parse( s.getLastAirDate());
+				_nearestAiring = Environment.TmdbDateFormater.parse( tvs.getLastAirDate());
 			} catch (ParseException e) {
 			}
 
@@ -86,8 +86,8 @@ public class SeriesInfo {
 
 	        if( ! td.after( _nearestAiring )  ) {
 	        	
-	        	if(s.getSeasons()!=null) {
-	        		ListIterator<TvSeason> season_iterator = s.getSeasons().listIterator(s.getSeasons().size());
+	        	if(tvs.getSeasons()!=null) {
+	        		ListIterator<TvSeason> season_iterator = tvs.getSeasons().listIterator(tvs.getSeasons().size());
 	        		TvEpisode episode = null;
 	        		TvSeason season = null;
 
@@ -96,7 +96,7 @@ public class SeriesInfo {
 	        		
 	        		while( ! found && season_iterator.hasPrevious() && (episode==null || td.before(getAirDate(episode))) ) {
 	        			season = season_iterator.previous();
-	        			season = Tmdb.get().loadSeason(s.getId(), season.getSeasonNumber());
+	        			season = Tmdb.get().loadSeason(tvs.getId(), season.getSeasonNumber());
 
 	        			if(season.getEpisodes()!=null) {
 
@@ -108,7 +108,7 @@ public class SeriesInfo {
 		        		        
 		        				if(episode.getAirDate()!=null && le!=null && getAirDate(episode).before(td) ) {
 			        				
-		        					EpisodeInfo ei = Tmdb.get().loadEpisode(s.getId(), ls.getSeasonNumber(), le.getEpisodeNumber());
+		        					EpisodeInfo ei = Tmdb.get().loadEpisode(tvs.getId(), ls.getSeasonNumber(), le.getEpisodeNumber());
 			        				
 			        				if(ei!=null && ei.getAirTime() != null) {
 			        					_nearestAiring = ei.getAirTime();
@@ -130,7 +130,7 @@ public class SeriesInfo {
 		        	}
 	        		
 	        		if(!found && season!=null && episode!=null && episode.getAirDate()!=null) {
-    					EpisodeInfo ei = Tmdb.get().loadEpisode(s.getId(), season.getSeasonNumber(), episode.getEpisodeNumber());
+    					EpisodeInfo ei = Tmdb.get().loadEpisode(tvs.getId(), season.getSeasonNumber(), episode.getEpisodeNumber());
         				
         				if(ei.getAirTime() != null) {
         					_nearestAiring = ei.getAirTime();
@@ -144,15 +144,15 @@ public class SeriesInfo {
         			}
 	        	}
 	        } else {
-	        	s = Tmdb.get().loadSeries(s.getId());
-	        	if(s.getSeasons()!=null && s.getSeasons().size()>0) {
+	        	tvs = Tmdb.get().loadSeries(tvs.getId());
+	        	if(tvs.getSeasons()!=null && tvs.getSeasons().size()>0) {
 	        		
 	        		
 	        		TvSeason ts = null;
 	        		int n = 1;
 	        		
-	        		while( s.getSeasons().size()-n >= 0 ) {
-	        			ts = Tmdb.get().loadSeason(s.getId(),s.getSeasons().get(s.getSeasons().size()-n).getSeasonNumber());
+	        		while( tvs.getSeasons().size()-n >= 0 ) {
+	        			ts = Tmdb.get().loadSeason(tvs.getId(),tvs.getSeasons().get(tvs.getSeasons().size()-n).getSeasonNumber());
 	        			if(ts!=null && ts.getEpisodes().size()>0)
 	        				break;
 	        			n++;
@@ -163,7 +163,10 @@ public class SeriesInfo {
         				_nearestEpisodeSeason = ts.getSeasonNumber();
         				_nearestEpisodeNumber = eps.getEpisodeNumber();
 	        			_nearestEpisodeTitle = eps.getName();
-	        			_nearestAiring = Tmdb.getAirDate(eps);
+	        			Date na = Tmdb.getAirDate(eps);
+	        			if(na != null) {
+	        				_nearestAiring = na;
+	        			}
 	        		}
 	        	}
 	        }
