@@ -10,7 +10,9 @@ import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -75,6 +77,35 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 						overview_webview.loadData(_prefix+
 			    				StringEscapeUtils.escapeHtml4(overview) +  
 			        			_postfix, "text/html; charset=utf-8;", "UTF-8");
+						
+						
+			        	// Then initialize lazy load of Bitmap + text
+						{
+							AsyncTask<String,Void,Bitmap> at = new AsyncTask<String,Void,Bitmap>() {
+								final String path = tvs.getPosterPath();
+								final WebView web = overview_webview;
+								
+								@Override
+								protected Bitmap doInBackground(String...p) {
+									Bitmap bm = Tmdb.get().loadPoster(1,path);
+									return bm;
+								}
+
+							    @Override
+							    // Once the image is downloaded, associates it to the imageView
+							    protected void onPostExecute(Bitmap bm) {
+							    	web.loadData(_prefix+getBitmapHtml(bm)+
+						    				StringEscapeUtils.escapeHtml4(overview) +  
+						        			_postfix, "text/html; charset=utf-8;", "UTF-8");
+							    	web.reload();
+							    	web.invalidate();
+							    }
+							};
+							at.execute();
+							
+							if(_threadObserver!=null)
+								_threadObserver.add(at);
+				        }
 					}
 				});
 			}
