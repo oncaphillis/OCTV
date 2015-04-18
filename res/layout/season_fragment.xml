@@ -101,7 +101,7 @@
                                                 android:text="@string/first" />
 
                                             <TextView
-                                                android:id="@+id/season_fragment_last_aired"
+                                                android:id="@+id/season_fragment_first_aired"
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
                                                 android:textAppearance="?android:attr/textAppearanceMedium" />

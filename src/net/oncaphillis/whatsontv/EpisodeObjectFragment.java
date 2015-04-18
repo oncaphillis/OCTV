@@ -1,5 +1,6 @@
 package net.oncaphillis.whatsontv;
 
+import info.movito.themoviedbapi.model.tv.TvSeason;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.util.Date;
@@ -27,25 +28,64 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 			   " <body style='background-color: #000000; color: #ffffff'>";
 
     private static final String _postfix = "</body></html>";
-	
+    
+    private String _no_overview = null;
+    
 	public EpisodeObjectFragment() {
 	}
 
 	@Override
     public View onCreateView(LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState) {
-
+		
+		if(_no_overview == null)
+			_no_overview  = container.getResources().getString(R.string.no_overview_available);
+		
 		Bundle args = getArguments();
 		
 		int series  = args.getInt("series");
 		int season  = args.getInt("season");
 		int episode = args.getInt("episode");
+		
 		return episode != 0 ? createEpisodeView(inflater,container,series,season,episode) : 
 			createSeasonView(inflater,container,series,season);
 	}
 	
 	private View createSeasonView(LayoutInflater inflater, ViewGroup container, final int series,final int season) {
 		View theView    = inflater.inflate(R.layout.season_fragment, container, false);
+
+		final Fragment fragment = this;
+		
+		final WebView  overview_webview    = ((WebView)   theView.findViewById(R.id.season_fragment_overview));
+		final TextView first_txt = (TextView)theView.findViewById(R.id.season_fragment_first_aired);
+		
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				final TvSeason tvs = Tmdb.get().loadSeason(series, season);
+				final Date d = Tmdb.getAirDate(tvs);
+				fragment.getActivity().runOnUiThread(new Runnable() {
+					String overview = tvs.getOverview();
+					public void run() {
+						first_txt.setText(Environment.TmdbDateFormater.format(d));
+						
+						if(overview == null || overview.equals(""))
+							overview = _no_overview;
+						
+						overview_webview.loadData(_prefix+
+			    				StringEscapeUtils.escapeHtml4(overview) +  
+			        			_postfix, "text/html; charset=utf-8;", "UTF-8");
+					}
+				});
+			}
+			
+		});
+		
+		t.start();
+		
+		if(_threadObserver!=null)
+			_threadObserver.add(t);
+		
 		return theView;
 	}
 	
@@ -62,7 +102,6 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
         final TextView tv_date_tag         = ((TextView) theView.findViewById(R.id.episode_fragment_nearest_tag));
         final TextView tv_date             = ((TextView) theView.findViewById(R.id.episode_fragment_last_aired));
 
-        final String no_overview = getActivity().getResources().getString(R.string.no_overview_available);
         final String aires = getActivity().getResources().getString(R.string.aires);
         final String aired = getActivity().getResources().getString(R.string.aired);
 		final Fragment fragment = this;
@@ -125,7 +164,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 
 							float  _voteAverage = tve.getTmdb().getVoteAverage();
 							int    _voteCount = tve.getTmdb().getVoteCount();
-							String _overview = tve.getTmdb().getOverview();
+							String overview = tve.getTmdb().getOverview();
 							
 							boolean withTime = tve.getAirTime()==null ? false : true;
 							
@@ -136,8 +175,8 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 								
 								Date today = TimeTool.getToday();
 								
-								if(_overview == null || _overview == "")
-									_overview = no_overview;
+								if(overview == null || overview == "")
+									overview = _no_overview;
 								
 								if(tve.getTmdb().getName() == null || tve.getTmdb().getName().equals(""))  {
 									tv_header.setTextColor(act.getResources().getColor(R.color.oncaphillis_light_grey));
@@ -148,7 +187,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 								}
 								
 								overview_webview.loadData(_prefix+
-							    				StringEscapeUtils.escapeHtml4(_overview) +  
+							    				StringEscapeUtils.escapeHtml4(overview) +  
 							        			_postfix, "text/html; charset=utf-8;", "UTF-8");
 	
 								tv_rating.setText(_voteCount==0 ? "-/-" : String.format("%.1f/10", _voteAverage));
