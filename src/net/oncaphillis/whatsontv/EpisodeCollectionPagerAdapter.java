@@ -21,12 +21,13 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 	private List<? extends SeriesInfo.SeasonNode> _seasonList = new ArrayList<SeriesInfo.SeasonNode>();
 	private int _series;
 	private TaskObserver _threadObserver;
+	private String _season;
 	
 	public EpisodeCollectionPagerAdapter(FragmentManager fm, EpisodePagerActivity episodePagerActivity,
 			int series,boolean nearest, TaskObserver to) {
 		
 		super(fm);
-		
+		_season=episodePagerActivity.getResources().getString(R.string.season);
 		_threadObserver = to;
 		_series = series;
 		
@@ -90,7 +91,7 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 		        	SeriesInfo.EpisodeNode en = (SeriesInfo.EpisodeNode) sn;
 		        	return Integer.toString(en.getSeason())+"x"+Integer.toString(en.getEpisode());
 		        } else {
-		        	return "#"+Integer.toString(sn.getSeason());
+		        	return _season+" "+Integer.toString(sn.getSeason());
 		        }
 	        }
 		}
