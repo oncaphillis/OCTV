@@ -38,17 +38,31 @@
 
         <TextView
             android:id="@+id/season_date"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
             android:text="TextView" />
+
+        <TextView
+            android:id="@+id/season_episodes"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:text="Small Text"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
             android:id="@+id/season_name"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginBottom="2dp"
-            android:layout_marginTop="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:ellipsize="marquee"
             android:gravity="left"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:maxLines="1"
             android:text="Creator"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textStyle="bold" />

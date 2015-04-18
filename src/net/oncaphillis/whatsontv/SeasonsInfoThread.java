@@ -40,19 +40,29 @@ class SeasonsInfoThread extends Thread {
 	private TextView _count = null;
 	private boolean _withHeader = false;
 	private TaskObserver _taskObserver = null;
-	
+	private static String _seasons = null;
+	private static String _episodes= null;
  	class InfoNode {
 		public TableRow row = null;
 		public ArrayList<ImageView>   img = new ArrayList<ImageView>();
 		public ArrayList<ProgressBar> pb  = new ArrayList<ProgressBar>();
 		public ArrayList<TextView>    date = new ArrayList<TextView>();
+		public ArrayList<TextView>    episodes = new ArrayList<TextView>();
 		public ArrayList<TextView>    name = new ArrayList<TextView>();
 
 		public ArrayList<TvSeason>    se  = new ArrayList<TvSeason>();
  	};
  	
+ 	
  	SeasonsInfoThread(Activity ac,TableLayout tl, int mc, boolean withHeader, TvSeries ts,TaskObserver obs) {
  		super();
+
+ 		if(_seasons == null)
+ 			_seasons = ac.getResources().getString(R.string.seasons);
+
+ 		if(_episodes == null)
+ 			_episodes = ac.getResources().getString(R.string.episodes);
+
  		_activity = ac;
  		_maxcol = mc;
  		_series = ts;
@@ -63,6 +73,13 @@ class SeasonsInfoThread extends Thread {
  	
  	SeasonsInfoThread(Activity ac,TableLayout tl, int mc, boolean withHeader,int s0, TextView tv_seasons_count,TaskObserver obs) {
  		super();
+ 		
+ 		if(_seasons == null)
+ 			_seasons = ac.getResources().getString(R.string.seasons);
+
+ 		if(_episodes == null)
+ 			_episodes = ac.getResources().getString(R.string.episodes);
+ 		
  		_activity = ac;
  		_maxcol = mc;
  		_series =null;
@@ -114,7 +131,7 @@ class SeasonsInfoThread extends Thread {
 		    			params.span = _maxcol;
 		    			header.setLayoutParams(params);
 			        
-		    			txt.setText(Integer.toString(tsa.size())+" Seasons");
+		    			txt.setText(Integer.toString(tsa.size())+" "+_seasons);
 		    			_table.addView(tr);
 		    		}
 		    		
@@ -147,12 +164,13 @@ class SeasonsInfoThread extends Thread {
 		    			TvSeason tv_season = i.next();
 		    										    			
 	    				TextView       date = (TextView)     v.findViewById(R.id.season_date);
+	    				TextView   episodes = (TextView)     v.findViewById(R.id.season_episodes);
 	    				TextView       name = (TextView)     v.findViewById(R.id.season_name);
 
 	    				ImageView       ii = (ImageView)    v.findViewById(R.id.season_image);
 	    				ProgressBar     pb = (ProgressBar)  v.findViewById(R.id.season_image_progress);
 
-	    				setText(date,name,tv_season);
+	    				setText(date,episodes,name,tv_season);
 	    				
 					    	
 				    	ii.setTag(tv_season.getPosterPath());
@@ -160,6 +178,7 @@ class SeasonsInfoThread extends Thread {
 				    	trl.get(trl.size()-1).img.add(ii);
 				    	trl.get(trl.size()-1).pb.add(pb);
 				    	trl.get(trl.size()-1).date.add(date);
+				    	trl.get(trl.size()-1).episodes.add(episodes);
 				    	trl.get(trl.size()-1).name.add(name);
 
 				    	trl.get(trl.size()-1).se.add(tv_season);
@@ -207,7 +226,9 @@ class SeasonsInfoThread extends Thread {
 										_taskObserver.add(b);
 									
 									final TextView _t0 = n.date.get(j);
-									final TextView _t1 = n.name.get(j);
+									final TextView _t1 = n.episodes.get(j);
+									final TextView _t2 = n.name.get(j);
+									
 									final int _si = _series.getId();
 									new AsyncTask<TvSeason,Void,TvSeason>() {
 										
@@ -225,7 +246,7 @@ class SeasonsInfoThread extends Thread {
 
 										protected void onPostExecute(TvSeason result) {
 											if(result!=null && result.getEpisodes() != null) {
-												setText(_t0,_t1,result);
+												setText(_t0,_t1,_t2,result);
 											}
 										}
 									}.execute(n.se.get(j));
@@ -242,7 +263,7 @@ class SeasonsInfoThread extends Thread {
 		    	// Fill a pair of TextViews with data from a 
 		    	// TvSeason object.
 		    	
-				private void setText(TextView date, TextView name,
+				private void setText(TextView date, TextView episodes,TextView name,
 						TvSeason tv_season) {
 					
     				String s=tv_season.getAirDate();
@@ -255,8 +276,9 @@ class SeasonsInfoThread extends Thread {
     				} else {
     					s="";
     				}
-				    date.setText(s + " " + (tv_season.getEpisodes() != null && !tv_season.getEpisodes().isEmpty() ? 
-			    			" "+Integer.toString(tv_season.getEpisodes().size())+" Episodes" : "") );
+				    date.setText(s);
+				    episodes.setText(tv_season.getEpisodes() != null && !tv_season.getEpisodes().isEmpty() ? 
+			    			Integer.toString(tv_season.getEpisodes().size())+" "+_episodes : "...");
 				    name.setText(tv_season.getName()!=null ? tv_season.getName() : "");
 				}
 			});
