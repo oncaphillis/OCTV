@@ -83,8 +83,12 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 					String overview = tvs.getOverview();
 					String name = tvs.getName();
 					public void run() {
-						first_txt.setText(Environment.TmdbDateFormater.format(d));
-
+						
+						if(d!=null)
+							first_txt.setText(Environment.TmdbDateFormater.format(d));
+						else
+							first_txt.setText("...");
+							
 						if(tvs.getEpisodes() != null && tvs.getEpisodes().size()!=0)
 							episodes_txt.setText(String.format("%d %s", tvs.getEpisodes().size(),_episodes));
 
