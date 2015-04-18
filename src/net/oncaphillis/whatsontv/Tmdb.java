@@ -275,6 +275,16 @@ public class Tmdb {
 		return null;
 	}
 
+	static Date getAirDate(TvSeason ts) {
+		if(ts.getAirDate()!=null) {
+			try {
+				return Environment.TmdbDateFormater.parse(ts.getAirDate());
+			} catch (ParseException e) {
+			}
+		}
+		return null;
+	}
+
 	class SeasonKey {
 		SeasonKey(int series, int season) {
 			this.series = series;
