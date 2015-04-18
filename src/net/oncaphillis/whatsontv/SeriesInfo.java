@@ -98,7 +98,7 @@ public class SeriesInfo {
 	        			season = season_iterator.previous();
 	        			season = Tmdb.get().loadSeason(tvs.getId(), season.getSeasonNumber());
 
-	        			if(season.getEpisodes()!=null) {
+	        			if(season != null  && season.getEpisodes()!=null) {
 
 		        			ListIterator<TvEpisode> episode_iterator = season.getEpisodes().listIterator(season.getEpisodes().size());
 
