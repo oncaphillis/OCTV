@@ -1,6 +1,7 @@
 package net.oncaphillis.whatsontv;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -111,21 +112,28 @@ public class EpisodePagerActivity extends FragmentActivity {
 	    }
 	    return super.onOptionsItemSelected(item);
 	}
-
+	
+	@Override
+	protected void onDestroy() {
+		clearReferences();
+		super.onDestroy();
+	}
+	
 	@Override
 	protected void	onPause() {
-		/*if(SearchThread!=null)
-			SearchThread.lock();
-		*/
+		clearReferences();
 		super.onPause();
 	}
 	
 	@Override
 	protected void	onResume() {
-		/*if(SearchThread!=null)
-			SearchThread.release();
-		*/
 		super.onResume();
+	    Environment.setCurrentActivity(this);
 	}
-
+	
+	private void clearReferences(){
+      Activity currActivity = Environment.getCurrentActivity();
+      if (currActivity!=null && currActivity.equals(this))
+            Environment.setCurrentActivity(null);
+	}
 }
