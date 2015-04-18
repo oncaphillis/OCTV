@@ -9,6 +9,7 @@ import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -42,8 +43,8 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 
 		Bundle args = getArguments();
 		
-		_series = args.getInt("series");
-		_season = args.getInt("season");
+		_series  = args.getInt("series");
+		_season  = args.getInt("season");
 		_episode = args.getInt("episode");
 		
 		_rootView    = inflater.inflate(R.layout.episode_fragment, container, false);
@@ -54,8 +55,8 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
         final TextView tv_header           = ((TextView) _rootView.findViewById(R.id.episode_fragment_title));
         final TextView tv_rating           = ((TextView) _rootView.findViewById(R.id.episode_page_voting));
         final TextView tv_rating_count     = ((TextView) _rootView.findViewById(R.id.episode_page_voting_count));
-        final TextView tv_date_tag = ((TextView) _rootView.findViewById(R.id.episode_fragment_nearest_tag));
-        final TextView tv_date = ((TextView) _rootView.findViewById(R.id.episode_fragment_last_aired));
+        final TextView tv_date_tag         = ((TextView) _rootView.findViewById(R.id.episode_fragment_nearest_tag));
+        final TextView tv_date             = ((TextView) _rootView.findViewById(R.id.episode_fragment_last_aired));
 
         final String no_overview = getActivity().getResources().getString(R.string.no_overview_available);
         final String aires = getActivity().getResources().getString(R.string.aires);
@@ -63,6 +64,9 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 		final Fragment fragment = this;
         
 		Thread t = new Thread(new Runnable() {
+			final int o_white  = fragment.getActivity().getResources().getColor(R.color.oncaphillis_white);
+			final int o_orange = fragment.getActivity().getResources().getColor(R.color.oncaphillis_orange);
+			
 			@Override
 			public void run() {
 				final TvSeries series = Tmdb.get().loadSeries(_series);
@@ -89,10 +93,10 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 											tv_date.setText(Environment.TimeFormater.format(date));
 											if(! today.before(date)) {
 												tv_date_tag.setText(aired);
-												tv_date.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_white));
+												tv_date.setTextColor(o_white);
 											} else {
 												tv_date_tag.setText(aires);
-												tv_date.setTextColor(getActivity().getResources().getColor(R.color.oncaphillis_orange));
+												tv_date.setTextColor(o_orange);
 											}
 										}
 									}
@@ -114,8 +118,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 			        	final Date _date = date;
 						final Activity act = getActivity();
 			        	getActivity().runOnUiThread(new Runnable() {
-							
-								
+
 							float  _voteAverage = episode.getTmdb().getVoteAverage();
 							int    _voteCount = episode.getTmdb().getVoteCount();
 							String _overview = episode.getTmdb().getOverview();
@@ -173,8 +176,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 		
 		if(_threadObserver!=null)
 			_threadObserver.add(t);
-		
-		
+
         return _rootView;
     }
 }
