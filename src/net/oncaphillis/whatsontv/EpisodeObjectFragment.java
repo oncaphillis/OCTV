@@ -31,7 +31,9 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 
     private static final String _postfix = "</body></html>";
     
-    private String _no_overview = null;
+    static private String _no_overview = null;
+    static private String _episodes = null;
+    static private String _no_name = null;
     
 	public EpisodeObjectFragment() {
 	}
@@ -42,7 +44,13 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 		
 		if(_no_overview == null)
 			_no_overview  = container.getResources().getString(R.string.no_overview_available);
-		
+
+		if(_episodes == null)
+			_episodes  = container.getResources().getString(R.string.episodes);
+
+		if(_no_name == null)
+			_no_name  = container.getResources().getString(R.string.no_name);
+
 		Bundle args = getArguments();
 		
 		int series  = args.getInt("series");
@@ -60,19 +68,33 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 		
 		final WebView  overview_webview    = ((WebView)   theView.findViewById(R.id.season_fragment_overview));
 		final TextView first_txt = (TextView)theView.findViewById(R.id.season_fragment_first_aired);
+		final TextView episodes_txt = (TextView)theView.findViewById(R.id.season_fragment_episodes);
+		final TextView name_txt = (TextView)theView.findViewById(R.id.season_fragment_name);
 		
 		Thread t = new Thread(new Runnable() {
-			@Override
+			Activity act = fragment.getActivity(); 
+			@Override			
 			public void run() {
+				
 				final TvSeason tvs = Tmdb.get().loadSeason(series, season);
 				final Date d = Tmdb.getAirDate(tvs);
-				fragment.getActivity().runOnUiThread(new Runnable() {
+
+				act.runOnUiThread(new Runnable() {
 					String overview = tvs.getOverview();
+					String name = tvs.getName();
 					public void run() {
 						first_txt.setText(Environment.TmdbDateFormater.format(d));
-						
+
+						if(tvs.getEpisodes() != null && tvs.getEpisodes().size()!=0)
+							episodes_txt.setText(String.format("%d %s", tvs.getEpisodes().size(),_episodes));
+
 						if(overview == null || overview.equals(""))
 							overview = _no_overview;
+						
+						if(name==null || name.equals(""))
+							name = _no_name;
+						
+						name_txt.setText(name);
 						
 						overview_webview.loadData(_prefix+
 			    				StringEscapeUtils.escapeHtml4(overview) +  
