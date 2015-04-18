@@ -9,7 +9,8 @@
     <string name="aires">aires</string>
   	<string name="about">About&#8230;</string>
     
-    <string name="episodes">Episodes&#8230;</string>
+  	
+    <string name="episodes">Episodes</string>
     <string name="episodes_for">Episodes:%s</string>
     
     <string name="fav_button_text">favorite</string>
@@ -25,7 +26,7 @@
     <string name="nav_bar_close">Close Navbar</string>
     <string name="nav_bar_open">Open Navigator</string>
     <string name="next">next</string>
-	
+	<string name="no_name">No Name</string>
 	<string name="no_network_available">No Network available</string>
     <string name="no_overview_available">No Overview available</string>
 	<string name="no_title_available">No Title available</string>
