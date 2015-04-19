@@ -117,14 +117,6 @@
                                         android:textAppearance="?android:attr/textAppearanceMedium" />
                                 </LinearLayout>
                             </LinearLayout>
-
-                            <TableLayout
-                                android:id="@+id/episode_fragment_info_table"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:stretchColumns="*" >
-                            </TableLayout>
                         </LinearLayout>
 
                     </LinearLayout>
@@ -170,11 +162,13 @@
                 <!--  -->
 
                 <TableLayout
-                    android:id="@+id/episode_page_info_table"
+                    android:id="@+id/episode_fragment_info_table"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:stretchColumns="*" >
                 </TableLayout>
+
             </LinearLayout>
         </ScrollView>
 

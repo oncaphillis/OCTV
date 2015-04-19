@@ -9,6 +9,9 @@
     <string name="aires">aires</string>
   	<string name="about">About&#8230;</string>
     
+    <string name="cast">Cast</string>
+  	<string name="crew">Crew</string>
+    	
   	
     <string name="episodes">Episodes</string>
     <string name="episodes_for">Episodes:%s</string>
@@ -16,6 +19,8 @@
     <string name="fav_button_text">favorite</string>
 	<string name="favorite">fac_button_text</string>
     <string name="first">first</string>
+	
+	<string name="guests">Guests</string>
     
     <string name="hi_voted">Hi Voted</string>
     

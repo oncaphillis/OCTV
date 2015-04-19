@@ -38,6 +38,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
     static private String _no_overview = null;
     static private String _episodes = null;
     static private String _no_name = null;
+    static private String[] _credits = null;
     
 	public EpisodeObjectFragment() {
 	}
@@ -55,6 +56,13 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 		if(_no_name == null)
 			_no_name  = container.getResources().getString(R.string.no_name);
 
+		if(_credits == null) {
+			_credits = new String[3];
+			_credits[0] = container.getResources().getString(R.string.cast);
+			_credits[1] = container.getResources().getString(R.string.guests);
+			_credits[2] = container.getResources().getString(R.string.crew);
+		}
+		
 		Bundle args = getArguments();
 		
 		int series  = args.getInt("series");
@@ -138,16 +146,13 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 							if(_threadObserver!=null)
 								_threadObserver.add(at);
 							
-							String[] titles = new String[] {
-									"Cast","Guest","Crew"
-							};
-							
+							// Fill the cast/crew Table
 							if(act!=null && tvs.getCredits()!=null) {
 								List<? extends Person>[] cc = new ArrayList[3];
 								cc[0] = tvs.getCredits().getCast();
 								cc[1] = tvs.getCredits().getGuestStars();
 								cc[2] = tvs.getCredits().getCrew();
-								new CastInfoThread(act,info_table,1,cc,titles).start();
+								new CastInfoThread(act,info_table,1,cc,_credits).start();
 							}
 				        }
 					}
@@ -176,7 +181,8 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
         final TextView tv_rating_count     = ((TextView) theView.findViewById(R.id.episode_page_voting_count));
         final TextView tv_date_tag         = ((TextView) theView.findViewById(R.id.episode_fragment_nearest_tag));
         final TextView tv_date             = ((TextView) theView.findViewById(R.id.episode_fragment_last_aired));
-
+        final TableLayout info_table       = (TableLayout) theView.findViewById(R.id.episode_fragment_info_table);
+        
         final String aires = getActivity().getResources().getString(R.string.aires);
         final String aired = getActivity().getResources().getString(R.string.aired);
 		final Fragment fragment = this;
@@ -232,6 +238,17 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 					episode_still.setTag(tve.getTmdb().getStillPath());
 			        new BitmapDownloaderTask(episode_still, 3, getActivity(), null, null, null).execute();
 			        
+			        
+			        					
+					// Fill the cast/crew Table
+					if(getActivity()!=null && tve.getTmdb()!=null && tve.getTmdb().getCredits()!=null) {
+						List<? extends Person>[] cc = new ArrayList[3];
+						cc[0] = tve.getTmdb().getCredits().getCast();
+						cc[1] = tve.getTmdb().getCredits().getGuestStars();
+						cc[2] = tve.getTmdb().getCredits().getCrew();
+						new CastInfoThread(getActivity(),info_table,1,cc,_credits).start();
+					}
+					
 			        if(getActivity()!=null) {
 			        	final Date _date = date;
 						final Activity act = getActivity();
