@@ -1,9 +1,12 @@
 package net.oncaphillis.whatsontv;
 
+import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.tv.TvSeason;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
 
@@ -20,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageView;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 public class EpisodeObjectFragment extends EntityInfoFragment {
@@ -70,6 +74,8 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 		final TextView first_txt = (TextView)theView.findViewById(R.id.season_fragment_first_aired);
 		final TextView episodes_txt = (TextView)theView.findViewById(R.id.season_fragment_episodes);
 		final TextView name_txt = (TextView)theView.findViewById(R.id.season_fragment_name);
+		final TableLayout info_table = (TableLayout)theView.findViewById(R.id.season_fragment_info_table);
+		
 		
 		Thread t = new Thread(new Runnable() {
 			Activity act = fragment.getActivity(); 
@@ -131,6 +137,18 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 							
 							if(_threadObserver!=null)
 								_threadObserver.add(at);
+							
+							String[] titles = new String[] {
+									"Cast","Guest","Crew"
+							};
+							
+							if(act!=null && tvs.getCredits()!=null) {
+								List<? extends Person>[] cc = new ArrayList[3];
+								cc[0] = tvs.getCredits().getCast();
+								cc[1] = tvs.getCredits().getGuestStars();
+								cc[2] = tvs.getCredits().getCrew();
+								new CastInfoThread(act,info_table,1,cc,titles).start();
+							}
 				        }
 					}
 				});
@@ -172,7 +190,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 				final TvSeries tvs = Tmdb.get().loadSeries( series);
 				final EpisodeInfo tve = Tmdb.get().loadEpisode( series,  season,  episode);
 				final String ds;
-				
+
 				if(tvs!= null && tve!=null) {
 
 					// If we currently do not have a clock value
