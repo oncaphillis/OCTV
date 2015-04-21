@@ -79,6 +79,8 @@ public class SearchActivity extends Activity {
 						@Override
 						public void run() {
 							
+							int cc = _searchThread.getCount();
+							
 							if(_nothingFoundLayout!=null && _searchThread.getCount()==0)
 								_nothingFoundLayout.setVisibility(View.VISIBLE);
 							

@@ -32,9 +32,9 @@ public class SearchThread extends Thread {
 	private Pager[]                  _pagers;
 	private ProgressBar              _pb;
 	private TextView                 _tv;
-	private int _list  = -1;
-	private int _count = -1;
-	private int _total = -1;
+	private int _list    = -1;
+	private int _counts[] = null;
+	private int _totals[] = null;
 	
 	public class Current {
 		public Current(int l,int c,int t) {
@@ -53,6 +53,14 @@ public class SearchThread extends Thread {
 		_pagers      = pagers;
 		_pb          = pb;
 		_tv          = tv;
+		_counts = new int[listAdapters.length];
+		_totals = new int[listAdapters.length];
+
+		for(int i=0;i<_counts.length;i++)
+			_counts[i] =  -1;
+		
+		for(int i=0;i<_totals.length;i++)
+			_totals[i] =  -1;
 	}
 	
 	
@@ -66,8 +74,6 @@ public class SearchThread extends Thread {
 		
 		synchronized(this) {
 			_list  =  0;
-			_count =  0;
-			_total = -1;
 		}
 		
 		for(_list=0; _list < _pagers.length ;) {
@@ -98,8 +104,12 @@ public class SearchThread extends Thread {
 			
 			_pagers[_list].start();
 			
-			int cc;
-			while( (cc=_listAdapters[_list].getCount()) < MAX_SEARCH) {
+			synchronized(this) {
+				_counts[_list] = 0;
+				_totals[_list] = 0;
+			}
+			
+			while( ( _listAdapters[_list].getCount()) < MAX_SEARCH) {
 
 				li_page=_pagers[_list].getPage(page++);
 				final TextView tv = _tv;
@@ -121,8 +131,8 @@ public class SearchThread extends Thread {
 					});
 					
 					synchronized(this) {
-						_count += li_page.size();
-						_total  = _pagers[_list].getTotal();
+						_counts[_list] += li_page.size();
+						_totals[_list]  = _pagers[_list].getTotal();
 					}
 					release();
 				}
@@ -153,25 +163,31 @@ public class SearchThread extends Thread {
 		}
 	}
 	
-	// Return the current count if results
+	// Return the current count of results
 	public int getCount() {
 		synchronized(this) {
-			return _count;
+			int n= -1;
+			for(int i=0;i<_counts.length;i++) {
+				n =  _counts[i] == -1 ? n : n == -1 ? _counts[i] : n + _counts[i];
+			}
+			return n;
 		}
 	}
 	
 	public int getCount(int list) {
 		synchronized(this) {
-			return list>=0 && list<_listAdapters.length ? _listAdapters[list].getCount() : -1;
+			return list>=0 && list<_counts.length ? _counts[list] : -1;
 		}
 	}
-	// Get the total amount to expect. -1 if not (yet) known
+	
+	/* Get the total amount to expect. -1 if not (yet) known
 	public int getTotal() {
 		synchronized(this) {
-			return _total;
+			return _totals;
 		}
 	}
-
+	*/
+	
 	/** Holds the read Thread by acquireing the 
 	 * associated semaphore.
 	 */
@@ -189,7 +205,7 @@ public class SearchThread extends Thread {
 
 	public Current getCurrent() {
 		synchronized(this) {
-			return new Current(this._list,this._count,this._total > MAX_SEARCH ? MAX_SEARCH : this._total);
+			return new Current(this._list,this._counts[this._list],this._totals[this._list] > MAX_SEARCH ? MAX_SEARCH : this._totals[this._list]);
 		}
 	}
 };
