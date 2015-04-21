@@ -199,22 +199,7 @@ public class SearchActivity extends Activity {
 		_progressObserver.add(_searchThread);
 		_searchThread.release();
 	}
-	
-	@Override
-	public void onResume() {
-		if(_searchThread!=null) {
-			_searchThread.release();
-		}
-		super.onResume();
-	}
 
-	@Override
-	public void onPause() {
-		if(_searchThread!=null) {
-			_searchThread.lock();
-		}
-		super.onPause();
-	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    return super.onCreateOptionsMenu(menu);
@@ -233,5 +218,35 @@ public class SearchActivity extends Activity {
 	@Override
 	public boolean onMenuItemSelected(int feature,MenuItem it) {
 		return super.onMenuItemSelected(feature, it);
+	}
+	
+	@Override
+	protected void onDestroy() {
+		clearReferences();
+		super.onDestroy();
+	}
+	
+	@Override
+	protected void	onPause() {
+		if(_searchThread!=null) {
+			_searchThread.lock();
+		}
+		clearReferences();
+		super.onPause();
+	}
+	
+	@Override
+	protected void	onResume() {
+		if(_searchThread!=null) {
+			_searchThread.release();
+		}
+		super.onResume();
+	    Environment.setCurrentActivity(this);
+	}
+	
+	private void clearReferences(){
+      Activity currActivity = Environment.getCurrentActivity();
+      if (currActivity!=null && currActivity.equals(this))
+            Environment.setCurrentActivity(null);
 	}
 }

@@ -45,10 +45,7 @@ public class SeriesPagerActivity extends FragmentActivity {
         }
 	}
 	
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    return super.onCreateOptionsMenu(menu);
@@ -71,5 +68,29 @@ public class SeriesPagerActivity extends FragmentActivity {
 	@Override
 	public boolean onSearchRequested() {
 		return super.onSearchRequested();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		clearReferences();
+		super.onDestroy();
+	}
+	
+	@Override
+	protected void	onPause() {
+		clearReferences();
+		super.onPause();
+	}
+	
+	@Override
+	protected void	onResume() {
+		super.onResume();
+	    Environment.setCurrentActivity(this);
+	}
+	
+	private void clearReferences(){
+      Activity currActivity = Environment.getCurrentActivity();
+      if (currActivity!=null && currActivity.equals(this))
+            Environment.setCurrentActivity(null);
 	}
 }
