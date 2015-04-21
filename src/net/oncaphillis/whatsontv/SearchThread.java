@@ -121,8 +121,8 @@ public class SearchThread extends Thread {
 					});
 					
 					synchronized(this) {
-						_count = _listAdapters[fj].getCount();
-						_total = _pagers[_list].getTotal();
+						_count += li_page.size();
+						_total  = _pagers[_list].getTotal();
 					}
 					release();
 				}

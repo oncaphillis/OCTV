@@ -79,7 +79,7 @@ public class SearchActivity extends Activity {
 						@Override
 						public void run() {
 							
-							if(_searchThread.getCount()==0)
+							if(_nothingFoundLayout!=null && _searchThread.getCount()==0)
 								_nothingFoundLayout.setVisibility(View.VISIBLE);
 							
 							_progressBar.setVisibility(View.GONE);
