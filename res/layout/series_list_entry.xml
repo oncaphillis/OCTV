@@ -75,6 +75,10 @@
 	                android:id="@+id/series_network"
 	                android:layout_width="fill_parent"
 	                android:layout_height="wrap_content"
+	                android:ellipsize="marquee"
+	                android:lines="1"
+	                android:marqueeRepeatLimit="marquee_forever"
+	                android:maxLines="1"
 	                android:textAppearance="?android:attr/textAppearanceSmall" />
 
 	            <LinearLayout
