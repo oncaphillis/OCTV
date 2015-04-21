@@ -51,7 +51,7 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 		
 		final int pos = position;
 		
-	    if (the_series != null && Tmdb.api()!=null) {
+	    if (the_series != null && (the_view.getTag() ==null || the_view.getTag() != the_series) && Tmdb.api()!=null) {
 	    	LinearLayout ll = (LinearLayout)the_view.findViewById(R.id.series_nearest_episode);
 	    	
 	    	ll.setOnClickListener(new OnClickListener() {
@@ -130,7 +130,9 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	tt3.setText("...");
     		tt4.setText("...");
     		
-	    	new SeriesInfoDownLoaderTask(tt1,tt2, tt3,tt4,_activity).execute();
+    		the_view.setTag(the_series);
+
+    		new SeriesInfoDownLoaderTask(tt1,tt2, tt3,tt4,_activity).execute();
  	    }
 	    return the_view;
 	}
