@@ -22,13 +22,17 @@ public class EpisodePagerActivity extends FragmentActivity {
 	private TableLayout _drawerTable;
 	private ScrollView _drawerScrollView;
 	private ProgressBar _progressBar;
+	private int _idx = -1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		if(savedInstanceState != null) {
+			_idx =  savedInstanceState.getInt("idx", -1);
+		}
+		
 		setContentView(R.layout.activity_episode_pager);
-		Bundle b = getIntent().getExtras();
 		
 		_progressBar = (ProgressBar) this.findViewById(R.id.episode_load_progress);
 		_progressBar.setIndeterminate(true);
@@ -54,9 +58,11 @@ public class EpisodePagerActivity extends FragmentActivity {
 			}
 		};
 
-		int series = b.getInt("series");
-		String series_name = b.getString("series_name");
-		boolean nearest = b.getBoolean("nearest");
+		Bundle bundle = getIntent().getExtras();
+
+		int series = bundle.getInt("series");
+		String series_name = bundle.getString("series_name");
+		boolean nearest = bundle.getBoolean("nearest");
 		series_name = series_name == null ? "" : series_name;
 		
 		String episodes_for = getResources().getString(R.string.episodes_for);
@@ -68,7 +74,7 @@ public class EpisodePagerActivity extends FragmentActivity {
 	    	actionBar.setDisplayHomeAsUpEnabled(true);
 	    
 		_episodePagerAdapter  = new EpisodeCollectionPagerAdapter(getSupportFragmentManager(),
-				this,series,nearest,progressObserver);
+				this,series,_idx == -1 ? nearest : false,_idx,progressObserver);
 		
 		_viewPager = (ViewPager) findViewById(R.id.series_page_layout);
         _viewPager.setAdapter(_episodePagerAdapter);
@@ -96,6 +102,13 @@ public class EpisodePagerActivity extends FragmentActivity {
 	    progressObserver.add(sit);
 	    
 	}
+	
+	@Override
+	protected void  onSaveInstanceState (Bundle outState){
+		outState.putInt("idx",_viewPager.getCurrentItem());
+		super.onSaveInstanceState (outState);
+	}
+
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

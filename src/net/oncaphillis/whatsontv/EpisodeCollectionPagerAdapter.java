@@ -24,18 +24,15 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 	private String _season;
 	
 	public EpisodeCollectionPagerAdapter(FragmentManager fm, EpisodePagerActivity episodePagerActivity,
-			int series,boolean nearest, TaskObserver to) {
+			int series,final boolean nearest, final int idx,TaskObserver to) {
 		
 		super(fm);
 		_season=episodePagerActivity.getResources().getString(R.string.season);
 		_threadObserver = to;
 		_series = series;
 		
-		final boolean near = nearest;
 		final FragmentStatePagerAdapter a = this;
 		final EpisodePagerActivity act =  episodePagerActivity;
-		
-		
 		Thread t = new Thread(new Runnable() {
 
 			@Override
@@ -44,7 +41,7 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 				 
 				final List<? extends SeriesInfo.SeasonNode> l = si.getSeasonsEpisodeList();
 				
-				final int c = near ? si.getNearestEpisodeCoordinate() : 0;
+				final int c = nearest ? si.getNearestEpisodeCoordinate() : idx<si.getSeasonsEpisodeList().size() ? idx : si.getSeasonsEpisodeList().size()-1;
 				
 				act.runOnUiThread(new Runnable() {
 					@Override
