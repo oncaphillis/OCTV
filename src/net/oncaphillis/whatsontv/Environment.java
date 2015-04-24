@@ -31,6 +31,8 @@ public class Environment {
 	final static public int HI_VOTED     = 2;
 	final static public int POPULAR      = 3;
 
+	final static int TTL = 60*60*24;
+	
 	public static String VERSION   ="1.0";
 	public static String NAME ="";
 	public static String COPYRIGHT ="&copy; 2015 Sebastian Kloska (<a href='http://www.oncaphillis.net/'>www.oncaphillis.net</a>; <a href='mailto:sebastian.kloska@snafu.de'>sebastian.kloska@snafu.de</a>)";
@@ -39,14 +41,14 @@ public class Environment {
 	static public ArrayAdapter<TvSeries>[]      ListAdapters  = null;
 	static public Map<Integer,List<TvSeries>>[] StoredResults = null;
 	static public List<TvSeries>[] MainList = null;
+	static public SQLCacheHelper CacheHelper = null;
 
 	static private Activity _theActivity = null;
 	
 	public static boolean isDebug() {
 		return true;
 	} 
-	
-	
+
 	static DateFormat TmdbDateFormater = new SimpleDateFormat("yyyy-MM-dd") {
 		DateFormat _outFormat = new SimpleDateFormat("EEE, dd.MM.yyyy"); 
 		{
@@ -128,6 +130,15 @@ public class Environment {
 			String popular  = a.getResources().getString(R.string.popular);
 			
 			Titles = new String[] {today,on_air,hi_voted,popular };
+		}
+		
+		if(CacheHelper == null) {
+	         CacheHelper = new SQLCacheHelper(a);
+			 long n = TimeTool.getNow().getTime() / 1000;
+			 CacheHelper.getWritableDatabase().execSQL("DELETE FROM SERIES WHERE ? - TIMESTAMP > ?",new Object[] {
+			 	new Long(n),
+			    new Long(TTL)
+			 });
 		}
 		
 		if(ListAdapters==null)

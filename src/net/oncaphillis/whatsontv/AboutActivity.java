@@ -72,8 +72,8 @@ public class AboutActivity extends Activity {
 		
 		if(Tmdb.isDebug()) {
 			debug = "<div>"+
-					"<p>Series:"+Integer.toString(Tmdb.getSeriesCache().size())+"/"+
-							Integer.toString(Tmdb.getSeriesCache().hit())+";"+
+					"<p>Series:"+Long.toString(Tmdb.getSeriesCacheSize())+"/"+
+							Integer.toString(Tmdb.getSeriesCacheHits())+";"+
 						   "Seasons:"+Integer.toString(Tmdb.getSeasonsCache().size())+"/"+
 						   Integer.toString(Tmdb.getSeasonsCache().hit())+"; "+
 						   "Episodes:"+Integer.toString(Tmdb.getEpisodeCache().size())+"/"+

@@ -1,9 +1,15 @@
 package net.oncaphillis.whatsontv;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -31,7 +37,10 @@ import com.uwetrottmann.trakt.v2.enums.Extended;
 import com.uwetrottmann.trakt.v2.enums.IdType;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.View;
@@ -331,17 +340,6 @@ public class Tmdb {
 		int season;
 		int episode;
 	};
-	
-	private CacheMap<Integer,TvSeries> _series  = new CacheMap<Integer,TvSeries>(5000) {
-		@Override
-		TvSeries load(Integer key) {
-			try {
-				return api().getTvSeries().getSeries(key, getLanguage(), TvMethod.external_ids,TvMethod.images,TvMethod.credits);
-			} catch(Throwable ta) {
-				return null;
-			}
-		}
-	};
 
 	private CacheMap<SeasonKey,TvSeason>   _seasons  = new CacheMap<SeasonKey,TvSeason>(5000) {
 		@Override
@@ -365,6 +363,8 @@ public class Tmdb {
 			return null;
 		}
 	};
+
+	private int _seriesHit = 0;
 	
 	private Tmdb() {
 		_trakt_reader.start();
@@ -468,7 +468,62 @@ public class Tmdb {
 	}
 
 	public TvSeries loadSeries(int id) {
-		return _series.get(id);
+		Integer key = new Integer(id);
+		
+		try {
+			ContentValues cvi = new ContentValues();
+			Cursor c = Environment.CacheHelper.getReadableDatabase().query(
+					"SERIES", new String[] {
+							"ID","TIMESTAMP","DATA"
+					}, "ID=?", new String[] {
+							key.toString()
+					}, null, null, null);
+			
+			long n = TimeTool.getNow().getTime() / 1000;
+			
+			while(c.moveToNext()) {
+				DatabaseUtils.cursorRowToContentValues(c, cvi);
+				cvi.getAsByteArray("DATA");
+				ByteArrayInputStream byteIn = new ByteArrayInputStream(cvi.getAsByteArray("DATA"));
+				ObjectInputStream in = new ObjectInputStream(byteIn);
+				TvSeries ts = (TvSeries)in.readObject();
+				in.close();
+				byteIn.close();
+
+				long d = cvi.getAsLong("TIMESTAMP");						
+				
+				if( n - d > Environment.TTL) {
+					Environment.CacheHelper.getWritableDatabase().delete("SERIES", "ID=?", new String[] {
+							key.toString()
+					});
+					break;
+				}
+				_seriesHit  ++;
+				return ts;
+			}
+			
+			TvSeries ts = api().getTvSeries().getSeries(key, getLanguage(), TvMethod.external_ids,TvMethod.images,TvMethod.credits);
+			
+			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+
+			ObjectOutputStream out = new ObjectOutputStream(byteOut);
+			out.writeObject(ts);
+			out.close();
+			byteOut.close();
+			 
+			ContentValues cvo = new ContentValues();
+			 
+			cvo.put("ID", key);
+			cvo.put("TIMESTAMP", n);
+			cvo.put("DATA",byteOut.toByteArray());
+			 
+			Environment.CacheHelper.getWritableDatabase().insert("SERIES",null,cvo);
+			 
+			return ts;
+	         
+		} catch(Throwable ta) {
+			return null;
+		}
 	}
 	
 	public TvSeason loadSeason(int series,int season) {
@@ -512,11 +567,6 @@ public class Tmdb {
 	List<Timezone> getTimezones() {
 		return _timezones;
 	}
-
-	
-	public static CacheMap<?, ?> getSeriesCache() {
-		return get()._series;
-	}
 	
 	public static CacheMap<?, ?> getSeasonsCache() {
 		return get()._seasons;
@@ -539,5 +589,21 @@ public class Tmdb {
 
 	public static Timezone getTimezone() {
 		return null;
+	}
+
+	public static long getSeriesCacheSize() {
+		Cursor c = Environment.CacheHelper.getReadableDatabase().query("SERIES",new String[] {
+				"COUNT(*)"},null,null,null,null,null);
+		
+		while(c.moveToNext()) {
+			ContentValues cvi = new ContentValues();
+			DatabaseUtils.cursorRowToContentValues(c, cvi);
+			return cvi.getAsLong("COUNT(*)");
+		}
+		return 0;
+	}
+
+	public static int getSeriesCacheHits() {
+		return get()._seriesHit;
 	}
 }
