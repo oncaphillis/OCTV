@@ -1,7 +1,12 @@
 package net.oncaphillis.whatsontv;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,6 +31,7 @@ import com.uwetrottmann.trakt.v2.enums.Extended;
 import com.uwetrottmann.trakt.v2.enums.IdType;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.View;
@@ -112,41 +118,39 @@ abstract class CacheMap<K,V> {
  *
  */
 
-class BitmapHash {
+class BitmapCache {
 	private int _hit = 0; 
-	private class Node {
-		public int count = 0;
-		public Bitmap bm = null;
-		public Map<String,Node> map;
- 		public String path;
- 		public Date date;
-		public Node(Bitmap b, String p,Map<String, Node> hm) {
-			bm = b;
-			map = hm;
-			path = p;
-			date = new Date();
-		}
-	};
-	
-	private HashMap<Integer,HashMap<String,Node>> _bmHash =
-			new HashMap<Integer,HashMap<String,Node>>();
-	
-	private class NodeComparator implements Comparator<Node> {
+	private File _cacheDir = null;
+	private long _n;
+	private PriorityQueue<File> _queue = new PriorityQueue<File>(100, new Comparator<File>() {
 		@Override
-		public int compare(Node lhs, Node rhs) {
-			return lhs.date.before(rhs.date) ? -1 : rhs.date.before(lhs.date) ? 1 : 0;
-			//return lhs.count < rhs.count ? -1 : lhs.count > rhs.count ? 1 : 
-			//	lhs.bm.getByteCount() < rhs.bm.getByteCount() ? -1 : lhs.bm.getByteCount() > rhs.bm.getByteCount() ? 1 : 0; 
+		public int compare(File o1, File o2) {
+			return o1.lastModified()<o2.lastModified() ? -1 : o1.lastModified() > o2.lastModified() ? 1 : 0;
 		}
-	};
+	});
 	
-	private NodeComparator comp = new NodeComparator();
-	
-	private PriorityQueue<Node> _queue = new PriorityQueue<Node>(10,comp);
+	private static final long TTL = 24*60*60;
+	/**
+	 * 
+	 * @param cashDir diretory in which to cache image files.
+	 */
+	BitmapCache(File cashDir) {
+		_cacheDir = cashDir;
+		if(_cacheDir.exists()) {
+			// walk through  
+			File[] fl = _cacheDir.listFiles();
+			for(File f : fl) {
+				//Age in seconds
+				_size += f.length();
+				_queue.add(f);
+			}
+		}
+		purge();
+	}
 	
 	private int _size = 0;
 	
-	static final int MAX_SIZE=5000000; 
+	static final int MAX_SIZE=20000000; 
 	
 	/** Stores a new Bitmap under a given Key. If the max size of 
 	 * the cache is exceeded we delete images until we are below
@@ -159,58 +163,57 @@ class BitmapHash {
 	
 	void put(Bitmap bm,int size,String path) {
 
-		HashMap<String,Node> hm0 = null;
+		File f = new File(_cacheDir,Integer.toString(size)+"_"+new File(path).getName());
 		
-		// Create a new sub-hash for the given size 
-		// if needed.
-		
-		if((hm0 = _bmHash.get(size))==null) {
-			_bmHash.put(size,hm0 = new HashMap<String,Node>());
+		try {
+			FileOutputStream os = new FileOutputStream(f.getAbsolutePath());
+			bm.compress(Bitmap.CompressFormat.JPEG, 85, os);
+			os.close();
+			_size += f.length();
+			_queue.add(f);
+			purge();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
-		// Delete nodes until the current cash size is ok.
-		while( (!_queue.isEmpty()) && (_size+bm.getByteCount() > MAX_SIZE) ) {
-			
-			Node n = _queue.remove();
-			n.map.remove(n.path);
-			_size -= n.bm.getByteCount();
-		}
-		
-		Node n = null;
-		
-		hm0.put(path, n=new Node(bm,path,hm0));
-		_queue.add(n);
-		
-		_size += bm.getByteCount();
 	}
 	
 	Bitmap get(int size,String path) {
-		
-		HashMap<String,Node> hm = _bmHash.get(size);
-
-		Node nd = null;
-		
-		if(hm != null) {
-			if((nd=hm.get(path))!=null) {
-				nd.count++;
-				_hit ++;
-				return nd.bm;
+		File f = new File(_cacheDir,Integer.toString(size)+"_"+new File(path).getName());
+		long n = TimeTool.getNow().getTime();
+		if(f.exists()) {
+			if( ((n-f.lastModified()) / 1000.0f) > TTL) {
+				f.delete();
+				_queue.remove(f);
+				return null;
 			}
+			_hit++;
+			Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
+			return bm;
 		}
 		return null;
 	}
 
-	public int size() {
-		Iterator<Integer> i = _bmHash.keySet().iterator();
-		int s = 0;
-		while(i.hasNext()) {
-			s+=_bmHash.get(i.next()).size();
-		}
-		return s;
+	public int getCount() {
+		return _queue.size();
+	}
+	
+	public int getSize() {
+		return _size;
 	}
 
-	public int hit() {
+	public int getHits() {
 		return _hit;
+	}
+	private void purge() {
+		long n = TimeTool.getNow().getTime();
+		while(!_queue.isEmpty() && (_size>MAX_SIZE || ((n-_queue.peek().lastModified())/1000.0) > TTL)) {
+			File f = _queue.remove();
+			long m=f.lastModified(); 
+			if(f.exists()) {
+				_size-=f.length();
+				f.delete();
+			}
+		}
 	}
 }
 
@@ -219,7 +222,7 @@ public class Tmdb {
 	private static String    _key     = null;
 	private TmdbApi          _api     = null;
 	private TraktV2          _trakt   = null;
-	private BitmapHash       _hash    = new BitmapHash();
+	private BitmapCache       _hash    = null;
 	private List<Timezone> _timezones = null;
 	private TraktReaderThread _trakt_reader = new TraktReaderThread();
 	static  Set<Integer>  _ss = new TreeSet<Integer>();
@@ -402,6 +405,11 @@ public class Tmdb {
 	}
 	
 	public Bitmap loadPoster(int size,String path,Activity act,ProgressBar pb) {
+		
+		if(_hash == null) {
+			_hash = new BitmapCache(act.getCacheDir());
+		}
+		
 		if(api()==null)
 			return null;
 		
@@ -518,7 +526,7 @@ public class Tmdb {
 		return get()._episodes; 
 	}
 	
-	public static BitmapHash getBitmapCache() {
+	public static BitmapCache getBitmapCache() {
 		return get()._hash;
 	}
 	public static String getLanguage() {
