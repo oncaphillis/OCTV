@@ -121,8 +121,6 @@ public class Tmdb {
 	private TraktV2          _trakt   = null;
 	private BitmapCache       _hash    = null;
 	private List<Timezone> _timezones = null;
-	private HashMap<Integer,TvSeries> _seriesMap = new HashMap<Integer,TvSeries>();
-			
 	private TraktReaderThread _trakt_reader = new TraktReaderThread();
 	static  Set<Integer>  _ss = new TreeSet<Integer>();
 	static EpisodeKey     _d  = null;
@@ -254,8 +252,7 @@ public class Tmdb {
 		}
 	};
 
-	private int _seriesHit1 = 0;
-	private int _seriesHit0 = 0;
+	private int _seriesHit = 0;
 	
 	private Tmdb() {
 		_trakt_reader.start();
@@ -360,12 +357,7 @@ public class Tmdb {
 
 	public TvSeries loadSeries(int id) {
 		Integer key = new Integer(id);
-		
-		if(_seriesMap.get(key)!=null) {
-			_seriesHit0 ++;
-			return _seriesMap.get(key);
-		}
-		
+
 		try {
 			ContentValues cvi = new ContentValues();
 			Cursor c = Environment.CacheHelper.getReadableDatabase().query(
@@ -394,10 +386,7 @@ public class Tmdb {
 					});
 					break;
 				}
-				_seriesHit1++;
-
-				_seriesMap.put(key, ts);
-				
+				_seriesHit  ++;
 				return ts;
 			}
 			
@@ -417,9 +406,7 @@ public class Tmdb {
 			cvo.put("DATA",byteOut.toByteArray());
 			 
 			Environment.CacheHelper.getWritableDatabase().insert("SERIES",null,cvo);
-			
-			_seriesMap.put(key, ts);
-			
+			 
 			return ts;
 	         
 		} catch(Throwable ta) {
@@ -505,6 +492,6 @@ public class Tmdb {
 	}
 
 	public static int getSeriesCacheHits() {
-		return get()._seriesHit1;
+		return get()._seriesHit;
 	}
 }
