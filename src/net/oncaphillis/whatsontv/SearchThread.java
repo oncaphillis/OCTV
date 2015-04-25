@@ -42,9 +42,12 @@ public class SearchThread extends Thread {
 			count = c;
 			total = t; 
 		}
-		public int list;
-		public int count;
-		public int total;
+		public Current() {
+		}
+		
+		public int list  = -1;
+		public int count = -1;
+		public int total = -1;
 	};
 	
 	public SearchThread(Activity a,ArrayAdapter<TvSeries>[] listAdapters,Pager[] pagers,ProgressBar pb,TextView tv) {
@@ -205,7 +208,10 @@ public class SearchThread extends Thread {
 
 	public Current getCurrent() {
 		synchronized(this) {
-			return new Current(this._list,this._counts[this._list],this._totals[this._list] > MAX_SEARCH ? MAX_SEARCH : this._totals[this._list]);
+			if(this._list < this._counts.length)
+				return new Current(this._list,this._counts[this._list],this._totals[this._list] > MAX_SEARCH ? MAX_SEARCH : this._totals[this._list]);
+			else
+				return new Current();
 		}
 	}
 };
