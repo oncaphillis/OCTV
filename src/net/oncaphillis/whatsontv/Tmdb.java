@@ -3,8 +3,6 @@ package net.oncaphillis.whatsontv;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -16,7 +14,6 @@ import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -24,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -118,114 +114,6 @@ abstract class CacheMap<K,V> {
 	abstract V load(K key);
 };
 
-/**
- * A cash for Bitmap objects we retrieve from the Web. It holds 
- * references until a threshold value is reached. After that
- * Bitmaps get deleted. 
- * 
- * @author kloska
- *
- */
-
-class BitmapCache {
-	private int _hit = 0; 
-	private File _cacheDir = null;
-	private long _n;
-	private PriorityQueue<File> _queue = new PriorityQueue<File>(100, new Comparator<File>() {
-		@Override
-		public int compare(File o1, File o2) {
-			return o1.lastModified()<o2.lastModified() ? -1 : o1.lastModified() > o2.lastModified() ? 1 : 0;
-		}
-	});
-	
-	private static final long TTL = 24*60*60;
-	/**
-	 * 
-	 * @param cashDir diretory in which to cache image files.
-	 */
-	BitmapCache(File cashDir) {
-		_cacheDir = cashDir;
-		if(_cacheDir.exists()) {
-			// walk through  
-			File[] fl = _cacheDir.listFiles();
-			for(File f : fl) {
-				//Age in seconds
-				_size += f.length();
-				_queue.add(f);
-			}
-		}
-		purge();
-	}
-	
-	private int _size = 0;
-	
-	static final int MAX_SIZE=20000000; 
-	
-	/** Stores a new Bitmap under a given Key. If the max size of 
-	 * the cache is exceeded we delete images until we are below
-	 * the treshold.
-	 * 
-	 * @param bm
-	 * @param size
-	 * @param path
-	 */
-	
-	void put(Bitmap bm,int size,String path) {
-
-		File f = new File(_cacheDir,Integer.toString(size)+"_"+new File(path).getName());
-		
-		try {
-			FileOutputStream os = new FileOutputStream(f.getAbsolutePath());
-			bm.compress(Bitmap.CompressFormat.JPEG, 85, os);
-			os.close();
-			_size += f.length();
-			_queue.add(f);
-			purge();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	Bitmap get(int size,String path) {
-		File f = new File(_cacheDir,Integer.toString(size)+"_"+new File(path).getName());
-		long n = TimeTool.getNow().getTime();
-		if(f.exists()) {
-			if( ((n-f.lastModified()) / 1000.0f) > TTL) {
-				f.delete();
-				_queue.remove(f);
-				return null;
-			}
-			_hit++;
-			Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
-			return bm;
-		}
-		return null;
-	}
-
-	public int getCount() {
-		return _queue.size();
-	}
-	
-	public int getSize() {
-		return _size;
-	}
-
-	public int getHits() {
-		return _hit;
-	}
-	private void purge() {
-		long n = TimeTool.getNow().getTime();
-		while(!_queue.isEmpty() && (_size>MAX_SIZE || ((n-_queue.peek().lastModified())/1000.0) > TTL)) {
-			File f = _queue.remove();
-			long m=f.lastModified(); 
-			if(f.exists()) {
-				_size-=f.length();
-				f.delete();
-			}
-		}
-	}
-}
-
 public class Tmdb {
 	private static Tmdb      _one     = null;
 	private static String    _key     = null;
@@ -233,6 +121,8 @@ public class Tmdb {
 	private TraktV2          _trakt   = null;
 	private BitmapCache       _hash    = null;
 	private List<Timezone> _timezones = null;
+	private HashMap<Integer,TvSeries> _seriesMap = new HashMap<Integer,TvSeries>();
+			
 	private TraktReaderThread _trakt_reader = new TraktReaderThread();
 	static  Set<Integer>  _ss = new TreeSet<Integer>();
 	static EpisodeKey     _d  = null;
@@ -364,7 +254,8 @@ public class Tmdb {
 		}
 	};
 
-	private int _seriesHit = 0;
+	private int _seriesHit1 = 0;
+	private int _seriesHit0 = 0;
 	
 	private Tmdb() {
 		_trakt_reader.start();
@@ -470,6 +361,11 @@ public class Tmdb {
 	public TvSeries loadSeries(int id) {
 		Integer key = new Integer(id);
 		
+		if(_seriesMap.get(key)!=null) {
+			_seriesHit0 ++;
+			return _seriesMap.get(key);
+		}
+		
 		try {
 			ContentValues cvi = new ContentValues();
 			Cursor c = Environment.CacheHelper.getReadableDatabase().query(
@@ -498,7 +394,10 @@ public class Tmdb {
 					});
 					break;
 				}
-				_seriesHit  ++;
+				_seriesHit1++;
+
+				_seriesMap.put(key, ts);
+				
 				return ts;
 			}
 			
@@ -518,7 +417,9 @@ public class Tmdb {
 			cvo.put("DATA",byteOut.toByteArray());
 			 
 			Environment.CacheHelper.getWritableDatabase().insert("SERIES",null,cvo);
-			 
+			
+			_seriesMap.put(key, ts);
+			
 			return ts;
 	         
 		} catch(Throwable ta) {
@@ -604,6 +505,6 @@ public class Tmdb {
 	}
 
 	public static int getSeriesCacheHits() {
-		return get()._seriesHit;
+		return get()._seriesHit1;
 	}
 }
