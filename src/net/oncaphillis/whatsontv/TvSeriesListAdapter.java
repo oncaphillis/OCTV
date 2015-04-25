@@ -97,8 +97,14 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	
 	    	if(the_series.getPosterPath() != null) {
 	    		ii.setTag(the_series.getPosterPath());
- 	    		new BitmapDownloaderTask(ii,_activity,pb,null,null).execute();
-    		} else {
+	    		Bitmap bm = null;
+	    		
+	    		if((bm = Tmdb.get().getCachedPoster(0,the_series.getPosterPath())) != null ) {
+	    			ii.setImageBitmap(bm);
+	    		} else {
+	   	    		new BitmapDownloaderTask(ii,_activity,pb,null,null).execute();
+	    		}
+	    	} else {
     			ii.setTag(null);
     		}
 

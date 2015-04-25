@@ -494,4 +494,11 @@ public class Tmdb {
 	public static int getSeriesCacheHits() {
 		return get()._seriesHit;
 	}
+
+	public  Bitmap getCachedPoster(int size,String path) {
+		if(_hash == null) {
+			return null;
+		}	
+		return _hash.get(size,path);
+	}
 }
