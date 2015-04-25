@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="list_text0_color">#ff000000</color>
     <color name="list_item0_color">#ffaaaaaa</color>
     <color name="list_item1_color">#ff444444</color>
     <color name="actionbar_text_color">#ffffffff</color>
     <color name="oncaphillis_blue">#2349bf</color>
     <color name="oncaphillis_light_blue">#5379ef</color>
     <color name="oncaphillis_orange">#FFFF9933</color>
+    <color name="oncaphillis_yellow">#FFF8DC58</color>
     <color name="oncaphillis_white">#ffffffff</color>
     <color name="oncaphillis_grey">#ff222222</color>
     <color name="oncaphillis_light_grey">#ff666666</color>

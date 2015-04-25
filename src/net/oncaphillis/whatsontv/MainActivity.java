@@ -46,7 +46,6 @@ public class MainActivity extends FragmentActivity {
 	
 	static private Pager[] ThePager = null;
 	static private NetWatchdog _watchDog = null;
-	static private Bitmap _defBitmap = null;
 
 	public  SearchThread SearchThread = null;
 	private ActionBarDrawerToggle _DrawerToggle = null;
@@ -160,7 +159,6 @@ public class MainActivity extends FragmentActivity {
 			
 			initNavbar();
 
-			_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image);
 			_mainPagerAdapter = new MainPagerAdapter(getSupportFragmentManager(),this);
 			_viewPager = (ViewPager) findViewById(R.id.main_pager_layout);
 	        _viewPager.setAdapter(_mainPagerAdapter);
@@ -176,7 +174,7 @@ public class MainActivity extends FragmentActivity {
 				
 	        	if(Environment.ListAdapters[i]==null)
 	        		Environment.ListAdapters[i] = new TvSeriesListAdapter(this,
-						android.R.layout.simple_list_item_1,Environment.MainList[i],_defBitmap,this);
+						android.R.layout.simple_list_item_1,Environment.MainList[i],this);
 	        	
 	        	final int idx = i;
 	        	

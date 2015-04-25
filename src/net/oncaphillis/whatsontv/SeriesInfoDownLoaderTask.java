@@ -23,7 +23,6 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 		_timeText    = new WeakReference(timeText);
 		_lastEpisodeText = new WeakReference(lastEpisodeText);
 		_timeStateText   = new WeakReference(timeState);
-		
 		_activity = activity;
 	}
 

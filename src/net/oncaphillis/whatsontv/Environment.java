@@ -158,4 +158,17 @@ public class Environment {
 	public static void setCurrentActivity(Activity a) {
 		_theActivity = a;
 	}
+
+	public static float getColWidth(Activity activity) {
+		// TODO Auto-generated method stub
+		if( activity!=null) {
+        	
+    		DisplayMetrics displaymetrics = new DisplayMetrics();
+    		activity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+    				
+    		float width  = displaymetrics.widthPixels / displaymetrics.xdpi;
+    		return width / getColumns(activity);
+        }
+        return 0;
+	}
 }

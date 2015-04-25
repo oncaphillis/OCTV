@@ -4,129 +4,158 @@
         android:layout_height="wrap_content"
         android:background="@color/oncaphillis_grey" >
 
-	<LinearLayout
-	    android:layout_width="fill_parent"
-	    android:layout_height="160dp"
-	    android:layout_marginBottom="4dp"
-	    android:layout_marginLeft="4dp"
-	    android:layout_marginRight="4dp"
-	    android:layout_marginTop="4dp"
-	    android:background="@color/oncaphillis_light_grey"
-	    android:minHeight="80dp"
-	    android:orientation="horizontal"
-	    android:padding="4dp"
-	    android:paddingBottom="4dp"
-	    android:paddingTop="4dp" >
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" >
 
-	    <LinearLayout
-	        android:layout_width="wrap_content"
-	        android:layout_height="match_parent"
-	        android:orientation="vertical" >
+            <LinearLayout
+                android:id="@+id/series_info_main_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="4dp"
+                android:background="@color/oncaphillis_light_grey"
+                android:minHeight="80dp"
+                android:orientation="horizontal"
+                android:padding="4dp"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp" >
 
-	        <TextView
-	            android:id="@+id/series_list_firstaired"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_gravity="center_horizontal"
-	            android:gravity="center_vertical"
-	            android:text="2006" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" >
 
-	        <RelativeLayout
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_marginRight="4dp" >
+                    <TextView
+                        android:id="@+id/series_list_firstaired"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center_vertical"
+                        android:text="2006"
+                        android:textStyle="bold" />
 
-	            <ImageView
-	                android:id="@+id/series_list_image"
-	                android:layout_width="92dp"
-	                android:layout_height="135dp"
-	                android:background="@android:drawable/dialog_holo_dark_frame" />
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="4dp" >
 
-	            <ProgressBar
-	                android:id="@+id/series_wait_bar"
-	                android:layout_width="64dp"
-	                android:layout_height="fill_parent"
-	                android:layout_centerHorizontal="true"
-	                android:layout_centerVertical="true" />
-	        </RelativeLayout>
+                        <ImageView
+                            android:id="@+id/series_list_image"
+                            android:layout_width="92dp"
+                            android:layout_height="135dp"
+                            android:background="@android:drawable/dialog_holo_dark_frame" />
 
-	    </LinearLayout>
+                        <ProgressBar
+                            android:id="@+id/series_wait_bar"
+                            android:layout_width="92dp"
+                            android:layout_height="135dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true" />
+                    </RelativeLayout>
 
-	    <LinearLayout
-	        android:layout_width="fill_parent"
-	        android:layout_height="match_parent"
-	        android:layout_weight="1"
-	        android:orientation="horizontal" >
+                    <TextView
+                        android:id="@+id/series_list_entry_rating_slim"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center_vertical|center"
+                        android:padding="2dp"
+                        android:text="10/10"
+                        android:textColor="@color/list_text0_color"
+                        android:textStyle="bold" />
 
-	        <LinearLayout
-	            android:layout_width="fill_parent"
-	            android:layout_height="fill_parent"
-	            android:orientation="vertical" >
+                </LinearLayout>
 
-	            <TextView
-	                android:id="@+id/series_title"
-	                android:layout_width="fill_parent"
-	                android:layout_height="wrap_content"
-	                android:maxLines="3"
-	                android:shadowColor="@color/list_item1_color"
-	                android:textSize="20sp" />
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal" >
 
-	            <TextView
-	                android:id="@+id/series_network"
-	                android:layout_width="fill_parent"
-	                android:layout_height="wrap_content"
-	                android:ellipsize="marquee"
-	                android:lines="1"
-	                android:marqueeRepeatLimit="marquee_forever"
-	                android:maxLines="1"
-	                android:textAppearance="?android:attr/textAppearanceSmall" />
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:orientation="vertical" >
 
-	            <LinearLayout
-	                android:id="@+id/series_nearest_episode"
-	                android:layout_width="match_parent"
-	                android:layout_height="fill_parent"
-	                android:background="@android:drawable/dialog_holo_dark_frame"
-	                android:orientation="vertical" >
+                        <TextView
+                            android:id="@+id/series_title"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:maxLines="3"
+                            android:shadowColor="@color/list_item1_color"
+                            android:textSize="20sp" />
 
-	                <LinearLayout
-	                    android:layout_width="match_parent"
-	                    android:layout_height="wrap_content" >
+                        <TextView
+                            android:id="@+id/series_network"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="marquee"
+                            android:lines="1"
+                            android:marqueeRepeatLimit="marquee_forever"
+                            android:maxLines="1"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
 
-	                    <TextView
-	                        android:id="@+id/series_airing_state"
-	                        android:layout_width="wrap_content"
-	                        android:layout_height="wrap_content"
-	                        android:gravity="center_vertical"
-	                        android:padding="4dp"
-	                        android:text="@string/next"
-	                        android:textStyle="bold" />
+                        <LinearLayout
+                            android:id="@+id/series_nearest_episode"
+                            android:layout_width="match_parent"
+                            android:layout_height="fill_parent"
+                            android:background="@android:drawable/dialog_holo_dark_frame"
+                            android:orientation="vertical" >
 
-	                    <TextView
-	                        android:id="@+id/series_time"
-	                        android:layout_width="fill_parent"
-	                        android:layout_height="wrap_content"
-	                        android:maxLines="1"
-	                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" >
 
-	                </LinearLayout>
+                                <TextView
+                                    android:id="@+id/series_airing_state"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:padding="4dp"
+                                    android:text="@string/next"
+                                    android:textStyle="bold" />
 
-	                <TextView
-	                    android:id="@+id/series_last_episode"
-	                    android:layout_width="fill_parent"
-	                    android:layout_height="fill_parent"
-	                    android:layout_weight="2"
-	                    android:maxLines="3"
-	                    android:padding="2dp"
-	                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                                <TextView
+                                    android:id="@+id/series_time"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:maxLines="1"
+                                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                            </LinearLayout>
 
-	            </LinearLayout>
-	        </LinearLayout>
-	    </LinearLayout>
+                            <TextView
+                                android:id="@+id/series_last_episode"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:layout_weight="2"
+                                android:maxLines="3"
+                                android:padding="2dp"
+                                android:textAppearance="?android:attr/textAppearanceMedium" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
 
-	    <RelativeLayout
-	        android:layout_width="wrap_content"
-	        android:layout_height="match_parent" >
-	    </RelativeLayout>
-	</LinearLayout>
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" >
+                </RelativeLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/series_list_entry_rating_wide"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_margin="6dp"
+                android:gravity="right"
+                android:padding="2dp"
+                android:text="10/10"
+                android:textColor="@color/list_text0_color"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
 
 </LinearLayout>

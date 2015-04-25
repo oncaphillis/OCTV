@@ -25,21 +25,21 @@ import android.widget.TextView;
 class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 
 	private List<TvSeries> _list      = null; 
-	private Bitmap         _defBitmap = null;
 	private Activity       _activity  = null;
 
-	public TvSeriesListAdapter(Context context, int resource, List<TvSeries> objects,Bitmap defBitmap,Activity ac) {
+	public TvSeriesListAdapter(Context context, int resource, List<TvSeries> objects,Activity ac) {
 		super(context, resource, objects);
 
-		_defBitmap = defBitmap;
 		_list      = objects;
 		_activity  = ac;
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		
+
 		View the_view = convertView;
+
+		boolean slim      = Environment.getColWidth(_activity) < 2.0;
 		
 		if(the_view == null) {
 	        LayoutInflater vi;
@@ -80,20 +80,26 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	TextView   tt3 = (TextView)     the_view.findViewById(R.id.series_last_episode);
 	    	TextView   tt4 = (TextView)     the_view.findViewById(R.id.series_airing_state);
 	    	
+	    	TextView   tt5 = (TextView)     the_view.findViewById(slim ? R.id.series_list_entry_rating_slim : R.id.series_list_entry_rating_wide);
+	    	TextView   tth = (TextView)     the_view.findViewById(slim ? R.id.series_list_entry_rating_wide : R.id.series_list_entry_rating_slim);
+	    	
+	    	tt5.setBackgroundColor(_activity.getResources().getColor(R.color.oncaphillis_light_grey));
+	    	tt5.setText("-/-");
+	    	
+	    	tth.setVisibility(View.GONE);
+	    	
 	    	ImageView       ii = (ImageView)    the_view.findViewById(R.id.series_list_image);
 	    	ProgressBar     pb = (ProgressBar)  the_view.findViewById(R.id.series_wait_bar);
 
 	    	pb.setVisibility(View.INVISIBLE);
+
+	    	ii.setImageBitmap(null);
 	    	
 	    	if(the_series.getPosterPath() != null) {
-		    	if(ii.getTag()==null || !ii.getTag().toString().equals(the_series.getPosterPath())) { 
-		    		ii.setImageBitmap(_defBitmap);
-		    	}
 	    		ii.setTag(the_series.getPosterPath());
-	    		new BitmapDownloaderTask(ii,_activity,pb,_defBitmap,null).execute();
+ 	    		new BitmapDownloaderTask(ii,_activity,pb,null,null).execute();
     		} else {
-	    		ii.setTag(null);
-    			ii.setImageBitmap(_defBitmap);
+    			ii.setTag(null);
     		}
 
 	    	String fa = "XXXX"; 
@@ -107,6 +113,14 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 				}
 	    	}
 	    	
+	    	if(the_series.getVoteCount()==0) {
+	    		tt5.setTextColor(_activity.getResources().getColor(R.color.oncaphillis_light_grey));
+	    		tt5.setText("-/-");
+	    	} else {
+	    		tt5.setTextColor(_activity.getResources().getColor(R.color.oncaphillis_orange));
+	    		tt5.setText(String.format("%2.1f/%d", the_series.getVoteAverage(),10));
+	    	}
+	    	
 	    	tt_series_title.setText( the_series.getName() + 
 	    			(the_series.getOriginalName()!=null 
 	    			&& !the_series.getOriginalName().equals("") 
@@ -116,15 +130,13 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	if(tt1.getTag() == null || !(tt1.getTag() instanceof Integer) || !((Integer)tt1.getTag()).equals(the_series.getId()) ) {
     			tt1.setTag(new Integer(the_series.getId()));
 	    	}
-
 	    	if(tt2.getTag() == null || !(tt2.getTag() instanceof Integer) || !((Integer)tt2.getTag()).equals(the_series.getId()) ) {
     			tt2.setTag(new Integer(the_series.getId()));
 	    	}
-
 	    	if(tt3.getTag() == null || !(tt3.getTag() instanceof Integer) || !((Integer)tt3.getTag()).equals(the_series.getId()) ) {
     			tt3.setTag(new Integer(the_series.getId()));
 	    	}
-
+	    
 	    	tt1.setText("...");
 	    	tt2.setText("...");
 	    	tt3.setText("...");
@@ -132,7 +144,7 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
     		
     		the_view.setTag(the_series);
 
-    		new SeriesInfoDownLoaderTask(tt1,tt2, tt3,tt4,_activity).execute();
+    		new SeriesInfoDownLoaderTask(tt1,tt2,tt3,tt4,_activity).execute();
  	    }
 	    return the_view;
 	}

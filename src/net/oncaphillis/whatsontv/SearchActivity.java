@@ -29,7 +29,6 @@ public class SearchActivity extends Activity {
 
 	private GridView _gridView;
 	private ArrayAdapter<TvSeries> _listAdapter;
-	private Bitmap                 _defBitmap;
 	private List<TvSeries> _mainList = new ArrayList<TvSeries>();
 
 
@@ -55,8 +54,6 @@ public class SearchActivity extends Activity {
 		_nothingFoundLayout.setVisibility(View.GONE);
 		
 		_progressBar.setIndeterminate(true);
-		
-		_defBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_image); 
 
 		final Activity act = this;
 		_progressObserver = new TaskObserver() {
@@ -92,7 +89,7 @@ public class SearchActivity extends Activity {
 
 	    /// Set up our special		
 		_listAdapter = new TvSeriesListAdapter(this,
-				android.R.layout.simple_list_item_1,_mainList,_defBitmap,this);
+				android.R.layout.simple_list_item_1,_mainList,this);
 		
 		int cols = Environment.getColumns(this);
 
