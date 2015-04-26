@@ -29,13 +29,7 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 	
 	private String[] _Groups = null;
 	
-	private String[][] _Children = new String[][] {
-			{},
-			{},
-			{"Today","On Air","Hi Vote","Popular"},
-			{},
-			{}
-	};
+	private String[][] _Children  = null;
 	
 	private int[] _GroupImageId = new int[] {
 			R.drawable.ic_action_person,
@@ -64,6 +58,23 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 		return _Groups;
 	}
 	
+	private String[][] getChildren() {
+		if(_Children  == null) {
+			_Children  = new String[][] {
+					{},
+					{},
+					{	_Context.getResources().getString(R.string.today),
+						_Context.getResources().getString(R.string.on_the_air),
+						_Context.getResources().getString(R.string.hi_voted),
+						_Context.getResources().getString(R.string.popular)
+					},
+					{},
+					{}
+			};
+		}
+		return _Children ;
+	}
+	
 	@Override
 	public int getGroupCount() {
 		return getGroups().length;
@@ -71,7 +82,7 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public int getChildrenCount(int idx) {
-		return _Children[idx].length;
+		return getChildren()[idx].length;
 	}
 
 	@Override
@@ -81,7 +92,7 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public Object getChild(int idxp, int idxc) {
-		return _Children[idxp][idxc];
+		return getChildren()[idxp][idxc];
 	}
 
 	@Override
