@@ -237,6 +237,8 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 					final String    _networks = networks;
 			        final TextView  tv_voting           = ((TextView) rootView.findViewById(R.id.series_page_vote));
 			        final TextView  tv_voting_count     = ((TextView) rootView.findViewById(R.id.series_page_vote_count));
+			        final View tv_voting_layout = (View) rootView.findViewById(R.id.series_fragment_voting_layout);
+			        
 			        final String    overview = series.getOverview()==null || series.getOverview()=="" ? no_overview : series.getOverview();
 			        final SeriesInfo series_info = SeriesInfo.fromSeries(series);
 			        // First without IMAGE
@@ -253,9 +255,11 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 								if(series.getVoteCount()!=0) {
 							    	tv_voting.setText(String.format("%.1f",series.getVoteAverage())+"/"+Integer.toString(10) );
 							        tv_voting_count.setText(Integer.toString(series.getVoteCount()));
+					        		tv_voting_layout.setAlpha(1.0f);
 					        	} else {
 					        		tv_voting.setText("-/-");
 					        		tv_voting_count.setText("0");
+					        		tv_voting_layout.setAlpha(0.3f);
 					        	}
 	
 								Date first_aired = series_info.getFirstAiring();

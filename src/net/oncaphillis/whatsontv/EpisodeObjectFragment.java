@@ -177,6 +177,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 		final ImageView episode_still      = ((ImageView) theView.findViewById(R.id.episode_stillpath));
 		
         final TextView tv_header           = ((TextView) theView.findViewById(R.id.episode_fragment_title));
+        final View tv_voting_layout        = theView.findViewById(R.id.episode_fragment_voting_layout);
         final TextView tv_rating           = ((TextView) theView.findViewById(R.id.episode_page_voting));
         final TextView tv_rating_count     = ((TextView) theView.findViewById(R.id.episode_page_voting_count));
         final TextView tv_date_tag         = ((TextView) theView.findViewById(R.id.episode_fragment_nearest_tag));
@@ -284,6 +285,13 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 	
 								tv_rating.setText(_voteCount==0 ? "-/-" : String.format("%.1f/10", _voteAverage));
 								tv_rating_count.setText(String.format("%d", _voteCount));
+								
+								if(_voteCount == 0) {
+									tv_voting_layout.setAlpha(0.3f);
+								} else {
+									tv_voting_layout.setAlpha(1.0f);
+								}
+								
 								if(fragment.getActivity()!=null)  {
 									if(_date!=null) {
 										tv_date.setText(withTime ? Environment.TimeFormater.format(_date) :  Environment.TmdbDateFormater.format(_date));
