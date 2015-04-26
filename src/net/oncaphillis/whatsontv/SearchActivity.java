@@ -55,22 +55,27 @@ public class SearchActivity extends Activity {
 		
 		_progressBar.setIndeterminate(true);
 
+		final int pos = savedInstanceState != null && savedInstanceState.containsKey("top") ? 
+				savedInstanceState.getInt("top") : 0;
+				
 		final Activity act = this;
 		_progressObserver = new TaskObserver() {
+			int npos = pos;
 			@Override
 			void beginProgress() {
-				if(_progressBar!=null)
+				if(_progressBar!=null) {
 					act.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
 							_progressBar.setVisibility(View.VISIBLE);
 						}
 					});
+				}
 			}
 
 			@Override
 			void endProgress() {
-				if(_progressBar!=null)
+				if(_progressBar!=null) {
 					act.runOnUiThread(new Runnable() {
 
 						@Override
@@ -82,8 +87,12 @@ public class SearchActivity extends Activity {
 								_nothingFoundLayout.setVisibility(View.VISIBLE);
 							
 							_progressBar.setVisibility(View.GONE);
-												}
+						
+							_gridView.requestFocusFromTouch();
+							_gridView.setSelection(npos);
+						}
 					});
+				}
 			}
 		};
 
@@ -230,6 +239,15 @@ public class SearchActivity extends Activity {
 		}
 		clearReferences();
 		super.onPause();
+	}
+	
+	@Override
+	protected
+	void onSaveInstanceState(Bundle outState) {
+		if(_gridView!=null) {
+			outState.putInt("top", _gridView.getFirstVisiblePosition());
+		}
+		super.onSaveInstanceState(outState);
 	}
 	
 	@Override
