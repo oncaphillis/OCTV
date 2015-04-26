@@ -185,26 +185,6 @@ public class Tmdb {
 		return null;
 	}
 
-	class SeasonKey {
-		SeasonKey(int series, int season) {
-			this.series = series;
-			this.season = season;
-		}
-		
-		@Override
-		public int hashCode() {
-			return series << 8 | season;
-		}
-		
-		@Override
-		public boolean equals(Object o) {
-			return (o instanceof SeasonKey ? ((SeasonKey)o).series == this.series && ((SeasonKey)o).season == this.season : false);
-		}
-		int	series;
-		int season;
-	};
-	
-	
 	class EpisodeKey {
 		
 		EpisodeKey(int series, int season,int episode) {
@@ -229,17 +209,7 @@ public class Tmdb {
 		int episode;
 	};
 
-	private CacheMap<SeasonKey,TvSeason>   _seasons  = new CacheMap<SeasonKey,TvSeason>(5000) {
-		@Override
-		TvSeason load(SeasonKey key) {
-			try {
-				return api().getTvSeasons().getSeason(key.series, key.season, getLanguage(),
-						SeasonMethod.external_ids, SeasonMethod.credits);
-			} catch(Throwable ta) {
-				return null;
-			}
-		}
-	};
+
 	private CacheMap<EpisodeKey,EpisodeInfo> _episodes = new CacheMap<EpisodeKey,EpisodeInfo>(5000) {
 		@Override
 		EpisodeInfo load(EpisodeKey key) {
@@ -253,6 +223,7 @@ public class Tmdb {
 	};
 
 	private int _seriesHit = 0;
+	private int _seasonHit = 0;
 	
 	private Tmdb() {
 		_trakt_reader.start();
@@ -355,6 +326,26 @@ public class Tmdb {
 		return loadPoster(size,path,null,null);
 	}
 
+	static <O> byte[] toByteArray(O o) throws IOException {
+		ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+		ObjectOutputStream out = new ObjectOutputStream(byteOut);
+		out.writeObject(o);
+		out.close();
+		byteOut.close();
+
+		return byteOut.toByteArray();
+	}
+	static <O> O fromByteArray(byte[] ba) throws IOException, ClassNotFoundException {
+
+		ByteArrayInputStream byteIn = new ByteArrayInputStream(ba);
+		ObjectInputStream in = new ObjectInputStream(byteIn);
+		O o = (O)in.readObject();
+		in.close();
+		byteIn.close();
+
+		return o;
+	}
+	
 	public TvSeries loadSeries(int id) {
 		Integer key = new Integer(id);
 
@@ -371,12 +362,7 @@ public class Tmdb {
 			
 			while(c.moveToNext()) {
 				DatabaseUtils.cursorRowToContentValues(c, cvi);
-				cvi.getAsByteArray("DATA");
-				ByteArrayInputStream byteIn = new ByteArrayInputStream(cvi.getAsByteArray("DATA"));
-				ObjectInputStream in = new ObjectInputStream(byteIn);
-				TvSeries ts = (TvSeries)in.readObject();
-				in.close();
-				byteIn.close();
+				TvSeries ts = fromByteArray(cvi.getAsByteArray("DATA"));
 
 				long d = cvi.getAsLong("TIMESTAMP");						
 				
@@ -391,19 +377,12 @@ public class Tmdb {
 			}
 			
 			TvSeries ts = api().getTvSeries().getSeries(key, getLanguage(), TvMethod.external_ids,TvMethod.images,TvMethod.credits);
-			
-			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 
-			ObjectOutputStream out = new ObjectOutputStream(byteOut);
-			out.writeObject(ts);
-			out.close();
-			byteOut.close();
-			 
 			ContentValues cvo = new ContentValues();
 			 
 			cvo.put("ID", key);
 			cvo.put("TIMESTAMP", n);
-			cvo.put("DATA",byteOut.toByteArray());
+			cvo.put("DATA",toByteArray(ts) );
 			 
 			Environment.CacheHelper.getWritableDatabase().insert("SERIES",null,cvo);
 			 
@@ -415,7 +394,56 @@ public class Tmdb {
 	}
 	
 	public TvSeason loadSeason(int series,int season) {
-		return _seasons.get(new SeasonKey(series,season));
+		try {
+			Integer ser = new Integer(series);
+			Integer sea = new Integer(season);
+
+			ContentValues cvi = new ContentValues();
+			
+			Cursor c = Environment.CacheHelper.getReadableDatabase().query(
+					"SEASON", new String[] {
+						"SERIES","ID","TIMESTAMP","DATA"
+					}, "SERIES=? AND ID=?", new String[] {
+						ser.toString(),
+						sea.toString()
+					}, null, null, null);
+				
+			long n = TimeTool.getNow().getTime() / 1000;
+				
+			while(c.moveToNext()) {
+				DatabaseUtils.cursorRowToContentValues(c, cvi);
+				TvSeason ts = fromByteArray(cvi.getAsByteArray("DATA"));
+
+				long d = cvi.getAsLong("TIMESTAMP");						
+				
+				if( n - d > Environment.TTL) {
+					Environment.CacheHelper.getWritableDatabase().delete("SEASON", "SERIES=? AND ID=?", new String[] {
+							ser.toString(),
+							sea.toString()
+					});
+					break;
+				}
+				_seasonHit  ++;
+				return ts;
+			}
+
+			TvSeason tvs = api().getTvSeasons().getSeason( series, season, getLanguage(),
+					SeasonMethod.external_ids, SeasonMethod.credits);
+
+			ContentValues cvo = new ContentValues();
+				 
+			cvo.put("SERIES", ser);
+			cvo.put("ID", sea);
+			cvo.put("TIMESTAMP", n);
+			cvo.put("DATA",toByteArray(tvs) );
+				 
+			Environment.CacheHelper.getWritableDatabase().insert("SEASON",null,cvo);
+				 
+			return tvs;
+		         
+		} catch(Throwable ta) {
+			return null;
+		}
 	}
 
 	public EpisodeInfo loadEpisode(int series,int season,int episode) {
@@ -455,11 +483,7 @@ public class Tmdb {
 	List<Timezone> getTimezones() {
 		return _timezones;
 	}
-	
-	public static CacheMap<?, ?> getSeasonsCache() {
-		return get()._seasons;
-	}
-	
+		
 	public static CacheMap<?, ?> getEpisodeCache() {
 		return get()._episodes; 
 	}
@@ -481,8 +505,9 @@ public class Tmdb {
 
 	public static long getSeriesCacheSize() {
 		Cursor c = Environment.CacheHelper.getReadableDatabase().query("SERIES",new String[] {
-				"COUNT(*)"},null,null,null,null,null);
-		
+			"COUNT(*)"},
+			null,null,null,null,null);
+
 		while(c.moveToNext()) {
 			ContentValues cvi = new ContentValues();
 			DatabaseUtils.cursorRowToContentValues(c, cvi);
@@ -500,5 +525,22 @@ public class Tmdb {
 			return null;
 		}	
 		return _hash.get(size,path);
+	}
+
+	public static long getSeasonsCacheSize() {
+		Cursor c = Environment.CacheHelper.getReadableDatabase().query("SEASON",new String[] {
+			"COUNT(*)"},
+			null,null,null,null,null);
+
+		while(c.moveToNext()) {
+			ContentValues cvi = new ContentValues();
+			DatabaseUtils.cursorRowToContentValues(c, cvi);
+			return cvi.getAsLong("COUNT(*)");
+		}
+		return 0;
+	}
+
+	public static int getSeasonsCacheHits() {
+		return get()._seasonHit;
 	}
 }
