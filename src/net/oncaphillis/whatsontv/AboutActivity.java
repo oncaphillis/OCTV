@@ -29,7 +29,7 @@ public class AboutActivity extends Activity {
 					"       <p> "+
 					"         %s"+
 					"         Licensed under the <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GPLv2</a>. "+
-					"         Source available at <a href='https://github.com/oncaphillis/WhatsOnTV'>github.com/oncaphillis/WhatsOnTV</a>. "+
+					"         Source available at <a href='https://github.com/oncaphillis/%s'>github.com/oncaphillis/%s</a>. "+
 					"         <i>'themoviedbapi'</i>&copy; 2014-15 by Holger Brandl. "+
 					"         <i>'trakt-java'</i>&copy; 2013-2015 by Uwe Trottmann."+
 					"         Icons made by  "+
@@ -90,6 +90,8 @@ public class AboutActivity extends Activity {
 				Environment.NAME,
 				Environment.VERSION,
 				Environment.COPYRIGHT,
+				Environment.NAME,
+				Environment.NAME,
 				getBitmapHtml(R.drawable.tmdb_logo,null,null),
 				getBitmapHtml(R.drawable.trakt_logo,null,null),
 				debug),

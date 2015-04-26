@@ -46,7 +46,7 @@ public class Environment {
 	static private Activity _theActivity = null;
 	
 	public static boolean isDebug() {
-		return true;
+		return VERSION.substring(0,3).equals("pre");
 	} 
 
 	static DateFormat TmdbDateFormater = new SimpleDateFormat("yyyy-MM-dd") {
@@ -160,7 +160,6 @@ public class Environment {
 	}
 
 	public static float getColWidth(Activity activity) {
-		// TODO Auto-generated method stub
 		if( activity!=null) {
         	
     		DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -170,5 +169,9 @@ public class Environment {
     		return width / getColumns(activity);
         }
         return 0;
+	}
+
+	public static boolean isSlim(Activity activity) {
+		return getColWidth(activity) < 2.0;
 	}
 }

@@ -39,7 +39,7 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 
 		View the_view = convertView;
 
-		boolean slim      = Environment.getColWidth(_activity) < 2.0;
+		boolean slim      = Environment.isSlim(_activity);
 		
 		if(the_view == null) {
 	        LayoutInflater vi;
