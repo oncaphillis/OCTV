@@ -81,6 +81,7 @@ public class AboutActivity extends Activity {
 						   "Bitmaps:"+String.format("%.2f MB" ,(float)Tmdb.getBitmapCache().getSize() / (float)(1024*1024))+" "+
 						   Integer.toString(Tmdb.getBitmapCache().getCount())+"/"+
 						   Integer.toString(Tmdb.getBitmapCache().getHits())+
+						   " DbMaxSize:"+String.format("%.2f MB",(float)Environment.CacheHelper.getWritableDatabase().getMaximumSize()/(float)(1024*1024))+
 						   "</p>"+
 						   "</div>";
 		}
