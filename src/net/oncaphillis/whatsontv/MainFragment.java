@@ -96,29 +96,17 @@ public class MainFragment extends Fragment {
 				@Override
 
 				public void run() {
-					while(act!=null && act.SearchThread!=null && act.SearchThread.isAlive()) {
+					while(act!=null && f.getIdx() >= act.SearchThread.getCurrent().list &&  act.SearchThread!=null && act.SearchThread.isAlive()) {
 						act.runOnUiThread(new Runnable(){
 							@Override
 							public void run() {
 								Current ci = act.SearchThread.getCurrent();
 								synchronized(act) {
-									if( f.getIdx() < ci.list) {
-										f.setProgressBarVisibility(false);							
-										
-										if(npos!=-1) {
-											_theView.requestFocusFromTouch();
-											_mainGridView.setSelection(npos);
-											npos=-1;
-										}
-											
-										if(act.SearchThread.getCount(f.getIdx()) == 0)
-											ll.setVisibility(View.VISIBLE);
-										
-									} else if(f.getIdx()==ci.list && ci.count>0) {
+									if(f.getIdx()==ci.list && ci.count>0) {
 										f.setProgressBarVisibility(true);
 										f.setProgressBarIndeterminate(false);
 										f.setProgress(ci.count * 10000 / ci.total);
-									} else {
+									} else if(f.getIdx()>ci.list && ci.count>0) {
 										f.setProgressBarVisibility(true);
 										f.setProgressBarIndeterminate(true);
 									}
@@ -150,6 +138,11 @@ public class MainFragment extends Fragment {
         return _theView;
     }
 		
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
+	
 	@Override
 	public void onSaveInstanceState(Bundle outState) { 
 		if(_mainGridView!=null)
