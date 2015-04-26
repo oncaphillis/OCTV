@@ -59,8 +59,9 @@ public class SearchActivity extends Activity {
 				savedInstanceState.getInt("top") : 0;
 				
 		final Activity act = this;
+
 		_progressObserver = new TaskObserver() {
-			int npos = pos;
+
 			@Override
 			void beginProgress() {
 				if(_progressBar!=null) {
@@ -88,11 +89,18 @@ public class SearchActivity extends Activity {
 							
 							_progressBar.setVisibility(View.GONE);
 						
-							_gridView.requestFocusFromTouch();
-							_gridView.setSelection(npos);
 						}
 					});
 				}
+				act.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						_gridView.invalidate();
+						_gridView.requestFocusFromTouch();
+						_gridView.setSelection(pos);
+					}
+				});
 			}
 		};
 
