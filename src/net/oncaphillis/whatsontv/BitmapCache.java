@@ -44,7 +44,7 @@ class BitmapCache {
 	
 	private int _size = 0;
 	
-	static final int MAX_SIZE=20000000; 
+	static final int MAX_SIZE=10 * 1024 * 1024; 
 	
 	/** Stores a new Bitmap under a given Key. If the max size of 
 	 * the cache is exceeded we delete images until we are below

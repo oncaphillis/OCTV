@@ -78,7 +78,7 @@ public class AboutActivity extends Activity {
 						   Integer.toString(Tmdb.getSeasonsCache().hit())+"; "+
 						   "Episodes:"+Integer.toString(Tmdb.getEpisodeCache().size())+"/"+
 						   Integer.toString(Tmdb.getEpisodeCache().hit())+"; "+
-						   "Bitmaps:"+Integer.toString(Tmdb.getBitmapCache().getSize())+"/"+
+						   "Bitmaps:"+String.format("%.2f MB" ,(float)Tmdb.getBitmapCache().getSize() / (float)(1024*1024))+" "+
 						   Integer.toString(Tmdb.getBitmapCache().getCount())+"/"+
 						   Integer.toString(Tmdb.getBitmapCache().getHits())+
 						   "</p>"+
