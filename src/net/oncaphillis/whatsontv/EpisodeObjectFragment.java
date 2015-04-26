@@ -271,6 +271,9 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 								if(overview == null || overview == "")
 									overview = _no_overview;
 								
+								if(Environment.isDebug())
+									overview = "["+overview+"]";
+								
 								if(tve.getTmdb().getName() == null || tve.getTmdb().getName().equals(""))  {
 									tv_header.setTextColor(act.getResources().getColor(R.color.oncaphillis_light_grey));
 									tv_header.setText(act.getResources().getString(R.string.no_title_available));
