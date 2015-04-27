@@ -1,6 +1,8 @@
 package net.oncaphillis.whatsontv;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.util.Calendar;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -26,6 +28,7 @@ public class AboutActivity extends Activity {
 					"         %s"+
 					"       </div> "+
 					"       <h1>%s %s</h1>  "+
+					"         <p style='font-size:80%%'>(%s)</p>"+
 					"       <p> "+
 					"         %s"+
 					"         Licensed under the <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GPLv2</a>. "+
@@ -71,6 +74,9 @@ public class AboutActivity extends Activity {
 		String debug = new String("");
 		
 		if(Tmdb.isDebug()) {
+
+			File f = webview.getContext().getDatabasePath(Environment.NAME);
+			long dbSize = f.length();
 			debug = "<div>"+
 					"<p>Series:"+Long.toString(Tmdb.getSeriesCacheSize())+"/"+
 							Integer.toString(Tmdb.getSeriesCacheHits())+";"+
@@ -82,14 +88,17 @@ public class AboutActivity extends Activity {
 						   Integer.toString(Tmdb.getBitmapCache().getCount())+"/"+
 						   Integer.toString(Tmdb.getBitmapCache().getHits())+
 						   " DbMaxSize:"+String.format("%.2f MB",(float)Environment.CacheHelper.getWritableDatabase().getMaximumSize()/(float)(1024*1024))+
+						   " DbSize:"+String.format("%.2f MB", (float)dbSize/(1024*1024))+
 						   "</p>"+
 						   "</div>";
 		}
-		
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(Environment.BUILD_DATE);
 		webview.loadData(String.format(_html, 
 				getBitmapHtml(R.drawable.ic_launcher,new Integer(128),null),
 				Environment.NAME,
 				Environment.VERSION,
+				Environment.TimeFormater.format(c.getTime()),
 				Environment.COPYRIGHT,
 				Environment.NAME,
 				Environment.NAME,

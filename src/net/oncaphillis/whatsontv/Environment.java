@@ -36,7 +36,8 @@ public class Environment {
 	public static String VERSION   ="1.0";
 	public static String NAME ="";
 	public static String COPYRIGHT ="&copy; 2015 Sebastian Kloska (<a href='http://www.oncaphillis.net/'>www.oncaphillis.net</a>; <a href='mailto:sebastian.kloska@snafu.de'>sebastian.kloska@snafu.de</a>)";
-
+	public static long BUILD_DATE = 0;
+	
 	static public String[] Titles = null;
 	static public ArrayAdapter<TvSeries>[]      ListAdapters  = null;
 	static public Map<Integer,List<TvSeries>>[] StoredResults = null;
@@ -120,6 +121,7 @@ public class Environment {
 		try {
 			VERSION = a.getPackageManager().getPackageInfo(a.getPackageName(), 0).versionName;
 			NAME = a.getResources().getString(R.string.app_name);
+			BUILD_DATE = a.getPackageManager().getPackageInfo(a.getPackageName(),0).lastUpdateTime;
 		} catch (NameNotFoundException e) {
 		}
 		
