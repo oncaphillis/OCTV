@@ -34,6 +34,9 @@ public class TraktReaderThread extends Thread {
 	private LinkedList<Integer> _list = new LinkedList<Integer>();
 	private WeakHashMap<Runnable,Void> _listeners = new WeakHashMap<Runnable,Void>();
 	private String _e ;
+	private long _loadCount = 0;
+	private long _lookupCount = 0;
+	private long _hitCount = 0;
 	
 	@Override
 	public void run()  {
@@ -53,6 +56,10 @@ public class TraktReaderThread extends Thread {
 
 				l = Tmdb.get().trakt().search().idLookup(IdType.TMDB,Integer.toString(n), 1, null);					
 
+				synchronized(this) {
+					_lookupCount++;
+				}
+				
 				if(l != null) {
 
 					for(SearchResult r : l) {
@@ -64,6 +71,7 @@ public class TraktReaderThread extends Thread {
 							if(eps.first_aired!=null) {
 								synchronized(this) {
 									_map.put(n,eps);
+									_loadCount++;
 								}
 							}
 						}
@@ -79,9 +87,7 @@ public class TraktReaderThread extends Thread {
 						_e = t.getMessage();
 					}
 				}
-				
 				Thread.sleep(100);
-
 			} catch(Throwable t) {
 				synchronized(this) {
 					_list.removeFirst();
@@ -106,11 +112,27 @@ public class TraktReaderThread extends Thread {
 		synchronized(this) {
 			if( !_map.containsKey(id) )  {
 				add(id);
+				_hitCount--;
 			}
+			_hitCount++;
 			return _map.get(id);
 		}
 	}
-
+	public long getHitCount() {
+		synchronized(this) {
+			return _hitCount;
+		}
+	}
+	public long getLoadCount() {
+		synchronized(this) {
+			return _loadCount;
+		}
+	}
+	public long getLookupCount() {
+		synchronized(this) {
+			return _lookupCount;
+		}
+	}
 	private void inform() {
 		synchronized(this) {
 			for(Runnable r : _listeners.keySet()) {
