@@ -33,6 +33,16 @@ public class TimeTool {
 		return Calendar.getInstance().getTime();
 	}
 
+	public static Date toDate(Date d) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(d);
+		c.set(Calendar.HOUR_OF_DAY,   0);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
+		return c.getTime();
+	}
+
 	public static Date getToday() {
 		Calendar c = Calendar.getInstance();
 		c.setTime(getNow());
@@ -40,6 +50,6 @@ public class TimeTool {
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
-		return c.getTime();
+		return toDate(getNow());
 	}
 }

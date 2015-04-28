@@ -127,12 +127,9 @@ public class Tmdb {
 	
 	public class EpisodeInfo {
 		private TvEpisode _tmdb_episode;
-		private Episode _trakt_episode;
-		private boolean _trakt_not_found = false;
 		
-		EpisodeInfo (TvEpisode tmdb,Episode trakt)  {
+		EpisodeInfo (TvEpisode tmdb)  {
 			_tmdb_episode = tmdb;
-			_trakt_episode = trakt;
 			
 		}
 		public TvEpisode getTmdb()  {
@@ -144,23 +141,26 @@ public class Tmdb {
 		 * @return Episode
 		 */
 		
-		public Episode getTrakt()  {
-			
-			if(Environment.useTrakt() && _trakt_episode == null && ! _trakt_not_found) {
-				_trakt_episode = Tmdb.get().trakt_reader().get(getTmdb().getId());
+		private Episode getTrakt()  {
+			if(Environment.useTrakt()) {
+				return Tmdb.get().trakt_reader().get(getTmdb().getId());
 			}
-
-			return _trakt_episode;
+			return null;
 		}
 		
 		public Date getAirTime() {
-			if(getTrakt()!=null && getTrakt().first_aired!=null) {
-				return  getTrakt().first_aired.toCalendar(Locale.getDefault()).getTime();
+			Episode e;
+			if( ((e=getTrakt())!=null) && e.first_aired!=null) {
+				return  e.first_aired.toCalendar(Locale.getDefault()).getTime();
 			}
 			return null;
 		}
 		
 		public Date getAirDate() {
+			Episode e;
+			if( (e=getTrakt())!=null && e.first_aired!=null) {
+				return TimeTool.toDate(e.first_aired.toCalendar(Locale.getDefault()).getTime());
+			}
 			return Tmdb.getAirDate(getTmdb());
 		}
 	}
@@ -215,7 +215,7 @@ public class Tmdb {
 		EpisodeInfo load(EpisodeKey key) {
 			try {
 				return new EpisodeInfo(api().getTvEpisodes().getEpisode(key.series,key.season,key.episode, 
-						getLanguage(), EpisodeMethod.credits,EpisodeMethod.external_ids,EpisodeMethod.images),null);
+						getLanguage(), EpisodeMethod.credits,EpisodeMethod.external_ids,EpisodeMethod.images));
 			} catch(Throwable ta) {
 			}
 			return null;
