@@ -88,10 +88,11 @@ public class AboutActivity extends Activity {
 						   Integer.toString(Tmdb.getBitmapCache().getCount())+"/"+
 						   Integer.toString(Tmdb.getBitmapCache().getHits())+
 						   " DbMaxSize:"+String.format("%.2f MB",(float)Environment.CacheHelper.getWritableDatabase().getMaximumSize()/(float)(1024*1024))+
-						   " DbSize:"+String.format("%.2f MB", (float)dbSize/(1024*1024))+
+						   " DbSize:"+String.format("%.2f MB", (float)dbSize/(1024*1024))+"<p/>"+
 						   " Trakt: lookup:"+Long.toString(Tmdb.get().trakt_reader().getLookupCount())+
 						   		" Load:"+Long.toString(Tmdb.get().trakt_reader().getLoadCount())+
-						   		" Hit:"+Long.toString(Tmdb.get().trakt_reader().getHitCount())+
+						   		" Hit:"+Long.toString(Tmdb.get().trakt_reader().getHitCount())+"<p/>"+
+						   	" SeriesInfo: size: "+Long.toString(SeriesInfo.getCacheSize())+" hits:"+Long.toString(SeriesInfo.getCacheHits())+"<p/>"+
 						   "</p>"+
 						   "</div>";
 		}

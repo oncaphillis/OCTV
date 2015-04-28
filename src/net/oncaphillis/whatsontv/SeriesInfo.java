@@ -8,9 +8,12 @@ import info.movito.themoviedbapi.model.tv.TvSeries;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.PriorityQueue;
 import java.util.TimeZone;
 
 import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
@@ -26,7 +29,8 @@ public class SeriesInfo {
 	private int _nearestEpisodeNumber = 0;
 	private List<SeasonNode> _seasonsEpisodeList = null;
 	private EpisodeInfo _nearestEpisodeInfo;
-
+	private static int MAX_CACHE = 100;
+	
 	public static class SeasonNode implements Serializable {
 		int _season;
 		public SeasonNode(int season) {
@@ -47,11 +51,52 @@ public class SeriesInfo {
 			return _episode;
 		}
 	}
+
 	
+	private static class CacheNode {
+		public long timestamp;
+		public int id;
+		public CacheNode(int i) {
+			timestamp = TimeTool.getNow().getTime();
+			id = i;
+		}
+	};
+	
+	static HashMap<Integer,SeriesInfo> _cacheMap = new HashMap<Integer,SeriesInfo>();
+	static PriorityQueue<CacheNode> _cacheQueue = new PriorityQueue<CacheNode>(100,new Comparator<CacheNode>() {
+		@Override
+		public int compare(CacheNode o1, CacheNode o2) {
+			return o1.timestamp<o2.timestamp ? -1 : o1.timestamp>o2.timestamp ? 1 : 0;
+		}
+	});
+	
+	private static long _hit=0;
+
 	static SeriesInfo fromSeries(TvSeries s) {
 		if(s == null)
 			return null;
-		return new SeriesInfo(s);
+		
+		if(_cacheMap.get(s.getId()) !=null) {
+			_hit ++;
+			return _cacheMap.get(s.getId());
+		}
+		
+		SeriesInfo si = new SeriesInfo(s);
+		_cacheMap.put(s.getId(), si);
+		_cacheQueue.add(new CacheNode(s.getId()) );
+	
+		if(_cacheQueue.size()>MAX_CACHE) {
+			_cacheMap.remove(_cacheQueue.poll());
+		}
+		return si;
+	}
+	
+	public static long getCacheHits() {
+		return _hit;
+	}
+	
+	public static long getCacheSize() {
+		return _cacheQueue.size();
 	}
 	private SeriesInfo(TvSeries tvs) {
 		_tvs = Tmdb.get().loadSeries(tvs.getId());
@@ -271,4 +316,6 @@ public class SeriesInfo {
 	public TvSeries getTmdb() {
 		return _tvs;
 	}
+	
+	
 }
