@@ -20,13 +20,14 @@ import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
 
 public class SeriesInfo {
 	private TvSeries _tvs;
-	private String _nws = new String("");
-	private Date    _nearestAiring  = null;
-	private Date    _firstAiring  = null;
-	private String _nearestEpisodeTitle = new String("");
+	private String   _networks       = new String("");
+	private Date     _nearestAiring  = null;
+	private Date     _firstAiring    = null;
+	
+	private String  _nearestEpisodeTitle = new String("");
 	private boolean _hasClock = false;
-	private int _nearestEpisodeSeason = 0;
-	private int _nearestEpisodeNumber = 0;
+	private int     _nearestEpisodeSeason = 0;
+	private int     _nearestEpisodeNumber = 0;
 	private List<SeasonNode> _seasonsEpisodeList = null;
 	private EpisodeInfo _nearestEpisodeInfo;
 	private static int MAX_CACHE = 100;
@@ -103,7 +104,7 @@ public class SeriesInfo {
 
 		if(_tvs.getNetworks()!=null) {
 			for(Network nw : _tvs.getNetworks() )  {
-				_nws += (_nws.isEmpty() ? "" : " ") + nw.getName();
+				_networks += (_networks.isEmpty() ? "" : " ") + nw.getName();
 			}
 		}
 
@@ -114,6 +115,10 @@ public class SeriesInfo {
 			}
 		}
 		
+        // If there is a last airing date given for the series
+        // we and iterate backwards thru seasons and episodes 
+		// to find the nearest airing  date. (next or last ever).
+
 		if(tvs.getLastAirDate()!=null) {
 			
 			try {
@@ -128,10 +133,11 @@ public class SeriesInfo {
 	        Date td = TimeTool.getToday();
 	        
 	        boolean found = false;
-
+	        
 	        if( ! td.after( _nearestAiring )  ) {
 	        	
 	        	if(tvs.getSeasons()!=null) {
+	        		
 	        		ListIterator<TvSeason> season_iterator = tvs.getSeasons().listIterator(tvs.getSeasons().size());
 	        		TvEpisode episode = null;
 	        		TvSeason season = null;
@@ -191,8 +197,7 @@ public class SeriesInfo {
 	        } else {
 	        	tvs = Tmdb.get().loadSeries(tvs.getId());
 	        	if(tvs.getSeasons()!=null && tvs.getSeasons().size()>0) {
-	        		
-	        		
+
 	        		TvSeason ts = null;
 	        		int n = 1;
 	        		
@@ -207,7 +212,7 @@ public class SeriesInfo {
 	        			TvEpisode eps = ts.getEpisodes().get(ts.getEpisodes().size()-1);
         				_nearestEpisodeSeason = ts.getSeasonNumber();
         				_nearestEpisodeNumber = eps.getEpisodeNumber();
-	        			_nearestEpisodeTitle = eps.getName();
+	        			_nearestEpisodeTitle  = eps.getName();
 	        			Date na = Tmdb.getAirDate(eps);
 	        			if(na != null) {
 	        				_nearestAiring = na;
@@ -271,11 +276,8 @@ public class SeriesInfo {
 	public Date getFirstAiring() {
 		return _firstAiring;
 	}
-	public Date getNearestAiring() {
-		return _nearestAiring;
-	}
 	public String getNetworks() {
-		return _nws;
+		return _networks;
 	}
 	public String getNearestEpisodeTitle() {
 		return _nearestEpisodeTitle;
@@ -287,8 +289,32 @@ public class SeriesInfo {
 		return _nearestEpisodeNumber;
 	}
 	public boolean hasClock() {
-		return _hasClock ;
+		if( _hasClock )
+			return true;
+		getNearestAiring();
+		
+		return _hasClock;
 	}
+
+	public Date getNearestAiring() {
+		if(_nearestAiring == null)
+			return null;
+		
+		Date td = TimeTool.getToday();
+		
+		if(td.after(_nearestAiring) || _hasClock)
+			return _nearestAiring;
+		
+		EpisodeInfo ei = Tmdb.get().loadEpisode(getTmdb().getId(), this._nearestEpisodeSeason,this._nearestEpisodeNumber);
+
+		if(ei != null && ei.getAirTime() != null) {
+			_nearestAiring = ei.getAirTime();
+			_hasClock      = true;
+		}
+		
+		return _nearestAiring;
+	}
+
 	public int getNearestEpisodeCoordinate() {
 		int n = 0;
 		for(SeasonNode s : getSeasonsEpisodeList()) {

@@ -24,6 +24,7 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 		_lastEpisodeText = new WeakReference(lastEpisodeText);
 		_timeStateText   = new WeakReference(timeState);
 		_activity = activity;
+		SeriesInfo si;
 	}
 
 	@Override
@@ -42,63 +43,68 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 		
 		// dates reported by Tmdb are in EST. We need this to compare
 		// the last aired
-		if(si!=null) {
-			if(_timeText != null && _timeText.get() != null && _timeText.get().getTag()!=null && _timeText.get().getTag() instanceof Integer) {
-				
-				if(si.getNearestAiring()!=null) {
-					
-					DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.TmdbDateFormater;
-					
-					Date now = TimeTool.getNow();
-					_timeText.get().setText(df.format(si.getNearestAiring()) );					
-					
-					if(si.getNearestAiring().before(now)) {
-						_timeText.get().setTextColor(_activity.getResources().getColor(R.color.actionbar_text_color));
-						if(_timeStateText.get()!=null)
-							_timeStateText.get().setText("last");
-					} else {
-						if(_timeStateText.get()!=null)
-							_timeStateText.get().setText("next");
+		if(si!=null && _timeText != null && _timeText.get() != null && _timeText.get().getTag()!=null && _timeText.get().getTag() instanceof Integer) {
+			refresh(_activity,si,_timeText.get(),_timeStateText.get(),_networkText.get(),_lastEpisodeText.get(),false);
+		}
+	}
 
-						if(!si.hasClock()) {
-							final TvSeries tvs = si.getTmdb();
+	static public void refresh(Activity act,SeriesInfo si, TextView timeText, TextView timeStateText,
+			TextView networkText, TextView lastEpisodeText, boolean std) {
+		if(si.getNearestAiring()!=null) {
+			
+			DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.TmdbDateFormater;
+			
+			Date now = TimeTool.getNow();
+			timeText.setText(df.format(si.getNearestAiring()) );					
+			
+			if(si.getNearestAiring().before(now)) {
+				timeText.setTextColor(act.getResources().getColor(R.color.actionbar_text_color));
+				if(timeStateText!=null)
+					timeStateText.setText("last");
+			} else {
+				if(timeStateText !=null)
+					timeStateText.setText("next");
+
+				if(!si.hasClock()) {
+
+					final SeriesInfo _si = si;
+					final Activity  _act = act;
+					final TextView  _timeText = timeText;
+					
+					Runnable r = new Runnable() {
+						final Runnable   _me = this;
+						
+						@Override
+						public void run() {
 							
-							if(tvs!=null) {
-								Runnable r = new Runnable() {
-									final Runnable _me = this;
-									@Override
-									public void run() {
-										SeriesInfo si = SeriesInfo.fromSeries(tvs);
-										DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.TmdbDateFormater;
-										final String t = df.format(si.getNearestAiring());
-										_activity.runOnUiThread(new Runnable() {
-											@Override
-											public void run() {
-												if( _timeText.get() != null && _timeText.get().getTag() != null && _timeText.get().getTag() == _me) {
-													_timeText.get().setText(t);
-												}
-											}
-										});
+							DateFormat df = _si.hasClock() ? Environment.TimeFormater : Environment.TmdbDateFormater;
+							
+							final String t = df.format(_si.getNearestAiring());
+									
+							_act.runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									if( _timeText != null && _timeText.getTag() != null && _timeText.getTag() == _me) {
+										_timeText.setText(Environment.isDebug() ? "@"+t : t);
 									}
-								};
-								_timeText.get().setTag(r);
-								Tmdb.get().trakt_reader().register(r);
-							}
+								}
+							});
 						}
-						_timeText.get().setTextColor(_activity.getResources().getColor(R.color.oncaphillis_orange));
-					}
+					};
+					timeText.setTag(r);
+					Tmdb.get().trakt_reader().register(r);
 				}
+				timeText.setTextColor(act.getResources().getColor(R.color.oncaphillis_orange));
 			}
+		}
 
-			if(_networkText != null && _networkText.get() != null && _networkText.get().getTag()!=null && _networkText.get().getTag() instanceof Integer) {
-				_networkText.get().setText(si.getNetworks());
-			}
+		if( networkText != null && networkText.getTag()!=null && networkText.getTag() instanceof Integer) {
+			 networkText.setText(si.getNetworks());
+		}
 
-			if(_lastEpisodeText != null && _lastEpisodeText.get() != null && _lastEpisodeText.get().getTag()!=null && _lastEpisodeText.get().getTag() instanceof Integer) {
-				String s = Integer.toString(si.getNearestEpisodeSeason())+"x"+Integer.toString(si.getNearestEpisodeNumber());
-				
-				_lastEpisodeText.get().setText(s+" "+si.getNearestEpisodeTitle());
-			}
+		if( lastEpisodeText != null &&  lastEpisodeText.getTag()!=null && lastEpisodeText.getTag() instanceof Integer) {
+			String s = Integer.toString(si.getNearestEpisodeSeason())+"x"+Integer.toString(si.getNearestEpisodeNumber());
+			lastEpisodeText.setText(s+" "+si.getNearestEpisodeTitle());
 		}
 	}
 }
