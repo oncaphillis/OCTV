@@ -122,9 +122,7 @@ public class Tmdb {
 	private BitmapCache       _hash    = null;
 	private List<Timezone> _timezones = null;
 	private TraktReaderThread _trakt_reader = new TraktReaderThread();
-	static  Set<Integer>  _ss = new TreeSet<Integer>();
-	static EpisodeKey     _d  = null;
-	
+
 	public class EpisodeInfo {
 		private TvEpisode _tmdb_episode;
 		
