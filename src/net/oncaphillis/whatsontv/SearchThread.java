@@ -3,7 +3,10 @@ package net.oncaphillis.whatsontv;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
 
 import android.app.Activity;
@@ -74,6 +77,7 @@ public class SearchThread extends Thread {
 
 	@Override
 	public void run() {
+		Set<Integer> doubleSet = new TreeSet<Integer>();
 		
 		synchronized(this) {
 			_list  =  0;
@@ -115,16 +119,31 @@ public class SearchThread extends Thread {
 			while( ( _listAdapters[_list].getCount()) < MAX_SEARCH) {
 
 				li_page=_pagers[_list].getPage(page++);
+				
+				
 				final TextView tv = _tv;
 
 				if(li_page != null) {
-
+					Iterator<TvSeries> i = li_page.iterator();
+					
+					List<TvSeries> o_li = new ArrayList<TvSeries>();
+					
+					// #46 Eliminate doubles in list
+					while(i.hasNext()) {
+						TvSeries tvs = i.next();
+						if(!doubleSet.contains(tvs.getId())) {
+							o_li.add(tvs);
+							doubleSet.add(tvs.getId());
+						}
+					}
+					
 					lock();
 					
-					final List<TvSeries> li = li_page;
+					final List<TvSeries> li = o_li;
 					_activity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
+							
 							_listAdapters[fj].addAll(li);	
 							_listAdapters[fj].notifyDataSetChanged();
 							if( tv != null ) {
