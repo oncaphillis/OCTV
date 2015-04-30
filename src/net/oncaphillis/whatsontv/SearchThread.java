@@ -77,7 +77,6 @@ public class SearchThread extends Thread {
 
 	@Override
 	public void run() {
-		Set<Integer> doubleSet = new TreeSet<Integer>();
 		
 		synchronized(this) {
 			_list  =  0;
@@ -85,6 +84,8 @@ public class SearchThread extends Thread {
 		
 		for(_list=0; _list < _pagers.length ;) {
 			final int fj = _list;
+
+			Set<Integer> doubleSet = new TreeSet<Integer>();
 
 			final Semaphore mutex = new Semaphore(0);
 
@@ -127,13 +128,15 @@ public class SearchThread extends Thread {
 					Iterator<TvSeries> i = li_page.iterator();
 					
 					List<TvSeries> o_li = new ArrayList<TvSeries>();
-					
+					int nn = 0;
 					// #46 Eliminate doubles in list
 					while(i.hasNext()) {
 						TvSeries tvs = i.next();
 						if(!doubleSet.contains(tvs.getId())) {
 							o_li.add(tvs);
 							doubleSet.add(tvs.getId());
+						} else {
+							nn = tvs.getId();
 						}
 					}
 					
