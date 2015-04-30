@@ -3,6 +3,7 @@ package net.oncaphillis.whatsontv;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -148,7 +149,16 @@ public class SearchThread extends Thread {
 						public void run() {
 							
 							_listAdapters[fj].addAll(li);	
+							_listAdapters[fj].sort(new Comparator<TvSeries>() {
+
+								@Override
+								public int compare(TvSeries o1, TvSeries o2) {
+									return o1.getName().toUpperCase().compareTo(o2.getName().toUpperCase());
+								}
+							});
+							
 							_listAdapters[fj].notifyDataSetChanged();
+							
 							if( tv != null ) {
 								tv.setText(Integer.toString(_listAdapters[fj].getCount()));
 							}
