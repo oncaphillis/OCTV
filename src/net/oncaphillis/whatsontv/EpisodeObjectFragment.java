@@ -188,6 +188,9 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
         final String aired = getActivity().getResources().getString(R.string.aired);
 		final Fragment fragment = this;
         
+		// May be a solution for #43
+		overview_webview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		
 		Thread t = new Thread(new Runnable() {
 			final int o_white  = fragment.getActivity().getResources().getColor(R.color.oncaphillis_white);
 			final int o_orange = fragment.getActivity().getResources().getColor(R.color.oncaphillis_orange);
