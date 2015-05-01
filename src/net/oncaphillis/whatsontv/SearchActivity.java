@@ -54,7 +54,8 @@ public class SearchActivity extends Activity {
 		_nothingFoundLayout.setVisibility(View.GONE);
 		
 		_progressBar.setIndeterminate(true);
-
+		_progressBar.setVisibility(View.VISIBLE);
+		
 		final int pos = savedInstanceState != null && savedInstanceState.containsKey("top") ? 
 				savedInstanceState.getInt("top") : 0;
 				
@@ -83,7 +84,7 @@ public class SearchActivity extends Activity {
 						public void run() {
 							
 							int cc = _searchThread.getCount();
-							
+
 							if(_nothingFoundLayout!=null && _searchThread.getCount()==0)
 								_nothingFoundLayout.setVisibility(View.VISIBLE);
 							
