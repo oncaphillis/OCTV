@@ -153,7 +153,26 @@ public class SearchThread extends Thread {
 
 								@Override
 								public int compare(TvSeries o1, TvSeries o2) {
-									return o1.getName().toUpperCase().compareTo(o2.getName().toUpperCase());
+									String n1 = o1.getName().toUpperCase();
+									String n2 = o2.getName().toUpperCase();
+									
+									for(String a : Environment.getArticles()) {
+										String a0 = a.toUpperCase()+" ";
+										if(n1.length() > a0.length() && n1.substring(0, a0.length()).equals(a0))  {
+											n1 = n1.substring(a0.length());
+											break;
+										}
+									}
+									
+									for(String a : Environment.getArticles()) {
+										String a0 = a.toUpperCase()+" ";
+										if(n2.length() > a0.length() && n2.substring(0, a0.length()).equals(a0))  {
+											n2 = n2.substring(a0.length());
+											break;
+										}
+									}
+									
+									return n1.compareTo(n2);
 								}
 							});
 							

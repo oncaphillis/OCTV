@@ -43,7 +43,11 @@ public class Environment {
 	static public Map<Integer,List<TvSeries>>[] StoredResults = null;
 	static public List<TvSeries>[] MainList = null;
 	static public SQLCacheHelper CacheHelper = null;
-
+	
+	static private String[] _articles = new String[] {
+		"The"
+	};
+	
 	static private Activity _theActivity = null;
 	
 	public static boolean isDebug() {
@@ -175,5 +179,9 @@ public class Environment {
 
 	public static boolean isSlim(Activity activity) {
 		return getColWidth(activity) < 2.0;
+	}
+
+	public static String[] getArticles() {
+		return _articles;
 	}
 }
