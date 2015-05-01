@@ -93,7 +93,8 @@ public class AboutActivity extends Activity {
 						   		" Load:"+Long.toString(Tmdb.get().trakt_reader().getLoadCount())+
 						   		" Hit:"+Long.toString(Tmdb.get().trakt_reader().getHitCount())+"<p/>"+
 						   	" SeriesInfo: size: "+Long.toString(SeriesInfo.getCacheSize())+" hits:"+Long.toString(SeriesInfo.getCacheHits())+"<p/>"+
-						   "</p>"+
+						   	" SQL: SELECT:"+ Tmdb.getSqlSelectCount()+" INSERT:"+Long.toString(Tmdb.getSqlInsertCount())+" DELETE:"+Tmdb.getSqlDelete()+"<p/>"+
+						   	"</p>"+
 						   "</div>";
 		}
 		Calendar c = Calendar.getInstance();

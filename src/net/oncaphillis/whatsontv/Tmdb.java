@@ -122,7 +122,14 @@ public class Tmdb {
 	private BitmapCache       _hash    = null;
 	private List<Timezone> _timezones = null;
 	private TraktReaderThread _trakt_reader = new TraktReaderThread();
+	
+	private long _sqlSelect = 0;
+	private long _sqlDelete = 0;
+	private long _sqlInsert = 0;
 
+	private int _seriesHit = 0;
+	private int _seasonHit = 0;
+	
 	public class EpisodeInfo {
 		private TvEpisode _tmdb_episode;
 		
@@ -220,8 +227,6 @@ public class Tmdb {
 		}
 	};
 
-	private int _seriesHit = 0;
-	private int _seasonHit = 0;
 	
 	private Tmdb() {
 		_trakt_reader.start();
@@ -355,7 +360,8 @@ public class Tmdb {
 					}, "ID=?", new String[] {
 							key.toString()
 					}, null, null, null);
-			
+			_sqlSelect++;
+
 			long n = TimeTool.getNow().getTime() / 1000;
 			
 			while(c.moveToNext()) {
@@ -368,6 +374,7 @@ public class Tmdb {
 					Environment.CacheHelper.getWritableDatabase().delete("SERIES", "ID=?", new String[] {
 							key.toString()
 					});
+					_sqlDelete++;
 					break;
 				}
 				_seriesHit  ++;
@@ -383,7 +390,8 @@ public class Tmdb {
 			cvo.put("DATA",toByteArray(ts) );
 			 
 			Environment.CacheHelper.getWritableDatabase().insert("SERIES",null,cvo);
-			 
+			_sqlInsert++;
+
 			return ts;
 	         
 		} catch(Throwable ta) {
@@ -406,6 +414,7 @@ public class Tmdb {
 						sea.toString()
 					}, null, null, null);
 				
+			_sqlSelect++;
 			long n = TimeTool.getNow().getTime() / 1000;
 				
 			while(c.moveToNext()) {
@@ -419,6 +428,7 @@ public class Tmdb {
 							ser.toString(),
 							sea.toString()
 					});
+					_sqlDelete++;
 					break;
 				}
 				_seasonHit  ++;
@@ -436,6 +446,7 @@ public class Tmdb {
 			cvo.put("DATA",toByteArray(tvs) );
 				 
 			Environment.CacheHelper.getWritableDatabase().insert("SEASON",null,cvo);
+			_sqlInsert++;
 				 
 			return tvs;
 		         
@@ -512,6 +523,18 @@ public class Tmdb {
 			return cvi.getAsLong("COUNT(*)");
 		}
 		return 0;
+	}
+
+	public static long getSqlSelectCount() {
+		return get()._sqlSelect;
+	}
+	
+	public static long getSqlInsertCount() {
+		return get()._sqlInsert;
+	}
+	
+	public static long getSqlDelete() {
+		return get()._sqlDelete;
 	}
 
 	public static int getSeriesCacheHits() {
