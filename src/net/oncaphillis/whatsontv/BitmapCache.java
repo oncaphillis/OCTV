@@ -46,6 +46,29 @@ class BitmapCache {
 	
 	static final int MAX_SIZE=10 * 1024 * 1024; 
 	
+	class BitmapNode {
+		private int size;
+		private String path;
+		
+		public BitmapNode(int s ,String p ) {
+			this.size = s;
+			this.path = p;
+		}
+		@Override
+		public int hashCode() {
+			return path.hashCode();
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			return o instanceof BitmapNode && ((BitmapNode)o).path.equals(this.path) &&
+					((BitmapNode)o).size == this.size;
+					
+		}
+	};
+	
+	private TtlCache<BitmapNode,Bitmap> _preCache = new TtlCache<BitmapNode,Bitmap>(Environment.TTL,100);
+	
 	/** Stores a new Bitmap under a given Key. If the max size of 
 	 * the cache is exceeded we delete images until we are below
 	 * the treshold.
@@ -59,6 +82,7 @@ class BitmapCache {
 
 		File f = new File(_cacheDir,Integer.toString(size)+"_"+new File(path).getName());
 		
+		
 		try {
 			FileOutputStream os = new FileOutputStream(f.getAbsolutePath());
 			bm.compress(Bitmap.CompressFormat.JPEG, 85, os);
@@ -69,11 +93,19 @@ class BitmapCache {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		_preCache.put(new BitmapNode(size,path),bm);
+
 	}
 	
 	Bitmap get(int size,String path) {
 		File f = new File(_cacheDir,Integer.toString(size)+"_"+new File(path).getName());
 		long n = TimeTool.getNow().getTime();
+		
+		Bitmap bm = _preCache.get(new BitmapNode(size,path));
+		
+		if(bm != null)
+			return bm;
+		
 		if(f.exists()) {
 			if( ((n-f.lastModified()) / 1000.0f) > Environment.TTL) {
 				f.delete();
@@ -81,7 +113,10 @@ class BitmapCache {
 				return null;
 			}
 			_hit++;
-			Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
+			bm = BitmapFactory.decodeFile(f.getAbsolutePath());
+			
+			_preCache.put(new BitmapNode(size,path), bm);
+			
 			return bm;
 		}
 		return null;
@@ -97,6 +132,10 @@ class BitmapCache {
 
 	public int getHits() {
 		return _hit;
+	}
+	
+	public TtlCache<BitmapNode,Bitmap> getPreCache() {
+		return _preCache;
 	}
 	
 	private void purge() {

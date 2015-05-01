@@ -83,14 +83,15 @@ public class AboutActivity extends Activity {
 					    "Seasons:[pre:"+Long.toString(Tmdb.getSeasonPreCache().getSize())+"/"+Long.toString(Tmdb.getSeasonPreCache().getHits())+" "
 								+"back:"+Long.toString(Tmdb.getSeasonsCacheSize())+"/"+Integer.toString(Tmdb.getSeasonsCacheHits())+"]<br>"+
 						"Episodes:"+Integer.toString(Tmdb.getEpisodeCache().size())+"/"+Integer.toString(Tmdb.getEpisodeCache().hit())+"<br>"+
-					    "Bitmaps:"+String.format("%.2f MB" ,(float)Tmdb.getBitmapCache().getSize() / (float)(1024*1024))+" "+
-						Integer.toString(Tmdb.getBitmapCache().getCount())+"/"+
-						   Integer.toString(Tmdb.getBitmapCache().getHits())+
+					    "Bitmaps:[pre:"+Long.toString(Tmdb.getBitmapCache().getPreCache().getSize())+"/"+Long.toString(Tmdb.getBitmapCache().getPreCache().getHits())+" "+
+					    		"back:"+String.format("%.2f MB" ,(float)Tmdb.getBitmapCache().getSize() / (float)(1024*1024))+" "+
+					    		Integer.toString(Tmdb.getBitmapCache().getCount())+"/"+
+					    		Integer.toString(Tmdb.getBitmapCache().getHits())+"<br>"+
 						   " DbMaxSize:"+String.format("%.2f MB",(float)Environment.CacheHelper.getWritableDatabase().getMaximumSize()/(float)(1024*1024))+
-						   " DbSize:"+String.format("%.2f MB", (float)dbSize/(1024*1024))+"<p/>"+
+						   " DbSize:"+String.format("%.2f MB", (float)dbSize/(1024*1024))+"<br>"+
 						   " Trakt: lookup:"+Long.toString(Tmdb.get().trakt_reader().getLookupCount())+
 						   		" Load:"+Long.toString(Tmdb.get().trakt_reader().getLoadCount())+
-						   		" Hit:"+Long.toString(Tmdb.get().trakt_reader().getHitCount())+"<p/>"+
+						   		" Hit:"+Long.toString(Tmdb.get().trakt_reader().getHitCount())+"<br>"+
 						   	" SeriesInfo: size: "+Long.toString(SeriesInfo.getCacheSize())+" hits:"+Long.toString(SeriesInfo.getCacheHits())+"<p/>"+
 						   	" SQL: SELECT:"+ Tmdb.getSqlSelectCount()+" INSERT:"+Long.toString(Tmdb.getSqlInsertCount())+" DELETE:"+Tmdb.getSqlDelete()+"<p/>"+
 						   	"</p>"+
