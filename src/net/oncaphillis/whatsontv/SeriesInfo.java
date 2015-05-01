@@ -62,14 +62,9 @@ public class SeriesInfo {
 			id = i;
 		}
 	};
-	
-	static HashMap<Integer,SeriesInfo> _cacheMap = new HashMap<Integer,SeriesInfo>();
-	static PriorityQueue<CacheNode> _cacheQueue = new PriorityQueue<CacheNode>(100,new Comparator<CacheNode>() {
-		@Override
-		public int compare(CacheNode o1, CacheNode o2) {
-			return o1.timestamp<o2.timestamp ? -1 : o1.timestamp>o2.timestamp ? 1 : 0;
-		}
-	});
+
+	static
+	private TtlCache<Integer,SeriesInfo> _infoMap = new TtlCache<Integer,SeriesInfo>(Environment.TTL,100);
 	
 	private static long _hit=0;
 
@@ -77,27 +72,25 @@ public class SeriesInfo {
 		if(s == null)
 			return null;
 		
-		if(_cacheMap.get(s.getId()) !=null) {
-			_hit ++;
-			return _cacheMap.get(s.getId());
+		SeriesInfo si = _infoMap.get(s.getId());
+		
+		if(si !=null) {
+			return si;
 		}
 		
-		SeriesInfo si = new SeriesInfo(s);
-		_cacheMap.put(s.getId(), si);
-		_cacheQueue.add(new CacheNode(s.getId()) );
-	
-		if(_cacheQueue.size()>MAX_CACHE) {
-			_cacheMap.remove(_cacheQueue.poll());
-		}
+		si  = new SeriesInfo(s);
+		
+		_infoMap.put(s.getId(),si);
+		
 		return si;
 	}
 	
 	public static long getCacheHits() {
-		return _hit;
+		return _infoMap.getHits();
 	}
 	
 	public static long getCacheSize() {
-		return _cacheQueue.size();
+		return _infoMap.getSize();
 	}
 	private SeriesInfo(TvSeries tvs) {
 		_tvs = Tmdb.get().loadSeries(tvs.getId());

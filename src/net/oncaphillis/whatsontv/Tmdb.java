@@ -122,7 +122,33 @@ public class Tmdb {
 	private BitmapCache       _hash    = null;
 	private List<Timezone> _timezones = null;
 	private TraktReaderThread _trakt_reader = new TraktReaderThread();
+
+	private TtlCache<Integer,TvSeries> _seriesCache = 
+			new TtlCache<Integer,TvSeries>(Environment.TTL,100);
 	
+	class SeasonNode {
+		public int series;
+		public int season;
+		SeasonNode(int ser,int sea) {
+			series = ser;
+			season = sea;
+		}
+		
+		@Override
+		public int hashCode() {
+			return (series << 8) | season;
+		}
+		
+		@Override 
+		public boolean equals( Object o ) {
+			return o instanceof SeasonNode && 
+					((SeasonNode)o).series == this.series && ((SeasonNode)o).season == this.season;
+		}
+	}
+
+	private TtlCache<SeasonNode,TvSeason> _seasonCache = 
+			new TtlCache<SeasonNode,TvSeason>(Environment.TTL,100);
+
 	private long _sqlSelect = 0;
 	private long _sqlDelete = 0;
 	private long _sqlInsert = 0;
@@ -351,6 +377,11 @@ public class Tmdb {
 	
 	public TvSeries loadSeries(int id) {
 		Integer key = new Integer(id);
+		
+		TvSeries tvs = _seriesCache.get(id);
+		
+		if(tvs != null)
+			return tvs;
 
 		try {
 			ContentValues cvi = new ContentValues();
@@ -378,6 +409,7 @@ public class Tmdb {
 					break;
 				}
 				_seriesHit  ++;
+				_seriesCache.put(id, ts);
 				return ts;
 			}
 			
@@ -392,6 +424,8 @@ public class Tmdb {
 			Environment.CacheHelper.getWritableDatabase().insert("SERIES",null,cvo);
 			_sqlInsert++;
 
+			_seriesCache.put(id, ts);
+
 			return ts;
 	         
 		} catch(Throwable ta) {
@@ -403,7 +437,14 @@ public class Tmdb {
 		try {
 			Integer ser = new Integer(series);
 			Integer sea = new Integer(season);
-
+			
+			{
+				TvSeason tvs = _seasonCache.get(new SeasonNode(ser,sea));
+				
+				if(tvs!=null)
+					return tvs;
+			}
+			
 			ContentValues cvi = new ContentValues();
 			
 			Cursor c = Environment.CacheHelper.getReadableDatabase().query(
@@ -432,6 +473,7 @@ public class Tmdb {
 					break;
 				}
 				_seasonHit  ++;
+				_seasonCache.put(new SeasonNode(ser,sea),ts); 
 				return ts;
 			}
 
@@ -447,6 +489,8 @@ public class Tmdb {
 				 
 			Environment.CacheHelper.getWritableDatabase().insert("SEASON",null,cvo);
 			_sqlInsert++;
+
+			_seasonCache.put(new SeasonNode(ser,sea),tvs); 
 				 
 			return tvs;
 		         
@@ -512,6 +556,14 @@ public class Tmdb {
 		return null;
 	}
 
+	public static TtlCache<Integer,TvSeries> getSeriesPreCache() {
+		return get()._seriesCache;
+	}
+
+	public static TtlCache<SeasonNode,TvSeason> getSeasonPreCache() {
+		return get()._seasonCache;
+	}
+	
 	public static long getSeriesCacheSize() {
 		Cursor c = Environment.CacheHelper.getReadableDatabase().query("SERIES",new String[] {
 			"COUNT(*)"},

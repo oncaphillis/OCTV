@@ -78,14 +78,13 @@ public class AboutActivity extends Activity {
 			File f = webview.getContext().getDatabasePath(Environment.NAME);
 			long dbSize = f.length();
 			debug = "<div>"+
-					"<p>Series:"+Long.toString(Tmdb.getSeriesCacheSize())+"/"+
-							Integer.toString(Tmdb.getSeriesCacheHits())+";"+
-						   "Seasons:"+Long.toString(Tmdb.getSeasonsCacheSize())+"/"+
-						   Integer.toString(Tmdb.getSeasonsCacheHits())+"; "+
-						   "Episodes:"+Integer.toString(Tmdb.getEpisodeCache().size())+"/"+
-						   Integer.toString(Tmdb.getEpisodeCache().hit())+"; "+
-						   "Bitmaps:"+String.format("%.2f MB" ,(float)Tmdb.getBitmapCache().getSize() / (float)(1024*1024))+" "+
-						   Integer.toString(Tmdb.getBitmapCache().getCount())+"/"+
+					"<p>Series[pre:"+Long.toString(Tmdb.getSeriesPreCache().getSize())+"/"+Long.toString(Tmdb.getSeriesPreCache().getHits())+" "
+								+"back:"+Long.toString(Tmdb.getSeriesCacheSize())+"/"+Integer.toString(Tmdb.getSeriesCacheHits())+"]<br>"+
+					    "Seasons:[pre:"+Long.toString(Tmdb.getSeasonPreCache().getSize())+"/"+Long.toString(Tmdb.getSeasonPreCache().getHits())+" "
+								+"back:"+Long.toString(Tmdb.getSeasonsCacheSize())+"/"+Integer.toString(Tmdb.getSeasonsCacheHits())+"]<br>"+
+						"Episodes:"+Integer.toString(Tmdb.getEpisodeCache().size())+"/"+Integer.toString(Tmdb.getEpisodeCache().hit())+"<br>"+
+					    "Bitmaps:"+String.format("%.2f MB" ,(float)Tmdb.getBitmapCache().getSize() / (float)(1024*1024))+" "+
+						Integer.toString(Tmdb.getBitmapCache().getCount())+"/"+
 						   Integer.toString(Tmdb.getBitmapCache().getHits())+
 						   " DbMaxSize:"+String.format("%.2f MB",(float)Environment.CacheHelper.getWritableDatabase().getMaximumSize()/(float)(1024*1024))+
 						   " DbSize:"+String.format("%.2f MB", (float)dbSize/(1024*1024))+"<p/>"+
