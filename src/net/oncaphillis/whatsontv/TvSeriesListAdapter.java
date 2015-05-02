@@ -76,7 +76,9 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	TextView   tt_first_aired  = (TextView) the_view.findViewById(R.id.series_list_firstaired);
 	    	
 	    	TextView   tt1 = (TextView)     the_view.findViewById(R.id.series_network);
-	    	TextView   tt2 = (TextView)     the_view.findViewById(R.id.series_time);
+	    	TextView   ttdate   = (TextView)     the_view.findViewById(R.id.series_date);
+	    	TextView   tv_clock = (TextView)  the_view.findViewById(R.id.series_airing_clock);
+	    	
 	    	TextView   tt3 = (TextView)     the_view.findViewById(R.id.series_last_episode);
 	    	TextView   tt4 = (TextView)     the_view.findViewById(R.id.series_airing_state);
 	    	
@@ -85,6 +87,10 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	
 	    	tt5.setBackgroundColor(_activity.getResources().getColor(R.color.oncaphillis_light_grey));
 	    	tt5.setText("-/-");
+	    	
+	    	if(!slim) {
+	    		tv_clock.setVisibility(View.GONE);
+	    	}
 	    	
 	    	tth.setVisibility(View.GONE);
 	    	
@@ -136,21 +142,22 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	if(tt1.getTag() == null || !(tt1.getTag() instanceof Integer) || !((Integer)tt1.getTag()).equals(the_series.getId()) ) {
     			tt1.setTag(new Integer(the_series.getId()));
 	    	}
-	    	if(tt2.getTag() == null || !(tt2.getTag() instanceof Integer) || !((Integer)tt2.getTag()).equals(the_series.getId()) ) {
-    			tt2.setTag(new Integer(the_series.getId()));
+	    	if(ttdate.getTag() == null || !(ttdate.getTag() instanceof Integer) || !((Integer)ttdate.getTag()).equals(the_series.getId()) ) {
+    			ttdate.setTag(new Integer(the_series.getId()));
 	    	}
 	    	if(tt3.getTag() == null || !(tt3.getTag() instanceof Integer) || !((Integer)tt3.getTag()).equals(the_series.getId()) ) {
     			tt3.setTag(new Integer(the_series.getId()));
 	    	}
 	    
 	    	tt1.setText("...");
-	    	tt2.setText("...");
+	    	ttdate.setText("...");
+	    	tv_clock.setText("...");
 	    	tt3.setText("...");
     		tt4.setText("...");
     		
     		the_view.setTag(the_series);
 
-    		new SeriesInfoDownLoaderTask(tt1,tt2,tt3,tt4,_activity).execute();
+    		new SeriesInfoDownLoaderTask(tt1,ttdate,tv_clock,tt3,tt4,_activity).execute();
  	    }
 	    return the_view;
 	}

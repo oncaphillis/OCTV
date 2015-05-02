@@ -96,6 +96,7 @@ public class Environment {
 		}
 	};
 	
+	static DateFormat ClockFormat = null;
 	
 	public static int getColumns(Activity activity) {
         
@@ -126,6 +127,9 @@ public class Environment {
 			VERSION = a.getPackageManager().getPackageInfo(a.getPackageName(), 0).versionName;
 			NAME = a.getResources().getString(R.string.app_name);
 			BUILD_DATE = a.getPackageManager().getPackageInfo(a.getPackageName(),0).lastUpdateTime;
+			
+			ClockFormat = android.text.format.DateFormat.getTimeFormat(a);
+			
 		} catch (NameNotFoundException e) {
 		}
 		
