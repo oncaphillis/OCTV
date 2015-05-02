@@ -31,7 +31,27 @@ public class SeriesInfo {
 	private List<SeasonNode> _seasonsEpisodeList = null;
 	private EpisodeInfo _nearestEpisodeInfo;
 	private static int MAX_CACHE = 100;
-	
+
+	public class NearestNode {
+		public  String title;
+		public  String networks; 
+		public  Date   date;
+		boolean hasClock;
+		int     season;
+		int     episode;
+	};
+
+	public NearestNode getNearestNode() {
+		NearestNode n = new NearestNode();
+		n.title          = _nearestEpisodeTitle;
+		n.networks       = _networks;
+		n.date           = _nearestAiring;
+		n.hasClock       = _hasClock;
+		n.season  = _nearestEpisodeSeason;;
+		n.episode = _nearestEpisodeNumber;
+		return n;
+	}
+
 	public static class SeasonNode implements Serializable {
 		int _season;
 		public SeasonNode(int season) {
@@ -216,6 +236,7 @@ public class SeriesInfo {
 		}
 	}
 	
+	
 	public TvSeason getSeason(int n) {
 		if(_tvs == null || _tvs.getSeasons() == null || _tvs.getSeasons().size()>=n)
 			return null;
@@ -334,6 +355,10 @@ public class SeriesInfo {
 
 	public TvSeries getTmdb() {
 		return _tvs;
+	}
+
+	public int getId() {
+		return _tvs == null ? 0 : _tvs.getId();
 	}
 	
 	

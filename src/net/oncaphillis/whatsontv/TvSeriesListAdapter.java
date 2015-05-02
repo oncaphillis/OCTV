@@ -75,12 +75,12 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	TextView   tt_series_title = (TextView) the_view.findViewById(R.id.series_title);
 	    	TextView   tt_first_aired  = (TextView) the_view.findViewById(R.id.series_list_firstaired);
 	    	
-	    	TextView   tt1 = (TextView)     the_view.findViewById(R.id.series_network);
-	    	TextView   ttdate   = (TextView)     the_view.findViewById(R.id.series_date);
+	    	TextView   tt_network = (TextView)     the_view.findViewById(R.id.series_network);
+	    	TextView   tt_date   = (TextView)     the_view.findViewById(R.id.series_date);
 	    	TextView   tv_clock = (TextView)  the_view.findViewById(R.id.series_airing_clock);
 	    	
-	    	TextView   tt3 = (TextView)     the_view.findViewById(R.id.series_last_episode);
-	    	TextView   tt4 = (TextView)     the_view.findViewById(R.id.series_airing_state);
+	    	TextView   tt_episode = (TextView)     the_view.findViewById(R.id.series_last_episode);
+	    	TextView   tt_date_state = (TextView)     the_view.findViewById(R.id.series_airing_state);
 	    	
 	    	TextView   tt5 = (TextView)     the_view.findViewById(slim ? R.id.series_list_entry_rating_slim : R.id.series_list_entry_rating_wide);
 	    	TextView   tth = (TextView)     the_view.findViewById(slim ? R.id.series_list_entry_rating_wide : R.id.series_list_entry_rating_slim);
@@ -139,25 +139,30 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    			&& !the_series.getOriginalName().equals(the_series.getName()) ? " ("+the_series.getOriginalName()+")" : ""));
 	    	tt_first_aired.setText( fa );
 	    	
-	    	if(tt1.getTag() == null || !(tt1.getTag() instanceof Integer) || !((Integer)tt1.getTag()).equals(the_series.getId()) ) {
-    			tt1.setTag(new Integer(the_series.getId()));
+	    	if(tt_network.getTag() == null || !(tt_network.getTag() instanceof Integer) || !((Integer)tt_network.getTag()).equals(the_series.getId()) ) {
+    			tt_network.setTag(new Integer(the_series.getId()));
 	    	}
-	    	if(ttdate.getTag() == null || !(ttdate.getTag() instanceof Integer) || !((Integer)ttdate.getTag()).equals(the_series.getId()) ) {
-    			ttdate.setTag(new Integer(the_series.getId()));
+	    	if(tt_date.getTag() == null || !(tt_date.getTag() instanceof Integer) || !((Integer)tt_date.getTag()).equals(the_series.getId()) ) {
+    			tt_date.setTag(new Integer(the_series.getId()));
 	    	}
-	    	if(tt3.getTag() == null || !(tt3.getTag() instanceof Integer) || !((Integer)tt3.getTag()).equals(the_series.getId()) ) {
-    			tt3.setTag(new Integer(the_series.getId()));
+	    	if(tt_episode.getTag() == null || !(tt_episode.getTag() instanceof Integer) || !((Integer)tt_episode.getTag()).equals(the_series.getId()) ) {
+    			tt_episode.setTag(new Integer(the_series.getId()));
 	    	}
-	    
-	    	tt1.setText("...");
-	    	ttdate.setText("...");
-	    	tv_clock.setText("...");
-	    	tt3.setText("...");
-    		tt4.setText("...");
-    		
-    		the_view.setTag(the_series);
 
-    		new SeriesInfoDownLoaderTask(tt1,ttdate,tv_clock,tt3,tt4,_activity).execute();
+	    	the_view.setTag(the_series);
+	    	
+	    	SeriesInfo.NearestNode nn = SeriesInfoDownLoaderTask.getNearest(the_series.getId());
+	    	if(nn!=null ) {
+	    		SeriesInfoDownLoaderTask.refresh(_activity, nn, 
+	    				tt_date, tv_clock, tt_date_state, tt_network, tt_episode, true);
+	    	} else {
+		    	tt_network.setText("...");
+		    	tt_date.setText("...");
+		    	tv_clock.setText("...");
+		    	tt_episode.setText("...");
+	    		tt_date_state.setText("...");
+	    		new SeriesInfoDownLoaderTask(tt_network,tt_date,tv_clock,tt_episode,tt_date_state,_activity).execute();
+	    	}
  	    }
 	    return the_view;
 	}

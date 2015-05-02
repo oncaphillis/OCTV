@@ -19,6 +19,19 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 	private WeakReference<TextView> _clockText;
 	private Activity _activity;
 
+	private static TtlCache<Integer,SeriesInfo.NearestNode> _nearestCache = new TtlCache<Integer,SeriesInfo.NearestNode>(Environment.TTL,500);
+	
+	public static SeriesInfo.NearestNode getNearest(int id) {
+		synchronized(_nearestCache) {
+			return _nearestCache.get(id);
+		}
+	}
+
+	public static void putNearest(int id,SeriesInfo.NearestNode nn) {
+		synchronized(_nearestCache) {
+			_nearestCache.put(id,nn);
+		}
+	}
 	
 	public SeriesInfoDownLoaderTask(TextView networkText, TextView timeText,TextView clockTime,TextView lastEpisodeText, TextView timeState,Activity activity) {
 		_networkText = new WeakReference(networkText);
@@ -47,90 +60,94 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 		// dates reported by Tmdb are in EST. We need this to compare
 		// the last aired
 		if(si!=null && _timeText != null && _timeText.get() != null && _clockText.get()!=null && _timeText.get().getTag()!=null && _timeText.get().getTag() instanceof Integer) {
-			refresh(_activity,si,_timeText.get(),_clockText.get(),_timeStateText.get(),_networkText.get(),_lastEpisodeText.get(),false);
+			SeriesInfo.NearestNode nn = si.getNearestNode();
+			refresh(_activity,nn,_timeText.get(),_clockText.get(),_timeStateText.get(),_networkText.get(),_lastEpisodeText.get(),false);
+			Date now = TimeTool.getNow();
+			
+			if( !si.getNearestAiring().before(now) && !si.hasClock() ) {
+
+				final SeriesInfo _si    = si;
+				final Activity  _act    = _activity;
+				final TextView  _tText  = _timeText.get();
+				final TextView  _cText  = _clockText.get(); 
+				final boolean   _slim   = Environment.isSlim(_act);
+				
+				Runnable r = new Runnable() {
+					final Runnable   _me = this;
+					
+					@Override
+					public void run() {
+						
+						DateFormat df = _si.hasClock() && ! _slim ? Environment.TimeFormater : Environment.TmdbDateFormater;
+						
+						final String t1 = df.format(_si.getNearestAiring());
+						final String t2 = Environment.ClockFormat.format(_si.getNearestAiring());
+								
+						_act.runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								if( _tText != null && _tText.getTag() == _me) {
+									_tText.setText(Environment.isDebug() ? "@"+t1 : t1);
+								}
+								if(_slim)
+									if(_si.hasClock()) {
+										_cText.setText(Environment.ClockFormat.format(_si.getNearestAiring()));					
+										_cText.setVisibility(View.VISIBLE);
+									} else {
+										_cText.setText("...");
+										_cText.setVisibility(View.GONE);
+									}
+							}
+						});
+					}
+				};
+				_timeText.get().setTag(r);
+				Tmdb.get().trakt_reader().register(r);
+			} else {
+				putNearest(si.getId(),nn);
+			}
 		}
 	}
 
-	static public void refresh(Activity act,SeriesInfo si, TextView timeText, TextView clockText,TextView timeStateText,
+	static public void refresh(Activity act,SeriesInfo.NearestNode nn, TextView timeText, TextView clockText,TextView timeStateText,
 			TextView networkText, TextView lastEpisodeText, boolean std) {
 		
 		boolean slim = Environment.isSlim(act);
 		
-		if(si.getNearestAiring()!=null) {
+		if(nn.date != null) {
 			
-			DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.TmdbDateFormater;
+			DateFormat df = nn.hasClock ? Environment.TimeFormater : Environment.TmdbDateFormater;
 			
 			Date now = TimeTool.getNow();
-			timeText.setText(df.format(si.getNearestAiring()) );					
+			timeText.setText(df.format(nn.date) );					
 			
 			if(slim)
-				if(si.hasClock()) {
-					clockText.setText(Environment.ClockFormat.format(si.getNearestAiring()));					
+				if(nn.hasClock ) {
+					clockText.setText(Environment.ClockFormat.format(nn.date));					
 					clockText.setVisibility(View.VISIBLE);
 				} else {
 					clockText.setText("...");
 					clockText.setVisibility(View.GONE);
 				}
 			
-			if(si.getNearestAiring().before(now)) {
+			if(nn.date.before(now)) {
 				timeText.setTextColor(act.getResources().getColor(R.color.actionbar_text_color));
 				if(timeStateText!=null)
 					timeStateText.setText("last");
 			} else {
 				if(timeStateText !=null)
 					timeStateText.setText("next");
-
-				if(!si.hasClock()) {
-
-					final SeriesInfo _si = si;
-					final Activity  _act = act;
-					final TextView  _timeText  = timeText;
-					final TextView  _clockText = clockText; 
-					final boolean   _slim      = slim;
-					
-					Runnable r = new Runnable() {
-						final Runnable   _me = this;
-						
-						@Override
-						public void run() {
-							
-							DateFormat df = _si.hasClock() && ! _slim ? Environment.TimeFormater : Environment.TmdbDateFormater;
-							
-							final String t1 = df.format(_si.getNearestAiring());
-							final String t2 = Environment.ClockFormat.format(_si.getNearestAiring());
-									
-							_act.runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									if( _timeText != null && _timeText.getTag() == _me) {
-										_timeText.setText(Environment.isDebug() ? "@"+t1 : t1);
-									}
-									if(_slim)
-										if(_si.hasClock()) {
-											_clockText.setText(Environment.ClockFormat.format(_si.getNearestAiring()));					
-											_clockText.setVisibility(View.VISIBLE);
-										} else {
-											_clockText.setText("...");
-											_clockText.setVisibility(View.GONE);
-										}
-								}
-							});
-						}
-					};
-					timeText.setTag(r);
-					Tmdb.get().trakt_reader().register(r);
-				}
 				timeText.setTextColor(act.getResources().getColor(R.color.oncaphillis_orange));
 			}
 		}
 
 		if( networkText != null && networkText.getTag()!=null && networkText.getTag() instanceof Integer) {
-			 networkText.setText(si.getNetworks());
+			 networkText.setText(nn.networks );
 		}
 
 		if( lastEpisodeText != null &&  lastEpisodeText.getTag()!=null && lastEpisodeText.getTag() instanceof Integer) {
-			String s = Integer.toString(si.getNearestEpisodeSeason())+"x"+Integer.toString(si.getNearestEpisodeNumber());
-			lastEpisodeText.setText(s+" "+si.getNearestEpisodeTitle());
+			String s = Integer.toString(nn.season )+"x"+Integer.toString(nn.episode);
+			lastEpisodeText.setText((std ? "@" : "" )+s+" "+nn.title);
 		}
 	}
 }
