@@ -94,6 +94,10 @@ public class AboutActivity extends Activity {
 						   		" Hit:"+Long.toString(Tmdb.get().trakt_reader().getHitCount())+"<br>"+
 						   	" SeriesInfo: size: "+Long.toString(SeriesInfo.getCacheSize())+" hits:"+Long.toString(SeriesInfo.getCacheHits())+"<p/>"+
 						   	" SQL: SELECT:"+ Tmdb.getSqlSelectCount()+" INSERT:"+Long.toString(Tmdb.getSqlInsertCount())+" DELETE:"+Tmdb.getSqlDelete()+"<p/>"+
+						   	" Lists: #"+Integer.toString(Environment.ListAdapters[0].getCount())+
+						   		" #"+Integer.toString(Environment.ListAdapters[1].getCount())+
+						   		" #"+Integer.toString(Environment.ListAdapters[2].getCount())+
+						   		" #"+Integer.toString(Environment.ListAdapters[3].getCount())+
 						   	"</p>"+
 						   "</div>";
 		}

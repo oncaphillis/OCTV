@@ -34,8 +34,7 @@ public class SearchThread extends Thread {
 	private Activity                 _activity;
 	private ArrayAdapter<TvSeries>[] _listAdapters;
 	private Pager[]                  _pagers;
-	private ProgressBar              _pb;
-	private TextView                 _tv;
+
 	private int _list    = -1;
 	private int _counts[] = null;
 	private int _totals[] = null;
@@ -54,12 +53,11 @@ public class SearchThread extends Thread {
 		public int total = -1;
 	};
 	
-	public SearchThread(Activity a,ArrayAdapter<TvSeries>[] listAdapters,Pager[] pagers,ProgressBar pb,TextView tv) {
+	public SearchThread(Activity a,ArrayAdapter<TvSeries>[] listAdapters,Pager[] pagers ) {
 		_activity    = a;		
 		_listAdapters= listAdapters;
 		_pagers      = pagers;
-		_pb          = pb;
-		_tv          = tv;
+
 		_counts = new int[listAdapters.length];
 		_totals = new int[listAdapters.length];
 
@@ -71,9 +69,8 @@ public class SearchThread extends Thread {
 	}
 	
 	
-	public SearchThread(SearchActivity a, ArrayAdapter<TvSeries> listadapter,
-			Pager pager, ProgressBar pb, TextView tv) {
-		this(a,new ArrayAdapter[]{listadapter},new Pager[]{pager},pb,tv);
+	public SearchThread(SearchActivity a, ArrayAdapter<TvSeries> listadapter, Pager pager ) {
+		this(a,new ArrayAdapter[]{listadapter},new Pager[]{pager} );
 	}
 
 	@Override
@@ -82,6 +79,8 @@ public class SearchThread extends Thread {
 		synchronized(this) {
 			_list  =  0;
 		}
+		
+		long t0 = TimeTool.getNow().getTime();
 		
 		for(_list=0; _list < _pagers.length ;) {
 			final int fj = _list;
@@ -117,100 +116,68 @@ public class SearchThread extends Thread {
 				_counts[_list] = 0;
 				_totals[_list] = 0;
 			}
+
+			List<TvSeries> o_li = new ArrayList<TvSeries>();
+			
 			
 			while( ( _listAdapters[_list].getCount()) < MAX_SEARCH) {
-
 				li_page=_pagers[_list].getPage(page++);
-				
-				
-				final TextView tv = _tv;
-
 				if(li_page != null) {
+					if(page==2) {
+						synchronized(this) {
+							_totals[_list]  = _pagers[_list].getTotal();
+						}
+					}
 					Iterator<TvSeries> i = li_page.iterator();
-					
-					List<TvSeries> o_li = new ArrayList<TvSeries>();
-					int nn = 0;
 					// #46 Eliminate doubles in list
+					
+					int d=0;
 					while(i.hasNext()) {
 						TvSeries tvs = i.next();
 						if(!doubleSet.contains(tvs.getId())) {
 							o_li.add(tvs);
 							doubleSet.add(tvs.getId());
 						} else {
-							nn = tvs.getId();
+							synchronized(this) {
+								if(_totals[_list]  > 1) {
+									_totals[_list]--;
+									d++;
+								}
+							}
 						}
 					}
-					
+					synchronized(this) {
+						_counts[_list]  += li_page.size()-d;
+					}
+				}
+			
+
+				
+				if(TimeTool.getNow().getTime() - t0 > 4000 || _listAdapters[_list].getCount()+o_li.size()>=MAX_SEARCH || li_page == null || li_page.size() == 0) {
+
 					lock();
-					
+
 					final List<TvSeries> li = o_li;
 					_activity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							
-							_listAdapters[fj].addAll(li);	
-							_listAdapters[fj].sort(new Comparator<TvSeries>() {
-
-								@Override
-								public int compare(TvSeries o1, TvSeries o2) {
-									String n1 = o1.getName().toUpperCase();
-									String n2 = o2.getName().toUpperCase();
-									
-									for(String a : Environment.getArticles()) {
-										String a0 = a.toUpperCase()+" ";
-										if(n1.length() > a0.length() && n1.substring(0, a0.length()).equals(a0))  {
-											n1 = n1.substring(a0.length());
-											break;
-										}
-									}
-									
-									for(String a : Environment.getArticles()) {
-										String a0 = a.toUpperCase()+" ";
-										if(n2.length() > a0.length() && n2.substring(0, a0.length()).equals(a0))  {
-											n2 = n2.substring(a0.length());
-											break;
-										}
-									}
-									
-									return n1.compareTo(n2);
-								}
-							});
-							
-							_listAdapters[fj].notifyDataSetChanged();
-							
-							if( tv != null ) {
-								tv.setText(Integer.toString(_listAdapters[fj].getCount()));
-							}
+						_listAdapters[fj].addAll(li);	
+							updateAdapter(fj);
 						}
 					});
 					
-					synchronized(this) {
-						_counts[_list] += li_page.size();
-						_totals[_list]  = _pagers[_list].getTotal();
-					}
 					release();
+						
+					o_li = new ArrayList<TvSeries>();
+					
+					t0 = TimeTool.getNow().getTime();
 				}
-				
 				if(li_page == null || li_page.size() == 0)
 					break;
 			} 
-			
+						
 			_pagers[_list].end();
-			
-			if( _pb != null || _tv != null) {
-				final ProgressBar pb = _pb;
-				final TextView    tv = _tv;
-				_activity.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						if(pb!=null)
-							pb.setVisibility(View.INVISIBLE);
-			        
-						if(tv!=null)
-							tv.setVisibility(View.INVISIBLE);
-					}
-				});
-			}
+
 			synchronized(this) {
 				_list++;
 			}
@@ -233,15 +200,7 @@ public class SearchThread extends Thread {
 			return list>=0 && list<_counts.length ? _counts[list] : -1;
 		}
 	}
-	
-	/* Get the total amount to expect. -1 if not (yet) known
-	public int getTotal() {
-		synchronized(this) {
-			return _totals;
-		}
-	}
-	*/
-	
+
 	/** Holds the read Thread by acquireing the 
 	 * associated semaphore.
 	 */
@@ -264,5 +223,35 @@ public class SearchThread extends Thread {
 			else
 				return new Current();
 		}
+	}
+
+	private void updateAdapter(int list) {
+
+		_listAdapters[list].sort(new Comparator<TvSeries>() {
+			@Override
+			public int compare(TvSeries o1, TvSeries o2) {
+				String n1 = o1.getName().toUpperCase();
+				String n2 = o2.getName().toUpperCase();
+				
+				for(String a : Environment.getArticles()) {
+					String a0 = a.toUpperCase()+" ";
+					if(n1.length() > a0.length() && n1.substring(0, a0.length()).equals(a0))  {
+						n1 = n1.substring(a0.length());
+						break;
+					}
+				}
+				
+				for(String a : Environment.getArticles()) {
+					String a0 = a.toUpperCase()+" ";
+					if(n2.length() > a0.length() && n2.substring(0, a0.length()).equals(a0))  {
+						n2 = n2.substring(a0.length());
+						break;
+					}
+				}
+				
+				return n1.compareTo(n2);
+			}
+		});
+		_listAdapters[list].notifyDataSetChanged();
 	}
 };

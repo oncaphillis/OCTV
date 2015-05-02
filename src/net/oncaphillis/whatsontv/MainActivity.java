@@ -201,8 +201,9 @@ public class MainActivity extends FragmentActivity {
 					};
 	        	}
 	        }
-
-	        refresh(false);
+	        
+	        if(savedInstanceState==null)
+	        	refresh(false);
 	        
 		} catch(Exception ex) {
 			Intent myIntent = new Intent(this, ErrorActivity.class);
@@ -237,7 +238,7 @@ public class MainActivity extends FragmentActivity {
 			}
 		}
 		
-		SearchThread = new SearchThread(this,Environment.ListAdapters,ThePager,null,null);
+		SearchThread = new SearchThread(this,Environment.ListAdapters,ThePager);
 	    final FragmentActivity a = this; 
 
 	    Thread.UncaughtExceptionHandler searchThreadExceptionHandler = new Thread.UncaughtExceptionHandler() {

@@ -96,7 +96,7 @@ public class MainFragment extends Fragment {
 				@Override
 
 				public void run() {
-					while(act!=null && f.getIdx() >= act.SearchThread.getCurrent().list &&  act.SearchThread!=null && act.SearchThread.isAlive()) {
+					while(act!=null && act.SearchThread!=null && f.getIdx() >= act.SearchThread.getCurrent().list &&  act.SearchThread!=null && act.SearchThread.isAlive()) {
 						act.runOnUiThread(new Runnable(){
 							@Override
 							public void run() {
@@ -123,7 +123,7 @@ public class MainFragment extends Fragment {
 					act.runOnUiThread(new Runnable(){
 						@Override
 						public void run() {
-							if(act.SearchThread.getCount(f.getIdx()) == 0)
+							if(act.SearchThread!=null && act.SearchThread.getCount(f.getIdx()) == 0)
 								ll.setVisibility(View.VISIBLE);
 							_theView.requestFocusFromTouch();
 							if(npos!=-1)
@@ -145,8 +145,10 @@ public class MainFragment extends Fragment {
 	
 	@Override
 	public void onSaveInstanceState(Bundle outState) { 
-		if(_mainGridView!=null)
+		if(_mainGridView!=null) {
 			outState.putInt("top", _mainGridView.getFirstVisiblePosition());
+			int n = _mainGridView.getFirstVisiblePosition();
+		}
 		super.onSaveInstanceState(outState);
 	}
 	

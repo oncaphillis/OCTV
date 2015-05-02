@@ -208,7 +208,7 @@ public class SearchActivity extends Activity {
 			void reset() {
 				
 			}
-		},null,null);
+		});
 		
 		_searchThread.start();
 		_progressObserver.add(_searchThread);
