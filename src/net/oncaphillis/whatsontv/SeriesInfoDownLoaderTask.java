@@ -64,7 +64,7 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 			refresh(_activity,nn,_timeText.get(),_clockText.get(),_timeStateText.get(),_networkText.get(),_lastEpisodeText.get(),false);
 			Date now = TimeTool.getNow();
 			
-			if( !si.getNearestAiring().before(now) && !si.hasClock() ) {
+			if( si.getNearestAiring()!=null && !si.getNearestAiring().before(now) && !si.hasClock() ) {
 
 				final SeriesInfo _si    = si;
 				final Activity  _act    = _activity;
@@ -77,21 +77,16 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 					
 					@Override
 					public void run() {
-						
-						DateFormat df = _si.hasClock() && ! _slim ? Environment.TimeFormater : Environment.TmdbDateFormater;
-						
-						final String t1 = df.format(_si.getNearestAiring());
-						final String t2 = Environment.ClockFormat.format(_si.getNearestAiring());
-								
+												
 						_act.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								if( _tText != null && _tText.getTag() == _me) {
-									_tText.setText(Environment.isDebug() ? "@"+t1 : t1);
+									_tText.setText( (Environment.isDebug() ? "@" : "") + Environment.formatDate(_si.getNearestAiring(),_si.hasClock() && ! _slim));
 								}
 								if(_slim)
 									if(_si.hasClock()) {
-										_cText.setText(Environment.ClockFormat.format(_si.getNearestAiring()));					
+										_cText.setText(Environment.formatTime(_si.getNearestAiring()));					
 										_cText.setVisibility(View.VISIBLE);
 									} else {
 										_cText.setText("...");
@@ -116,14 +111,12 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 		
 		if(nn.date != null) {
 			
-			DateFormat df = nn.hasClock ? Environment.TimeFormater : Environment.TmdbDateFormater;
-			
 			Date now = TimeTool.getNow();
-			timeText.setText(df.format(nn.date) );					
+			timeText.setText(Environment.formatDate(nn.date,nn.hasClock && ! slim ) );					
 			
 			if(slim)
 				if(nn.hasClock ) {
-					clockText.setText(Environment.ClockFormat.format(nn.date));					
+					clockText.setText(Environment.formatTime(nn.date));					
 					clockText.setVisibility(View.VISIBLE);
 				} else {
 					clockText.setText("...");

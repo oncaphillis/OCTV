@@ -105,34 +105,54 @@
                             android:background="@android:drawable/dialog_holo_dark_frame"
                             android:orientation="vertical" >
 
-                            <LinearLayout
+                            <TableLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content" >
 
-                                <TextView
-                                    android:id="@+id/series_airing_state"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:padding="4dp"
-                                    android:text="@string/next"
-                                    android:textStyle="bold" />
-
-                                <TextView
-                                    android:id="@+id/series_date"
+                                <TableRow
+                                    android:id="@+id/tableRow1"
                                     android:layout_width="fill_parent"
-                                    android:layout_height="wrap_content"
-                                    android:maxLines="1"
-                                    android:textAppearance="?android:attr/textAppearanceMedium" />
-                            </LinearLayout>
+                                    android:layout_height="wrap_content" >
 
-                            <TextView
-                                android:id="@+id/series_airing_clock"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Medium Text"
-                                android:textAppearance="?android:attr/textAppearanceMedium"
-                                android:textColor="@color/oncaphillis_orange" />
+                                    <TextView
+                                        android:id="@+id/series_airing_state"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:padding="4dp"
+                                        android:text="@string/next"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/series_date"
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="wrap_content"
+                                        android:maxLines="1"
+                                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                                </TableRow>
+
+                                <TableRow
+                                    android:id="@+id/series_nearest_episode_clock_row"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content" >
+
+                                    <TextView
+                                        android:id="@+id/textView1"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                                    <TextView
+                                        android:id="@+id/series_airing_clock"
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Medium Text"
+                                        android:textAppearance="?android:attr/textAppearanceMedium"
+                                        android:textColor="@color/oncaphillis_orange" />
+
+                                </TableRow>
+                            </TableLayout>
 
                             <TextView
                                 android:id="@+id/series_last_episode"

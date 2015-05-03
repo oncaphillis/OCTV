@@ -107,7 +107,7 @@ public class AboutActivity extends Activity {
 				getBitmapHtml(R.drawable.ic_launcher,new Integer(128),null),
 				Environment.NAME,
 				Environment.VERSION,
-				Environment.TimeFormater.format(c.getTime()),
+				Environment.formatDate(c.getTime(),true),
 				Environment.COPYRIGHT,
 				Environment.NAME,
 				Environment.NAME,

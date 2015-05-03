@@ -53,7 +53,7 @@ public class Environment {
 	public static boolean isDebug() {
 		return VERSION.substring(0,3).equals("pre");
 	} 
-
+	
 	static DateFormat TmdbDateFormater = new SimpleDateFormat("yyyy-MM-dd") {
 		DateFormat _outFormat = new SimpleDateFormat("EEE, dd.MM.yyyy"); 
 		{
@@ -90,13 +90,21 @@ public class Environment {
 		}
 	};
 
-	static DateFormat TimeFormater   = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm") {
-		{
-			this.setTimeZone(TimeZone.getDefault());
-		}
-	};
+	static String formatDate(Date d,boolean withTime) {
+		DateFormat df = new SimpleDateFormat("EEE,");
+		return df.format(d)+DayDateFormat.format(d)+(withTime ? " "+formatTime(d) : "");
+	}
+
+	public static CharSequence formatDate(Date d) {
+		return formatDate(d,false);
+	}
+
+	static String formatTime(Date d) {
+		return ClockFormat.format(d);
+	}
 	
-	static DateFormat ClockFormat = null;
+	private static DateFormat ClockFormat = null;
+	private static DateFormat DayDateFormat = null;
 	
 	public static int getColumns(Activity activity) {
         
@@ -128,8 +136,8 @@ public class Environment {
 			NAME = a.getResources().getString(R.string.app_name);
 			BUILD_DATE = a.getPackageManager().getPackageInfo(a.getPackageName(),0).lastUpdateTime;
 			
-			ClockFormat = android.text.format.DateFormat.getTimeFormat(a);
-			
+			ClockFormat   = android.text.format.DateFormat.getTimeFormat(a);
+			DayDateFormat = android.text.format.DateFormat.getLongDateFormat(a);
 		} catch (NameNotFoundException e) {
 		}
 		
@@ -182,10 +190,12 @@ public class Environment {
 	}
 
 	public static boolean isSlim(Activity activity) {
-		return getColWidth(activity) < 2.0;
+		return true;
+		//return getColWidth(activity) < 2.0;
 	}
 
 	public static String[] getArticles() {
 		return _articles;
 	}
+
 }

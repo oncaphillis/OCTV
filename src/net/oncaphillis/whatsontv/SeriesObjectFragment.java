@@ -265,7 +265,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 								Date first_aired = series_info.getFirstAiring();
 					        	
 								if(first_aired != null)
-					        		tv_first_aired.setText(Environment.TmdbDateFormater.format( first_aired ));
+					        		tv_first_aired.setText(Environment.formatDate( first_aired ));
 								else
 					        		tv_first_aired.setText("...");
 										
@@ -366,8 +366,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 							        					@Override
 														public void run() {
 						        							SeriesInfo si = SeriesInfo.fromSeries(tvs);
-						        							DateFormat df = si.hasClock() ? Environment.TimeFormater : Environment.TimeFormater;
-						        							final String s = df.format(si.getNearestAiring());
+						        							final String s = Environment.formatDate(si.getNearestAiring(),si.hasClock());
 						        							if(getActivity()!=null && view.get() != null && view.get().getTag() == _me) {
 						        								getActivity().runOnUiThread(new Runnable() {
 						        									@Override
@@ -382,8 +381,8 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 							        				Tmdb.get().trakt_reader().register(r);
 							        			}
 							        		}
-							        		DateFormat df = series_info.hasClock() ? Environment.TimeFormater : Environment.TmdbDateFormater;
-							        		tv_last_aired.setText(df.format(nearest));
+
+							        		tv_last_aired.setText(Environment.formatDate(nearest,series_info.hasClock()));
 										} else {
 											tv_last_aired.setText("...");
 										}

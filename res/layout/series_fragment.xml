@@ -183,7 +183,7 @@
                                 android:layout_height="wrap_content" >
 
                                 <TableRow
-                                    android:id="@+id/tableRow2"
+                                    android:id="@+id/series_nearest_episode_clock_row"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content" >
 

@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
@@ -78,21 +79,19 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	TextView   tt_network = (TextView)     the_view.findViewById(R.id.series_network);
 	    	TextView   tt_date   = (TextView)     the_view.findViewById(R.id.series_date);
 	    	TextView   tv_clock = (TextView)  the_view.findViewById(R.id.series_airing_clock);
+	    	TableRow   tr_clock = (TableRow) the_view.findViewById(R.id.series_nearest_episode_clock_row);
 	    	
 	    	TextView   tt_episode = (TextView)     the_view.findViewById(R.id.series_last_episode);
 	    	TextView   tt_date_state = (TextView)     the_view.findViewById(R.id.series_airing_state);
 	    	
-	    	TextView   tt5 = (TextView)     the_view.findViewById(slim ? R.id.series_list_entry_rating_slim : R.id.series_list_entry_rating_wide);
-	    	TextView   tth = (TextView)     the_view.findViewById(slim ? R.id.series_list_entry_rating_wide : R.id.series_list_entry_rating_slim);
+	    	TextView   tt_rating = (TextView)     the_view.findViewById(slim ? R.id.series_list_entry_rating_slim : R.id.series_list_entry_rating_wide);
+	    	TextView   tt_hide_rating= (TextView)  the_view.findViewById(slim ? R.id.series_list_entry_rating_wide : R.id.series_list_entry_rating_slim);
 	    	
-	    	tt5.setBackgroundColor(_activity.getResources().getColor(R.color.oncaphillis_light_grey));
-	    	tt5.setText("-/-");
 	    	
-	    	if(!slim) {
-	    		tv_clock.setVisibility(View.GONE);
-	    	}
-	    	
-	    	tth.setVisibility(View.GONE);
+	    	tt_rating.setBackgroundColor(_activity.getResources().getColor(R.color.oncaphillis_light_grey));
+	    	tt_rating.setText("-/-");
+
+	    	tt_hide_rating.setVisibility(View.GONE);
 	    	
 	    	ImageView       ii = (ImageView)    the_view.findViewById(R.id.series_list_image);
 	    	ProgressBar     pb = (ProgressBar)  the_view.findViewById(R.id.series_wait_bar);
@@ -126,11 +125,11 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	}
 	    	
 	    	if(the_series.getVoteCount()==0) {
-	    		tt5.setTextColor(_activity.getResources().getColor(R.color.oncaphillis_light_grey));
-	    		tt5.setText("-/-");
+	    		tt_rating.setTextColor(_activity.getResources().getColor(R.color.oncaphillis_light_grey));
+	    		tt_rating.setText("-/-");
 	    	} else {
-	    		tt5.setTextColor(_activity.getResources().getColor(R.color.oncaphillis_orange));
-	    		tt5.setText(String.format("%2.1f/%d", the_series.getVoteAverage(),10));
+	    		tt_rating.setTextColor(_activity.getResources().getColor(R.color.oncaphillis_orange));
+	    		tt_rating.setText(String.format("%2.1f/%d", the_series.getVoteAverage(),10));
 	    	}
 	    	
 	    	tt_series_title.setText( the_series.getName() + 
@@ -153,9 +152,16 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 	    	
 	    	SeriesInfo.NearestNode nn = SeriesInfoDownLoaderTask.getNearest(the_series.getId());
 	    	if(nn!=null ) {
+		    	if(slim && nn.hasClock) {
+			    	tr_clock.setVisibility(View.VISIBLE);
+			    	tr_clock.setVisibility(View.VISIBLE);
+		    	} else {
+			    	tr_clock.setVisibility(View.GONE);
+		    	}
 	    		SeriesInfoDownLoaderTask.refresh(_activity, nn, 
 	    				tt_date, tv_clock, tt_date_state, tt_network, tt_episode, true);
 	    	} else {
+		    	tr_clock.setVisibility(View.GONE);
 		    	tt_network.setText("...");
 		    	tt_date.setText("...");
 		    	tv_clock.setText("...");

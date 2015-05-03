@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 public class EpisodeObjectFragment extends EntityInfoFragment {
@@ -69,11 +70,13 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 		int season  = args.getInt("season");
 		int episode = args.getInt("episode");
 		
-		return episode != 0 ? createEpisodeView(inflater,container,series,season,episode) : 
-			createSeasonView(inflater,container,series,season);
+		boolean slim = Environment.isSlim(this.getActivity());
+		
+		return episode != 0 ? createEpisodeView(inflater,container,series,season,episode,slim) : 
+			createSeasonView(inflater,container,series,season,slim);
 	}
 	
-	private View createSeasonView(LayoutInflater inflater, ViewGroup container, final int series,final int season) {
+	private View createSeasonView(LayoutInflater inflater, ViewGroup container, final int series,final int season,boolean slim) {
 		View theView    = inflater.inflate(R.layout.season_fragment, container, false);
 
 		final Fragment fragment = this;
@@ -83,7 +86,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 		final TextView episodes_txt = (TextView)theView.findViewById(R.id.season_fragment_episodes);
 		final TextView name_txt = (TextView)theView.findViewById(R.id.season_fragment_name);
 		final TableLayout info_table = (TableLayout)theView.findViewById(R.id.season_fragment_info_table);
-		
+
 		
 		Thread t = new Thread(new Runnable() {
 			Activity act = fragment.getActivity(); 
@@ -99,7 +102,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 					public void run() {
 						
 						if(d!=null)
-							first_txt.setText(Environment.TmdbDateFormater.format(d));
+							first_txt.setText(Environment.formatDate(d,false));
 						else
 							first_txt.setText("...");
 							
@@ -169,10 +172,10 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 		return theView;
 	}
 	
-	private View createEpisodeView(LayoutInflater inflater, ViewGroup container, final int series,final int season,final int episode) {
+	private View createEpisodeView(LayoutInflater inflater, ViewGroup container, final int series,final int season,final int episode,final boolean slim) {
 		
 		View theView    = inflater.inflate(R.layout.episode_fragment, container, false);
-		
+	
 		final WebView  overview_webview    = ((WebView)   theView.findViewById(R.id.episode_fragment_overview));
 		final ImageView episode_still      = ((ImageView) theView.findViewById(R.id.episode_stillpath));
 		
@@ -183,7 +186,9 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
         final TextView tv_date_tag         = ((TextView) theView.findViewById(R.id.episode_fragment_nearest_tag));
         final TextView tv_date             = ((TextView) theView.findViewById(R.id.episode_fragment_last_aired));
         final TableLayout info_table       = (TableLayout) theView.findViewById(R.id.episode_fragment_info_table);
-        
+		final TextView tv_clock            = (TextView)theView.findViewById(R.id.episode_fragment_clock);
+		final TableRow tr_clock            = (TableRow)theView.findViewById(R.id.episode_fragment_clock_row);
+		
         final String aires = getActivity().getResources().getString(R.string.aires);
         final String aired = getActivity().getResources().getString(R.string.aired);
 		final Fragment fragment = this;
@@ -218,7 +223,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 									@Override
 									public void run() {
 										if(date!=null) {
-											tv_date.setText(Environment.TimeFormater.format(date));
+											tv_date.setText(Environment.formatDate(date,false));
 											if(! today.before(date)) {
 												tv_date_tag.setText(aired);
 												tv_date.setTextColor(o_white);
@@ -256,12 +261,12 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 			        if(getActivity()!=null) {
 			        	final Date _date = date;
 						final Activity act = getActivity();
+						boolean _slim = slim;
 			        	getActivity().runOnUiThread(new Runnable() {
 
 							float  _voteAverage = tve.getTmdb().getVoteAverage();
 							int    _voteCount = tve.getTmdb().getVoteCount();
 							String overview = tve.getTmdb().getOverview();
-							
 							boolean withTime = tve.getAirTime()==null ? false : true;
 							
 							@Override
@@ -300,13 +305,23 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 								
 								if(fragment.getActivity()!=null)  {
 									if(_date!=null) {
-										tv_date.setText(withTime ? Environment.TimeFormater.format(_date) :  Environment.TmdbDateFormater.format(_date));
+										tv_date.setText(Environment.formatDate(_date,withTime && ! slim));
+										
+										if( slim && withTime) {
+											tv_clock.setText(Environment.formatTime(_date));
+											tr_clock.setVisibility(View.VISIBLE);
+										} else {
+											tr_clock.setVisibility(View.GONE);
+										}
+										
 										if(!today.before(_date)) {
 											tv_date_tag.setText(aired);
 											tv_date.setTextColor(fragment.getActivity().getResources().getColor(R.color.oncaphillis_white));
+											tv_clock.setTextColor(fragment.getActivity().getResources().getColor(R.color.oncaphillis_white));
 										} else {
 											tv_date_tag.setText(aires);
 											tv_date.setTextColor(fragment.getActivity().getResources().getColor(R.color.oncaphillis_orange));
+											tv_clock.setTextColor(fragment.getActivity().getResources().getColor(R.color.oncaphillis_orange));
 										}
 									} else {
 										tv_date.setText("...");
