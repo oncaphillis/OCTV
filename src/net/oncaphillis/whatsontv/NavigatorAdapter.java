@@ -64,9 +64,9 @@ public class NavigatorAdapter extends BaseExpandableListAdapter {
 					{},
 					{},
 					{	_Context.getResources().getString(R.string.today),
-						_Context.getResources().getString(R.string.on_the_air),
-						_Context.getResources().getString(R.string.hi_voted),
-						_Context.getResources().getString(R.string.popular)
+						_Context.getResources().getString(R.string.on_the_air)
+						/*,_Context.getResources().getString(R.string.hi_voted),
+						_Context.getResources().getString(R.string.popular)*/
 					},
 					{},
 					{}

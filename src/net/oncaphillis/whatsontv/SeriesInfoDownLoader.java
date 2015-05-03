@@ -11,13 +11,9 @@ import android.os.AsyncTask;
 import android.view.View;
 import android.widget.TextView;
 
-public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo> {
-	private WeakReference<TextView> _networkText;
-	private WeakReference<TextView> _timeText;
-	private WeakReference<TextView> _lastEpisodeText;
-	private WeakReference<TextView> _timeStateText;
-	private WeakReference<TextView> _clockText;
-	private Activity _activity;
+public class SeriesInfoDownLoader extends AsyncTask<String, Void, SeriesInfo> {
+
+	private WeakReference<View> _view;
 
 	private static TtlCache<Integer,SeriesInfo.NearestNode> _nearestCache = new TtlCache<Integer,SeriesInfo.NearestNode>(Environment.TTL,500);
 	
@@ -33,22 +29,17 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 		}
 	}
 	
-	public SeriesInfoDownLoaderTask(TextView networkText, TextView timeText,TextView clockTime,TextView lastEpisodeText, TextView timeState,Activity activity) {
-		_networkText = new WeakReference(networkText);
-		_timeText    = new WeakReference(timeText);
-		_clockText = new WeakReference(clockTime);
-		_lastEpisodeText = new WeakReference(lastEpisodeText);
-		_timeStateText   = new WeakReference(timeState);
-		_activity = activity;
-		SeriesInfo si;
+	public SeriesInfoDownLoader(int id,View v) {
+		_view = new WeakReference<View>(v);
+		v.setTag(new Integer(id));
 	}
 
 	@Override
 	protected SeriesInfo doInBackground(String... params) {
-		
+
 		SeriesInfo si = null;
-		if(_networkText != null && _networkText.get() != null && _networkText.get().getTag()!=null && _networkText.get().getTag() instanceof Integer) {
-			TvSeries s = Tmdb.get().loadSeries((Integer)_networkText.get().getTag());
+		if(_view != null && _view.get() != null && _view.get().getTag() != null && _view.get().getTag() instanceof Integer) {
+			TvSeries s = Tmdb.get().loadSeries((Integer)_view.get().getTag());
 			si = SeriesInfo.fromSeries(s);
 		}
 		return si;
@@ -59,25 +50,19 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 		
 		// dates reported by Tmdb are in EST. We need this to compare
 		// the last aired
-		if(si!=null && _timeText != null && _timeText.get() != null && _clockText.get()!=null && _timeText.get().getTag()!=null && _timeText.get().getTag() instanceof Integer) {
+		if(si!=null && _view!=null && _view.get()!=null && _view.get().getTag() != null 
+				&& _view.get().getTag() instanceof Integer && ((Integer)_view.get().getTag()).equals(si.getId())) {
 			SeriesInfo.NearestNode nn = si.getNearestNode();
-			refresh(_activity,nn,_timeText.get(),_clockText.get(),_timeStateText.get(),_networkText.get(),_lastEpisodeText.get(),false);
+			TvSeriesListAdapter.refresh(_view.get(),nn,true);
 			Date now = TimeTool.getNow();
 			
 			if( si.getNearestAiring()!=null && !si.getNearestAiring().before(now) && !si.hasClock() ) {
-
-				final SeriesInfo _si    = si;
-				final Activity  _act    = _activity;
-				final TextView  _tText  = _timeText.get();
-				final TextView  _cText  = _clockText.get(); 
-				final boolean   _slim   = Environment.isSlim(_act);
-				
+				/*final SeriesInfo _si    = si;
 				Runnable r = new Runnable() {
 					final Runnable   _me = this;
 					
 					@Override
 					public void run() {
-												
 						_act.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
@@ -98,49 +83,10 @@ public class SeriesInfoDownLoaderTask extends AsyncTask<String, Void, SeriesInfo
 				};
 				_timeText.get().setTag(r);
 				Tmdb.get().trakt_reader().register(r);
+				*/
 			} else {
 				putNearest(si.getId(),nn);
 			}
-		}
-	}
-
-	static public void refresh(Activity act,SeriesInfo.NearestNode nn, TextView timeText, TextView clockText,TextView timeStateText,
-			TextView networkText, TextView lastEpisodeText, boolean std) {
-		
-		boolean slim = Environment.isSlim(act);
-		
-		if(nn.date != null) {
-			
-			Date now = TimeTool.getNow();
-			timeText.setText(Environment.formatDate(nn.date,nn.hasClock && ! slim ) );					
-			
-			if(slim)
-				if(nn.hasClock ) {
-					clockText.setText(Environment.formatTime(nn.date));					
-					clockText.setVisibility(View.VISIBLE);
-				} else {
-					clockText.setText("...");
-					clockText.setVisibility(View.GONE);
-				}
-			
-			if(nn.date.before(now)) {
-				timeText.setTextColor(act.getResources().getColor(R.color.actionbar_text_color));
-				if(timeStateText!=null)
-					timeStateText.setText("last");
-			} else {
-				if(timeStateText !=null)
-					timeStateText.setText("next");
-				timeText.setTextColor(act.getResources().getColor(R.color.oncaphillis_orange));
-			}
-		}
-
-		if( networkText != null && networkText.getTag()!=null && networkText.getTag() instanceof Integer) {
-			 networkText.setText(nn.networks );
-		}
-
-		if( lastEpisodeText != null &&  lastEpisodeText.getTag()!=null && lastEpisodeText.getTag() instanceof Integer) {
-			String s = Integer.toString(nn.season )+"x"+Integer.toString(nn.episode);
-			lastEpisodeText.setText((std ? "@" : "" )+s+" "+nn.title);
 		}
 	}
 }

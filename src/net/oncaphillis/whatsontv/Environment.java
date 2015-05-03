@@ -144,10 +144,10 @@ public class Environment {
 		if(Titles==null) {
 			String today    = a.getResources().getString(R.string.today);
 			String on_air   = a.getResources().getString(R.string.on_the_air);
-			String hi_voted = a.getResources().getString(R.string.hi_voted);
-			String popular  = a.getResources().getString(R.string.popular);
+			//String hi_voted = a.getResources().getString(R.string.hi_voted);
+			//String popular  = a.getResources().getString(R.string.popular);
 			
-			Titles = new String[] {today,on_air,hi_voted,popular };
+			Titles = new String[] {today,on_air/*,hi_voted,popular*/ };
 		}
 		
 		if(CacheHelper == null) {

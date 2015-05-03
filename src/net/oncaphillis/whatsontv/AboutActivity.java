@@ -14,6 +14,7 @@ import android.util.Base64;
 import android.view.MenuItem;
 import android.view.Window;
 import android.webkit.WebView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
 public class AboutActivity extends Activity {
@@ -94,12 +95,12 @@ public class AboutActivity extends Activity {
 						   		" Hit:"+Long.toString(Tmdb.get().trakt_reader().getHitCount())+"<br>"+
 						   	" SeriesInfo: size: "+Long.toString(SeriesInfo.getCacheSize())+" hits:"+Long.toString(SeriesInfo.getCacheHits())+"<p/>"+
 						   	" SQL: SELECT:"+ Tmdb.getSqlSelectCount()+" INSERT:"+Long.toString(Tmdb.getSqlInsertCount())+" DELETE:"+Tmdb.getSqlDelete()+"<p/>"+
-						   	" Lists: #"+Integer.toString(Environment.ListAdapters[0].getCount())+
-						   		" #"+Integer.toString(Environment.ListAdapters[1].getCount())+
-						   		" #"+Integer.toString(Environment.ListAdapters[2].getCount())+
-						   		" #"+Integer.toString(Environment.ListAdapters[3].getCount())+
-						   	"</p>"+
-						   "</div>";
+						   	" Lists: ";
+				for( ArrayAdapter aa : Environment.ListAdapters ) {
+					debug += " #"+Integer.toString(aa.getCount());
+				}
+				debug+="</p>"+
+						"</div>";
 		}
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(Environment.BUILD_DATE);
