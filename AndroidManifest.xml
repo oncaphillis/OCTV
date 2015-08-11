@@ -32,11 +32,6 @@
                 android:value=".SearchActivity" />
         </activity>
         <activity
-            android:name=".SeriesActivity"
-            android:label="@string/title_activity_series"
-            android:theme="@style/OncaphillisTheme" >
-        </activity>
-        <activity
             android:name=".AboutActivity"
             android:label="@string/title_activity_about"
             android:theme="@style/OncaphillisTheme" >
