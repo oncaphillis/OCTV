@@ -1,9 +1,9 @@
 package net.oncaphillis.whatsontv;
 
+import java.util.List;
+
 import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.tv.TvSeries;
-
-import java.util.List;
 
 public abstract class Pager {
 	

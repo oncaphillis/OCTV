@@ -1,15 +1,12 @@
 package net.oncaphillis.whatsontv;
 
-import info.movito.themoviedbapi.model.tv.TvSeries;
-
-import java.lang.ref.WeakReference;
-import java.text.DateFormat;
-import java.util.Date;
-
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.view.View;
-import android.widget.TextView;
+
+import java.lang.ref.WeakReference;
+import java.util.Date;
+
+import info.movito.themoviedbapi.model.tv.TvSeries;
 
 public class SeriesInfoDownLoader extends AsyncTask<String, Void, SeriesInfo> {
 

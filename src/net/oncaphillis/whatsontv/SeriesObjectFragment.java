@@ -1,23 +1,5 @@
 package net.oncaphillis.whatsontv;
 
-import info.movito.themoviedbapi.model.Credits;
-import info.movito.themoviedbapi.model.Genre;
-import info.movito.themoviedbapi.model.people.Person;
-import info.movito.themoviedbapi.model.tv.Network;
-import info.movito.themoviedbapi.model.tv.TvEpisode;
-import info.movito.themoviedbapi.model.tv.TvSeries;
-
-import java.lang.ref.WeakReference;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.commons.lang3.StringEscapeUtils;
-
-import net.oncaphillis.whatsontv.R;
-import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -31,6 +13,23 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
+
+import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
+
+import org.apache.commons.lang3.StringEscapeUtils;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import info.movito.themoviedbapi.model.Credits;
+import info.movito.themoviedbapi.model.Genre;
+import info.movito.themoviedbapi.model.people.Person;
+import info.movito.themoviedbapi.model.tv.Network;
+import info.movito.themoviedbapi.model.tv.TvEpisode;
+import info.movito.themoviedbapi.model.tv.TvSeries;
 
 public class SeriesObjectFragment extends EntityInfoFragment {
     public static final String ARG_IX    = "ix";

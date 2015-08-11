@@ -1,12 +1,12 @@
 package net.oncaphillis.whatsontv;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Comparator;
 import java.util.PriorityQueue;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 /**
  * A cash for Bitmap objects we retrieve from the Web. It holds 

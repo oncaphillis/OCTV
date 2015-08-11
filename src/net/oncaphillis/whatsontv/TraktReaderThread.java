@@ -1,16 +1,16 @@
 package net.oncaphillis.whatsontv;
 
+import com.uwetrottmann.trakt.v2.entities.Episode;
+import com.uwetrottmann.trakt.v2.entities.SearchResult;
+import com.uwetrottmann.trakt.v2.enums.Extended;
+import com.uwetrottmann.trakt.v2.enums.IdType;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.Semaphore;
-
-import com.uwetrottmann.trakt.v2.entities.Episode;
-import com.uwetrottmann.trakt.v2.entities.SearchResult;
-import com.uwetrottmann.trakt.v2.enums.Extended;
-import com.uwetrottmann.trakt.v2.enums.IdType;
 
 /**
  * We use track.tv to pull the time value for a given episode

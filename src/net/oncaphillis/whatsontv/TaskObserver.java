@@ -1,9 +1,9 @@
 package net.oncaphillis.whatsontv;
 
+import android.os.AsyncTask;
+
 import java.util.Iterator;
 import java.util.WeakHashMap;
-
-import android.os.AsyncTask;
 
 abstract public class TaskObserver {
 	

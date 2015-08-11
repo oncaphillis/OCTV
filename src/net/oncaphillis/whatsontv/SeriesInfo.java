@@ -1,22 +1,19 @@
 package net.oncaphillis.whatsontv;
 
-import info.movito.themoviedbapi.model.tv.Network;
-import info.movito.themoviedbapi.model.tv.TvEpisode;
-import info.movito.themoviedbapi.model.tv.TvSeason;
-import info.movito.themoviedbapi.model.tv.TvSeries;
+import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
 
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.PriorityQueue;
 import java.util.TimeZone;
 
-import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
+import info.movito.themoviedbapi.model.tv.Network;
+import info.movito.themoviedbapi.model.tv.TvEpisode;
+import info.movito.themoviedbapi.model.tv.TvSeason;
+import info.movito.themoviedbapi.model.tv.TvSeries;
 
 public class SeriesInfo {
 	private TvSeries _tvs;

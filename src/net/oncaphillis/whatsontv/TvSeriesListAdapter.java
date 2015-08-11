@@ -1,13 +1,5 @@
 package net.oncaphillis.whatsontv;
 
-import info.movito.themoviedbapi.model.tv.TvSeries;
-
-import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import net.oncaphillis.whatsontv.R;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +15,13 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import info.movito.themoviedbapi.model.tv.TvSeries;
 
 class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 

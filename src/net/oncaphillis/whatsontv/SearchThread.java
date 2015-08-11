@@ -1,6 +1,7 @@
 package net.oncaphillis.whatsontv;
 
-import info.movito.themoviedbapi.model.tv.TvSeries;
+import android.app.Activity;
+import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -10,11 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
 
-import android.app.Activity;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import info.movito.themoviedbapi.model.tv.TvSeries;
 
 /**
  * Tread responsible for the download of TvSeries data (search or list)

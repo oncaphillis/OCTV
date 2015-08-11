@@ -1,18 +1,12 @@
 package net.oncaphillis.whatsontv;
 
-import java.util.ArrayList;
-
-import info.movito.themoviedbapi.model.tv.TvSeries;
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 
 public class NavigatorAdapter extends BaseExpandableListAdapter {

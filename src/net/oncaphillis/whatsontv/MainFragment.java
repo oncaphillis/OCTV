@@ -1,29 +1,18 @@
 package net.oncaphillis.whatsontv;
 
-import info.movito.themoviedbapi.model.tv.TvSeries;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
-import net.oncaphillis.whatsontv.SearchThread.Current;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.support.v4.app.Fragment;
+
+import net.oncaphillis.whatsontv.SearchThread.Current;
 
 public class MainFragment extends Fragment {
 	private Activity     _activity    = null;

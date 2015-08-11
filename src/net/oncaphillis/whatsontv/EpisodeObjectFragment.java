@@ -1,20 +1,7 @@
 package net.oncaphillis.whatsontv;
 
-import info.movito.themoviedbapi.model.people.Person;
-import info.movito.themoviedbapi.model.tv.TvSeason;
-import info.movito.themoviedbapi.model.tv.TvSeries;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
-
-import org.apache.commons.lang3.StringEscapeUtils;
-
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,6 +13,18 @@ import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import net.oncaphillis.whatsontv.Tmdb.EpisodeInfo;
+
+import org.apache.commons.lang3.StringEscapeUtils;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import info.movito.themoviedbapi.model.people.Person;
+import info.movito.themoviedbapi.model.tv.TvSeason;
+import info.movito.themoviedbapi.model.tv.TvSeries;
 
 public class EpisodeObjectFragment extends EntityInfoFragment {
 

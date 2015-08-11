@@ -1,6 +1,9 @@
 package net.oncaphillis.whatsontv;
 
-import info.movito.themoviedbapi.model.tv.TvSeries;
+import android.app.Activity;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.util.DisplayMetrics;
+import android.widget.ArrayAdapter;
 
 import java.text.DateFormat;
 import java.text.FieldPosition;
@@ -13,11 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.util.DisplayMetrics;
-import android.widget.ArrayAdapter;
+import info.movito.themoviedbapi.model.tv.TvSeries;
 
 public class Environment {
 	

@@ -1,11 +1,11 @@
 package net.oncaphillis.whatsontv;
 
-import java.io.ByteArrayOutputStream;
-
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
+
+import java.io.ByteArrayOutputStream;
 
 public class EntityInfoFragment extends Fragment {
 	

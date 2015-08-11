@@ -1,21 +1,18 @@
 package net.oncaphillis.whatsontv;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.util.Calendar;
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.util.Base64;
 import android.view.MenuItem;
-import android.view.Window;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.util.Calendar;
 
 public class AboutActivity extends Activity {
 

@@ -1,13 +1,13 @@
 package net.oncaphillis.whatsontv;
 
-import java.lang.ref.WeakReference;
-
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+
+import java.lang.ref.WeakReference;
 
 class BitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
 
