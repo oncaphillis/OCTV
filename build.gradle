@@ -1,0 +1,48 @@
+repositories {
+	jcenter()
+}
+buildscript {
+    repositories {
+        mavenCentral()
+	jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.1.1'
+    }
+}
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "net.oncaphillis.octv"
+        minSdkVersion 15
+        targetSdkVersion 19
+        versionCode 1
+        versionName "1.0"
+    }
+
+    packagingOptions {
+	exclude 'META-INF/LICENSE'
+	exclude 'META-INF/LICENSE.txt'
+	exclude 'META-INF/NOTICE'
+	exclude 'META-INF/NOTICE.txt'
+	exclude 'META-INF/DEPENDENCIES'
+    }
+
+    buildTypes {
+        release {
+            // runProguard false
+            // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+	compile 'com.android.support:appcompat-v7:19.0.1'
+	compile group: 'info.movito', name: 'themoviedbapi', version:'1.1'
+	compile 'com.uwetrottmann:trakt-java:4.3.1'
+}
