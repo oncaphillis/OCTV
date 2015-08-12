@@ -38,7 +38,7 @@ class BitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
     	if(_imageView!=null && _imageView.get()!=null &&
     			_imageView.get().getTag()!=null &&
     			_imageView.get().getTag().toString().equals(_path)) 
-    		return Tmdb.get().loadPoster(_size,_path,_act,_pb);      		 
+    		return Tmdb.loadPoster(_size,_path,_act,_pb);
     	return null;
     }
 

@@ -152,7 +152,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 				String gens = "";
 				
 				try {
-					series = Tmdb.get().loadSeries(seriesId);
+					series = Tmdb.loadSeries(seriesId);
 					if(Environment.isDebug())
 		        		networks = "#"+Integer.toString(seriesId)+((series.getPosterPath()==null) ? " \u2205" : "\u753b")+" ";
 					else
@@ -191,7 +191,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 						public void run() {
 							Credits c;
 							try {
-								c = Tmdb.get().api().getTvSeries().getCredits(series.getId(),null);
+								c = Tmdb.api().getTvSeries().getCredits(series.getId(),null);
 							} catch(Exception ex) {
 								return;
 							}
@@ -283,7 +283,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 								
 								@Override
 								protected Bitmap doInBackground(String...p) {
-									Bitmap bm = Tmdb.get().loadPoster(1,_path);
+									Bitmap bm = Tmdb.loadPoster(1,_path);
 									return bm;
 								}
 
@@ -377,7 +377,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 														}
 							        				};
 								        			tv_last_aired.setTag(r);
-							        				Tmdb.get().trakt_reader().register(r);
+							        				Tmdb.trakt_reader().register(r);
 							        			}
 							        		}
 

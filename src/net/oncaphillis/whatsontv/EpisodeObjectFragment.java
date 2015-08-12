@@ -92,7 +92,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 			@Override			
 			public void run() {
 				
-				final TvSeason tvs = Tmdb.get().loadSeason(series, season);
+				final TvSeason tvs = Tmdb.loadSeason(series, season);
 				final Date d = Tmdb.getAirDate(tvs);
 
 				act.runOnUiThread(new Runnable() {
@@ -129,7 +129,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 								
 								@Override
 								protected Bitmap doInBackground(String...p) {
-									Bitmap bm = Tmdb.get().loadPoster(1,path);
+									Bitmap bm = Tmdb.loadPoster(1,path);
 									return bm;
 								}
 
@@ -201,8 +201,8 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 			
 			@Override
 			public void run() {
-				final TvSeries tvs = Tmdb.get().loadSeries( series);
-				final EpisodeInfo tve = Tmdb.get().loadEpisode( series,  season,  episode);
+				final TvSeries tvs = Tmdb.loadSeries( series);
+				final EpisodeInfo tve = Tmdb.loadEpisode( series,  season,  episode);
 				final String ds;
 
 				if(tvs!= null && tve!=null) {
@@ -238,7 +238,7 @@ public class EpisodeObjectFragment extends EntityInfoFragment {
 					};
 					
 					tv_date.setTag(r0);
-					Tmdb.get().trakt_reader().register(r0);
+					Tmdb.trakt_reader().register(r0);
 					
 					Date date  = tve.getAirTime() == null ? tve.getAirDate() : tve.getAirTime();
 					Date today = TimeTool.getToday();

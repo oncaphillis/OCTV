@@ -64,8 +64,8 @@ public class LoginActivity extends Activity {
 					@Override
 					protected LoginPair doInBackground(String... params) {
 						try {
-							TokenSession s = Tmdb.get().api().getAuthentication().getSessionLogin(u, p);
-							Account ac = Tmdb.get().api().getAccount().getAccount(new SessionToken(s.getSessionId()));
+							TokenSession s = Tmdb.api().getAuthentication().getSessionLogin(u, p);
+							Account ac = Tmdb.api().getAccount().getAccount(new SessionToken(s.getSessionId()));
 							
 							return new LoginPair(ac.getUserName(),s.getSessionId());
 						} catch(Exception ex) {

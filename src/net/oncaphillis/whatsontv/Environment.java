@@ -128,8 +128,10 @@ public class Environment {
 	}
 
 
-	public static void init(Activity a) {
-		
+	public static void init(Activity a) throws Exception {
+
+		Tmdb.init();
+
 		try {
 			VERSION = a.getPackageManager().getPackageInfo(a.getPackageName(), 0).versionName;
 			NAME = a.getResources().getString(R.string.app_name);

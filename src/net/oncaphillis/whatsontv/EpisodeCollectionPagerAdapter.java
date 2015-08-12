@@ -37,7 +37,7 @@ public class EpisodeCollectionPagerAdapter extends FragmentStatePagerAdapter {
 
 			@Override
 			public void run() {
-				SeriesInfo si = SeriesInfo.fromSeries(Tmdb.get().loadSeries(_series));						
+				SeriesInfo si = SeriesInfo.fromSeries(Tmdb.loadSeries(_series));
 				 
 				final List<? extends SeriesInfo.SeasonNode> l = si.getSeasonsEpisodeList();
 				

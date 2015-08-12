@@ -113,7 +113,7 @@ public class SetupActivity extends Activity {
 		final Spinner spinner_c = (Spinner) findViewById(R.id.time_city_slect);
 				
 		final Activity  act = this; 
-		final TzCollection tc  = new TzCollection(Tmdb.get().getTimezones());
+		final TzCollection tc  = new TzCollection(Tmdb.getTimezones());
 		
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);

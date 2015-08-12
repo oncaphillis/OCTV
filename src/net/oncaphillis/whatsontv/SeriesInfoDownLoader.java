@@ -36,7 +36,7 @@ public class SeriesInfoDownLoader extends AsyncTask<String, Void, SeriesInfo> {
 
 		SeriesInfo si = null;
 		if(_view != null && _view.get() != null && _view.get().getTag() != null && _view.get().getTag() instanceof Integer) {
-			TvSeries s = Tmdb.get().loadSeries((Integer)_view.get().getTag());
+			TvSeries s = Tmdb.loadSeries((Integer)_view.get().getTag());
 			si = SeriesInfo.fromSeries(s);
 		}
 		return si;

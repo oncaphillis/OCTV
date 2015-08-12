@@ -94,7 +94,7 @@ class SeasonsInfoThread extends Thread {
  	public void run() {
 
  		if(_series==null) {
-			_series = Tmdb.get().loadSeries(_seriesN);
+			_series = Tmdb.loadSeries(_seriesN);
 		}
 		
 		if(_series==null)
@@ -236,7 +236,7 @@ class SeasonsInfoThread extends Thread {
 										protected TvSeason doInBackground(
 											TvSeason... params) {
 											if(params.length>0) {
-												TvSeason s =  Tmdb.get().loadSeason(_si, params[0].getSeasonNumber());
+												TvSeason s =  Tmdb.loadSeason(_si, params[0].getSeasonNumber());
 												return s;
 											}
 											else

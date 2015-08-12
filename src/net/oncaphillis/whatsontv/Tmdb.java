@@ -100,17 +100,17 @@ abstract class CacheMap<K,V> {
 };
 
 public class Tmdb {
-	private static Tmdb      _one     = null;
-	private static String    _key     = null;
-	private TmdbApi          _api     = null;
-	private TraktV2          _trakt   = null;
-	private BitmapCache       _hash    = null;
-	private List<Timezone> _timezones = null;
-	private TraktReaderThread _trakt_reader = new TraktReaderThread();
+	private static boolean   _once    = false;
+	private static TmdbApi   _api     = null;
+	private static TraktV2   _trakt   = null;
+	private static BitmapCache       _hash    = null;
+	private static List<Timezone> _timezones = null;
+	private static TraktReaderThread _trakt_reader = new TraktReaderThread();
 
-	private TtlCache<Integer,TvSeries> _seriesCache = 
+	private static TtlCache<Integer,TvSeries> _seriesCache =
 			new TtlCache<Integer,TvSeries>(Environment.TTL,100);
-	
+
+    static
 	class SeasonNode {
 		public int series;
 		public int season;
@@ -131,16 +131,25 @@ public class Tmdb {
 		}
 	}
 
+    static
 	private TtlCache<SeasonNode,TvSeason> _seasonCache = 
 			new TtlCache<SeasonNode,TvSeason>(Environment.TTL,100);
-
+    static
 	private long _sqlSelect = 0;
-	private long _sqlDelete = 0;
-	private long _sqlInsert = 0;
 
-	private int _seriesHit = 0;
-	private int _seasonHit = 0;
-	
+    static
+    private long _sqlDelete = 0;
+
+    static
+    private long _sqlInsert = 0;
+
+    static
+	private int  _seriesHit = 0;
+
+    static
+    private int  _seasonHit = 0;
+
+    static
 	public class EpisodeInfo {
 		private TvEpisode _tmdb_episode;
 		
@@ -159,7 +168,7 @@ public class Tmdb {
 		
 		private Episode getTrakt()  {
 			if(Environment.useTrakt()) {
-				return Tmdb.get().trakt_reader().get(getTmdb().getId());
+				return Tmdb.trakt_reader().get(getTmdb().getId());
 			}
 			return null;
 		}
@@ -201,6 +210,7 @@ public class Tmdb {
 		return null;
 	}
 
+    static
 	class EpisodeKey {
 		
 		EpisodeKey(int series, int season,int episode) {
@@ -225,12 +235,12 @@ public class Tmdb {
 		int episode;
 	};
 
-
+    static
 	private CacheMap<EpisodeKey,EpisodeInfo> _episodes = new CacheMap<EpisodeKey,EpisodeInfo>(5000) {
 		@Override
 		EpisodeInfo load(EpisodeKey key) {
 			try {
-				return new EpisodeInfo(api().getTvEpisodes().getEpisode(key.series,key.season,key.episode, 
+				return new EpisodeInfo(_api.getTvEpisodes().getEpisode(key.series,key.season,key.episode,
 						getLanguage(), EpisodeMethod.credits,EpisodeMethod.external_ids,EpisodeMethod.images));
 			} catch(Throwable ta) {
 			}
@@ -238,14 +248,11 @@ public class Tmdb {
 		}
 	};
 
-	
-	private Tmdb() {
-		_trakt_reader.start();
-	}
+	static
+    public
+	void init() throws Exception {
+        if(!_once) {
 
-	private TmdbApi getApi() {
-		if(_api == null || _api.getConfiguration() == null) {
-			
 			final Semaphore mutex = new Semaphore(0);
 
 			// This may trigger net access. Therefor we place it
@@ -271,27 +278,31 @@ public class Tmdb {
 			try {
 				mutex.acquire();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+                throw e;
 			}
+
+            if(_api == null || _timezones == null || _trakt == null)
+                throw new Exception("Failed to set up TmDb/Trakt");
+
+            _trakt_reader.start();
+
+            _once = true;
 		}
-		return _api;
 	}
 	
+	static
 	public Bitmap loadPoster(int size,String path,Activity act,ProgressBar pb) {
 		
 		if(_hash == null) {
 			_hash = new BitmapCache(act.getCacheDir());
 		}
-		
-		if(api()==null)
-			return null;
-		
-		if(size>=api().getConfiguration().getPosterSizes().size())
+
+		if(size>=_api.getConfiguration().getPosterSizes().size())
 			return null;
 		
 		Bitmap bm = null;
 		
-		synchronized(this) {
+		synchronized(_hash) {
 			
 			if(path!=null && (bm=_hash.get(size,path))==null) {
 				try {
@@ -335,7 +346,8 @@ public class Tmdb {
 		
 		return bm;
 	}
-	
+
+    static
 	public Bitmap loadPoster(int size,String path) {
 		return loadPoster(size,path,null,null);
 	}
@@ -359,9 +371,9 @@ public class Tmdb {
 
 		return o;
 	}
-	
+	static
 	public TvSeries loadSeries(int id) {
-		Integer key = new Integer(id);
+		Integer key = id;
 		
 		TvSeries tvs = _seriesCache.get(id);
 		
@@ -417,11 +429,12 @@ public class Tmdb {
 			return null;
 		}
 	}
-	
+
+	static
 	public TvSeason loadSeason(int series,int season) {
 		try {
-			Integer ser = new Integer(series);
-			Integer sea = new Integer(season);
+			Integer ser = series;
+			Integer sea = season;
 			
 			{
 				TvSeason tvs = _seasonCache.get(new SeasonNode(ser,sea));
@@ -462,8 +475,8 @@ public class Tmdb {
 				return ts;
 			}
 
-			TvSeason tvs = api().getTvSeasons().getSeason( series, season, getLanguage(),
-					SeasonMethod.external_ids, SeasonMethod.credits);
+			TvSeason tvs = api().getTvSeasons().getSeason(series, season, getLanguage(),
+                    SeasonMethod.external_ids, SeasonMethod.credits);
 
 			ContentValues cvo = new ContentValues();
 				 
@@ -484,50 +497,39 @@ public class Tmdb {
 		}
 	}
 
-	public EpisodeInfo loadEpisode(int series,int season,int episode) {
+	static
+    public EpisodeInfo loadEpisode(int series,int season,int episode) {
 		return _episodes.get(new EpisodeKey(series,season,episode));
 	}
-	
-	/** returns the TmdbApi object we are working with. Might be null
-	 * if we currently don't have a connection.
-	 *  
-	 * @return
-	 */
-	
-	static TmdbApi api() {
-		if(get()==null)
-			return null;
-		return get().getApi();
+
+
+	static
+    TmdbApi api() {
+		return _api;
 	}
-	
+
+    static
 	public TraktReaderThread trakt_reader() {
 		return _trakt_reader;
 	}
+
+    static
 	TraktV2 trakt() {
 		return _trakt;
 	}
-	
-	static Tmdb get() {
-		if( _one == null ) {
-			try {
-				_one=new Tmdb();
-			} catch(Throwable t) {
-				return null;
-			}
-		}
-		return _one;  
-	}
 
+    static
 	List<Timezone> getTimezones() {
 		return _timezones;
 	}
-		
-	public static CacheMap<?, ?> getEpisodeCache() {
-		return get()._episodes; 
+
+    static
+    public CacheMap<?, ?> getEpisodeCache() {
+		return _episodes;
 	}
 	
 	public static BitmapCache getBitmapCache() {
-		return get()._hash;
+		return _hash;
 	}
 	public static String getLanguage() {
 		return "en";
@@ -542,11 +544,11 @@ public class Tmdb {
 	}
 
 	public static TtlCache<Integer,TvSeries> getSeriesPreCache() {
-		return get()._seriesCache;
+		return _seriesCache;
 	}
 
 	public static TtlCache<SeasonNode,TvSeason> getSeasonPreCache() {
-		return get()._seasonCache;
+		return _seasonCache;
 	}
 	
 	public static long getSeriesCacheSize() {
@@ -562,30 +564,36 @@ public class Tmdb {
 		return 0;
 	}
 
-	public static long getSqlSelectCount() {
-		return get()._sqlSelect;
-	}
-	
-	public static long getSqlInsertCount() {
-		return get()._sqlInsert;
-	}
-	
-	public static long getSqlDelete() {
-		return get()._sqlDelete;
+    static
+	public long getSqlSelectCount() {
+		return _sqlSelect;
 	}
 
-	public static int getSeriesCacheHits() {
-		return get()._seriesHit;
+    static
+	public long getSqlInsertCount() {
+		return _sqlInsert;
 	}
 
-	public  Bitmap getCachedPoster(int size,String path) {
+    static
+	public long getSqlDelete() {
+		return _sqlDelete;
+	}
+
+    static
+	public int getSeriesCacheHits() {
+		return _seriesHit;
+	}
+
+	static
+    public  Bitmap getCachedPoster(int size,String path) {
 		if(_hash == null) {
 			return null;
 		}	
 		return _hash.get(size,path);
 	}
 
-	public static long getSeasonsCacheSize() {
+    static
+	public long getSeasonsCacheSize() {
 		Cursor c = Environment.CacheHelper.getReadableDatabase().query("SEASON",new String[] {
 			"COUNT(*)"},
 			null,null,null,null,null);
@@ -598,7 +606,8 @@ public class Tmdb {
 		return 0;
 	}
 
-	public static int getSeasonsCacheHits() {
-		return get()._seasonHit;
+    static
+	public int getSeasonsCacheHits() {
+		return _seasonHit;
 	}
 }

@@ -24,13 +24,12 @@ import java.util.concurrent.Semaphore;
  * Whenever all requested keys are downloaded we inform 
  * objects that they may want to update their data.
  * 
- * @author kloska
- *
+ * @author Sebastian Kloska
  */
 
 public class TraktReaderThread extends Thread {
 	private Semaphore _lock          = new Semaphore(0);
-	private Map<Integer,Episode> _map = new HashMap<Integer,Episode>(); 
+	private Map<Integer,Episode> _map = new HashMap<Integer,Episode>();
 	private LinkedList<Integer> _list = new LinkedList<Integer>();
 	private WeakHashMap<Runnable,Void> _listeners = new WeakHashMap<Runnable,Void>();
 	private String _e ;
@@ -54,7 +53,7 @@ public class TraktReaderThread extends Thread {
 				Episode eps = null;
 				List<SearchResult> l;
 
-				l = Tmdb.get().trakt().search().idLookup(IdType.TMDB,Integer.toString(n), 1, null);					
+				l = Tmdb.trakt().search().idLookup(IdType.TMDB,Integer.toString(n), 1, null);
 
 				synchronized(this) {
 					_lookupCount++;
@@ -65,7 +64,7 @@ public class TraktReaderThread extends Thread {
 					for(SearchResult r : l) {
 						if(r.type.equals("episode") ) {
 
-							eps = Tmdb.get().trakt().episodes().summary(Integer.toString(r.show.ids.trakt),r.episode.season, 
+							eps = Tmdb.trakt().episodes().summary(Integer.toString(r.show.ids.trakt),r.episode.season,
 									r.episode.number, Extended.FULL);
 
 							if(eps.first_aired!=null) {
