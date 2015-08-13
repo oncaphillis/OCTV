@@ -205,12 +205,14 @@ public class MainActivity extends FragmentActivity {
 			b.putString("txt1", ex.getMessage()+" "+ex.getCause());
 			myIntent.putExtras(b);
 			startActivity(myIntent);
+			this.finish();
 		} catch(Throwable ta) {
 			Intent myIntent = new Intent(this,ErrorActivity.class);
 			Bundle b = new Bundle();
 			b.putString("txt1", ta.getMessage()+" "+ta.getCause());
 			myIntent.putExtras(b);
 			startActivity(myIntent);
+			this.finish();
 		}
 	}
 
