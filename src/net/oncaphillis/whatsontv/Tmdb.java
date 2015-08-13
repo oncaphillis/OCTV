@@ -27,10 +27,16 @@ import java.util.Locale;
 import java.util.concurrent.Semaphore;
 
 import info.movito.themoviedbapi.TmdbApi;
+import info.movito.themoviedbapi.TmdbTV;
 import info.movito.themoviedbapi.TmdbTV.TvMethod;
 import info.movito.themoviedbapi.TmdbTvEpisodes.EpisodeMethod;
 import info.movito.themoviedbapi.TmdbTvSeasons.SeasonMethod;
+import info.movito.themoviedbapi.TvResultsPage;
+import info.movito.themoviedbapi.model.Credits;
+import info.movito.themoviedbapi.model.config.Account;
 import info.movito.themoviedbapi.model.config.Timezone;
+import info.movito.themoviedbapi.model.config.TokenSession;
+import info.movito.themoviedbapi.model.core.SessionToken;
 import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
 import info.movito.themoviedbapi.model.tv.TvSeries;
@@ -103,15 +109,63 @@ public class Tmdb {
 	private static boolean   _once    = false;
 	private static TmdbApi   _api     = null;
 	private static TraktV2   _trakt   = null;
-	private static BitmapCache       _hash    = null;
+	private static BitmapCache       _hash   = null;
 	private static List<Timezone> _timezones = null;
 	private static TraktReaderThread _trakt_reader = new TraktReaderThread();
 
 	private static TtlCache<Integer,TvSeries> _seriesCache =
 			new TtlCache<Integer,TvSeries>(Environment.TTL,100);
 
+    private static Account _account = null;
+
+    private static String _sessionId = null;
+
+    public static TvResultsPage searchTv(String query, String lang, int page) {
+		return _api.getSearch().searchTv(query, lang, page);
+	}
+
+    public static TvResultsPage getAiringToday(String language, int page, Timezone timezone) {
+        return _api.getTvSeries().getAiringToday(language, page, timezone);
+    }
+
+    public static TvResultsPage getOnTheAir(String language, int page) {
+        return _api.getTvSeries().getOnTheAir(language, page);
+    }
+
+
+    public static TvResultsPage getTopRated(String language, int page) {
+        return _api.getTvSeries().getTopRated(language, page);
+    }
+
+
+    public static TvResultsPage getPopular(String language, int page) {
+        return _api.getTvSeries().getPopular(language, page);
+    }
+
+
+    public static Credits getCredits(TvSeries series, String lang) {
+        return _api.getTvSeries().getCredits(series.getId(), lang);
+    }
+
+    public static boolean login(String u, String p) {
+        TokenSession s = _api.getAuthentication().getSessionLogin(u, p);
+        if(s != null && (_sessionId=s.getSessionId()) != null) {
+            _account = _api.getAccount().getAccount(new SessionToken(s.getSessionId()));
+            return true;
+        }
+        return false;
+    }
+
+    public static String getUserName() {
+        return _account == null ? null : _account.getUserName();
+    }
+
+    public static String getSessionId() {
+        return _sessionId;
+    }
+
     static
-	class SeasonNode {
+	private class SeasonNode {
 		public int series;
 		public int season;
 		SeasonNode(int ser,int sea) {
@@ -149,8 +203,7 @@ public class Tmdb {
     static
     private int  _seasonHit = 0;
 
-    static
-	public class EpisodeInfo {
+    public static class EpisodeInfo {
 		private TvEpisode _tmdb_episode;
 		
 		EpisodeInfo (TvEpisode tmdb)  {
@@ -160,6 +213,7 @@ public class Tmdb {
 		public TvEpisode getTmdb()  {
 			return _tmdb_episode;
 		}
+
 		/** 
 		 * Lazy loading of TraktT.TV Episode info.
 		 * 
@@ -211,7 +265,7 @@ public class Tmdb {
 	}
 
     static
-	class EpisodeKey {
+	private class EpisodeKey {
 		
 		EpisodeKey(int series, int season,int episode) {
 			this.series  = series;
@@ -249,8 +303,7 @@ public class Tmdb {
 	};
 
 	static
-    public
-	void init() throws Exception {
+    public void init() throws Exception {
         if(!_once) {
 
 			final Semaphore mutex = new Semaphore(0);
@@ -289,7 +342,7 @@ public class Tmdb {
             _once = true;
 		}
 	}
-	
+
 	static
 	public Bitmap loadPoster(int size,String path,Activity act,ProgressBar pb) {
 		
@@ -315,7 +368,7 @@ public class Tmdb {
 							}
 						});
 					}
-					URL url = new URL(api().getConfiguration().getBaseUrl() + api().getConfiguration().getPosterSizes().get(size) + path);
+					URL url = new URL(_api.getConfiguration().getBaseUrl() + _api.getConfiguration().getPosterSizes().get(size) + path);
 					InputStream is = url.openConnection().getInputStream();
 					bm = BitmapFactory.decodeStream(is);
 					if(bm != null) {
@@ -371,6 +424,7 @@ public class Tmdb {
 
 		return o;
 	}
+
 	static
 	public TvSeries loadSeries(int id) {
 		Integer key = id;
@@ -410,7 +464,7 @@ public class Tmdb {
 				return ts;
 			}
 			
-			TvSeries ts = api().getTvSeries().getSeries(key, getLanguage(), TvMethod.external_ids,TvMethod.images,TvMethod.credits);
+			TvSeries ts = _api.getTvSeries().getSeries(key, getLanguage(), TvMethod.external_ids,TvMethod.images,TvMethod.credits);
 
 			ContentValues cvo = new ContentValues();
 			 
@@ -475,7 +529,7 @@ public class Tmdb {
 				return ts;
 			}
 
-			TvSeason tvs = api().getTvSeasons().getSeason(series, season, getLanguage(),
+			TvSeason tvs = _api.getTvSeasons().getSeason(series, season, getLanguage(),
                     SeasonMethod.external_ids, SeasonMethod.credits);
 
 			ContentValues cvo = new ContentValues();
@@ -503,11 +557,11 @@ public class Tmdb {
 	}
 
 
-	static
+/*	static
     TmdbApi api() {
 		return _api;
 	}
-
+*/
     static
 	public TraktReaderThread trakt_reader() {
 		return _trakt_reader;

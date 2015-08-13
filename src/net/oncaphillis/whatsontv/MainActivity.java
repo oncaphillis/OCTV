@@ -177,16 +177,16 @@ public class MainActivity extends FragmentActivity {
 						public TvResultsPage request(int page) throws Exception {
 			        		switch(idx) {
 			        		case Environment.AIRING_TODAY:
-		        				return api() == null ? null : api().getTvSeries().getAiringToday(Tmdb.getLanguage(), page,Tmdb.getTimezone());
+		        				return Tmdb.getAiringToday(Tmdb.getLanguage(), page,Tmdb.getTimezone());
 
 			        		case Environment.ON_THE_AIR:
-			        			return api() == null ? null : api().getTvSeries().getOnTheAir(Tmdb.getLanguage(),page);
+			        			return Tmdb.getOnTheAir(Tmdb.getLanguage(),page);
 			        			
 			        		case Environment.HI_VOTED:	
-			        			return api() == null ? null : api().getTvSeries().getTopRated(Tmdb.getLanguage(),page);
+			        			return Tmdb.getTopRated(Tmdb.getLanguage(),page);
 
 			        		case Environment.POPULAR:	
-			        			return api() == null ? null : api().getTvSeries().getPopular(Tmdb.getLanguage(), page);
+			        			return Tmdb.getPopular(Tmdb.getLanguage(), page);
 
 			        		default:
 			        			return null;

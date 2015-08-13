@@ -60,7 +60,7 @@ class TvSeriesListAdapter extends ArrayAdapter<TvSeries> {
 		
 		final int pos = position;
 		
-	    if (the_series != null && (the_view.getTag() ==null || the_view.getTag() != the_series) && Tmdb.api()!=null) {
+	    if (the_series != null && (the_view.getTag() ==null || the_view.getTag() != the_series)) {
 	    	LinearLayout ll = (LinearLayout)the_view.findViewById(R.id.series_nearest_episode);
 	    	
 	    	ll.setOnClickListener(new OnClickListener() {

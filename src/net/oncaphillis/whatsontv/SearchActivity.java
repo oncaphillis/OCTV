@@ -180,7 +180,7 @@ public class SearchActivity extends Activity {
 			@Override
 			public List<TvSeries> getPage(int page) {
 				try {
-					TvResultsPage r = api().getSearch().searchTv(query, null, page);
+					TvResultsPage r = Tmdb.searchTv(query, null, page);
 					_Total = r.getTotalResults();
 					return r.getResults();
 				} catch(Throwable t) {

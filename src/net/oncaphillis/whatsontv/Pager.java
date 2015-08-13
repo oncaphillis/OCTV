@@ -9,9 +9,10 @@ public abstract class Pager {
 	
 	private String _language=null;
 	
-	protected TmdbApi api()  {
+/*	protected TmdbApi api()  {
 		return Tmdb.api();
 	}
+*/
 	abstract List<TvSeries> getPage(int page);
 	abstract void start();
 	abstract void end();

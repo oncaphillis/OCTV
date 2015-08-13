@@ -191,7 +191,7 @@ public class SeriesObjectFragment extends EntityInfoFragment {
 						public void run() {
 							Credits c;
 							try {
-								c = Tmdb.api().getTvSeries().getCredits(series.getId(),null);
+								c = Tmdb.getCredits(series,null);
 							} catch(Exception ex) {
 								return;
 							}
