@@ -130,7 +130,6 @@ public class Environment {
 
 	public static void init(Activity a) throws Exception {
 
-		Tmdb.init();
 
 		try {
 			VERSION = a.getPackageManager().getPackageInfo(a.getPackageName(), 0).versionName;
@@ -155,10 +154,7 @@ public class Environment {
 		if(CacheHelper == null) {
 	         CacheHelper = new SQLCacheHelper(a);
 			 long n = TimeTool.getNow().getTime() / 1000;
-			 CacheHelper.getWritableDatabase().execSQL("DELETE FROM SERIES WHERE ? - TIMESTAMP > ?",new Object[] {
-			 	new Long(n),
-			    new Long(TTL)
-			 });
+			 CacheHelper.getWritableDatabase().execSQL("DELETE FROM SERIES WHERE ? - TIMESTAMP > ?",new Object[] { n, TTL } ) ;
 		}
 		
 		if(ListAdapters==null)
@@ -169,6 +165,8 @@ public class Environment {
 		
 		if(MainList==null)
 			MainList = new List[Titles.length];
+
+        Tmdb.init();
 	}
 
 	public static Activity getCurrentActivity() {
