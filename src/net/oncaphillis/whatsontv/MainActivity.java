@@ -198,18 +198,13 @@ public class MainActivity extends FragmentActivity {
 	        
 	        if(savedInstanceState==null)
 	        	refresh(false);
-	        
-		} catch(Exception ex) {
-			Intent myIntent = new Intent(this, ErrorActivity.class);
-			Bundle b        = new Bundle();
-			b.putString("txt1", ex.getMessage()+" "+ex.getCause());
-			myIntent.putExtras(b);
-			startActivity(myIntent);
-			this.finish();
+
 		} catch(Throwable ta) {
 			Intent myIntent = new Intent(this,ErrorActivity.class);
 			Bundle b = new Bundle();
-			b.putString("txt1", ta.getMessage()+" "+ta.getCause());
+
+			b.putString("txt1", ta.getMessage());
+
 			myIntent.putExtras(b);
 			startActivity(myIntent);
 			this.finish();

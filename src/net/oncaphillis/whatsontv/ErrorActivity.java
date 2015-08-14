@@ -16,10 +16,9 @@ public class ErrorActivity extends Activity {
 		setContentView(R.layout.activity_error);
 		TextView tv1 = (TextView) findViewById(R.id.error_text1);
 		TextView tv2 = (TextView) findViewById(R.id.error_text2);
-		if(txt1!=null)
-			tv1.setText(txt1);
-		if(txt2!=null)
-			tv2.setText(txt2);
+
+		tv1.setText(txt1==null ? "" : txt1);
+		tv2.setText(txt2==null ? "" : txt2);
 		
 		Button but = (Button) findViewById(R.id.error_done_button);
 		but.setOnClickListener(new OnClickListener() {
