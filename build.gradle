@@ -34,10 +34,10 @@ android {
     }
     buildTypes {
         release {
-            apply from: 'oncaphillis-signing.gradle'
+            // apply from: 'oncaphillis-signing.gradle'
             // runProguard false
             // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.Oncaphillis
+            // signingConfig signingConfigs.Oncaphillis
         }
         debug {
             jniDebuggable false
