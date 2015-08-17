@@ -18,7 +18,7 @@ import java.util.concurrent.Semaphore;
  * However since trakt.tv appears to be slow and sometimes
  * unreliable we do a very laaazy load.
  * 
- * This Thread behaves like a container for trakt.tv episode
+ * This Thread behaves like a container for trakt.tv {@code Episode}
  * records. Whenever a record is missing we immediately return
  * null but place the key in a queue for later download.
  * Whenever all requested keys are downloaded we inform 
